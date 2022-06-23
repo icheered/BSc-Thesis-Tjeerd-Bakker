@@ -126,65 +126,70 @@ Both static and adaptive filters can be implemented as both FIR or IIR filters. 
 \textcolor{red}{(TODO: MATHEMATICAL DEFINITIONS OF FIR/IIR/ADAPTIVE)}
 
 \section{Pre-whitening}
+Back in 1948 a mathematician, electrical engineer, and cryptographer named C.E. Shannon published a pioneering paper that formed the basis of information theory \cite{shannon}. In this paper it is shown that repetition does not carry information, and that the maximum information transfer occurs when a signal is truly random. Imagine a signal with only a single frequency component. After measuring a few samples of the signal the conlusion is drawn that this is a 50Hz signal. Since it is possible to predict the value of every future measurement of the signal after drawing this conclusion it becomes unnecessary to continue measuring the signal because it will not give any new information. A repeating pattern is predictable, and predictable events carry no information.
 
-\textcolor{red}{Todo: This source was a revelation:
+The polar opposite of a signal containing a single frequency that is therefore predictable and carries little information is a signal that contains all frequencies an equal amount. This is called a white noise signal and carries the maximum amount of information because there exists no repetition and therefore every sample carries new, unpredictable information.
 
-https://www.youtube.com/watch?v=R4RpNG_Botk&ab_channel=DavidDorran}
+Between the existance of a signal containing a single frequency, and a signal containing all frequencys (white noise), all other signals exist and have certain frequencies that are more 'present' than other frequencies. These signals have different degrees of predictability (and thus information density), and the degree of predictability is determined by how closely the frequency content resembles white noise.
+
+Whitening is a filtering technique that tries to equalize the presence of frequency components in a signal to approximate white noise and thus increase information density. It reduces the random error and yields a larger dynamic range because the small frequency components that contribute to the 'randomness' of the signal but not so much to the value of the measurement sample become more present \cite{time_series_analysis_methods} (Chapter: 5.4.9. Zero-Padding and Prewhitening). The serial correlation of the signal is decreased by reducing the presence of 'predictable' signals, which increases the randomness and thus information density \cite{serial_correlation_definition}. 
+
+This previous information manifests itself in sEMG signal processing by the fact that the measured sEMG signal is not white. Some frequency components are much more present than others, but all frequencies equally contribute to the indication of muscle contraction. To get a more accurate indication of muscle contraction the signal should be whitened to increase the information of each sample.
+
+Whitening in real-time is achieved through a digital filter with a frequency response that when multiplied with the sEMG signal frequency spectrum yields a white noise spectrum.
+
+To summarize: Whitening reduces the power of repeating frequencies and increase the power of random frequencies in the signal. An example is given in figure \ref{fig:whitening_example}.
+
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[height=60mm]{images/prewhitening_example.jpg}
+	\end{center}
+	\caption{An example of whitening a signal. The indicated peak contains the 'random' signal of interest. By whitening the powerful lower frequencies it is possible to give the information-carrying peak more presence on the signal \cite{time_series_analysis_methods}}
+	\label{fig:whitening_example}
+\end{figure}
 
 
-The measured sEMG signal is not white. That is, not all frequencies are equally present in the signal. Certain frequencies present in the sEMG signal will have much more spectral power than other frequencies. However, these powerful frequencies may be not be proportionally correlated with the degree of muscle contraction. Other frequencies with less power in the spectral domain may carry more information as to the degree of contraction.
+\section{Envelope detection}
 
-\begin{quote}
-    "Prewhitening is a filtering or smoothing technique used to improve the statistical reliability of spectral estimates by reducing the leakage from the most intense spectral components and low-frequency components of the time series that are poorly resolved. To reduce the biasing of these components, the data are smoothed by a window whose spectrum is inversely proportional to the unknown spectrum being considered. 
-    
-    Prewhitening reduces leakage and increases the effectiveness of frequency averaging of the spectral estimate (reduces the random error). The reduced leakage gives rise to a greater dynamic range of the analysis and allows us to examine weak spectral components".
-    (\cite{time_series_analysis_methods_whitening}, Chapter: 5.4.9. Zero-Padding and Prewhitening)
-\end{quote}
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[height=60mm]{images/envelope_wikipedia.png}
+	\end{center}
+	\caption{Illustrating envelope detection of an analytical signal \cite{envelope_wikipedia}}
+	\label{fig:envelope_wikipedia}
+\end{figure}
 
-\textcolor{red}{(TODO: INSERT MATHEMATICAL DEFINITION)}
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[height=60mm]{images/amplitude_force_estimation_example.png}
+	\end{center}
+	\caption{On the left a time-domain sEMG signal. On the right an example of force estimation is presented. By taking the absolute value of the sEMG signal on the left, calculating the envelope, and recognizing that the force is a linearly scaled version of the envelope it is possible to estimate the force from the sEMG signal.}
+	\label{fig:amplitude_estimation_example}
+\end{figure}
 
-\section{Amplitude estimation}
-As mentioned earlier the amplitude of a measured sEMG signal scales linearly with how much a skeletal muscle is contracted. \textcolor{red}{(REFER TO FIGURE)} If we mirror the negative part of the sEMG signal onto the positive part (i.e. taking the absolute value), a line can be drawn from peak to peak to create a smooth curve that represents the contraction of a muscle. This is called an envelope.
+As mentioned earlier the amplitude of a measured sEMG signal scales approximately linear with how much a skeletal muscle is contracted \cite{adaptive_filter_dry_electrode}. If we mirror the negative part of the sEMG signal onto the positive part (i.e. taking the absolute value), a line can be drawn from peak to peak to create a smooth curve that represents the contraction of a muscle. This is called an envelope and an example can be found in figure \ref{fig:envelope_wikipedia}. Applying this concept to an sEMG signal can be found in figure \ref{fig:amplitude_estimation_example}
 
-Computationally envelope detection can be achieved in a number of different methods where "speed", or how much the detected envelope lags behind the true signal envelope, is traded against noise. \textcolor{red}{(https://www.dsprelated.com/showarticle/938.php) \url{https://www1.udel.edu/biology/rosewc/kaap686/notes/EMG%20analysis.pdf
-}}.
+Computationally envelope detection can be achieved in a number of different methods where "speed", or how much the detected envelope lags behind the true signal envelope, is traded against accuracy or noisiness \cite{dsp_good_bad_ugly}. A few different envelope detection techniques are discussed in \cite{rose2011electromyogram}.
 
-Most conventional envelope detection methods calculate the value of a sample based on samples before \textit{and after} the measured point. This is possible in non-real-time signal processing, but during real-time signal processing comes at the cost of a delayed output signal.
+\subsection{Finite Impulse Response filter}
+calculate_moving_average
 
-\textcolor{red}{< INSERT IMAGE OF DIFFERENT DETECTION TECHNIQUES >.}
+\subsection{Infinite Impulse Response filter}
+calculate_butterworth
 
-\textcolor{red}{(NICE PICTURE ON WIKIPEDIA:  $https://en.wikipedia.org/wiki/Envelope_detector$) }
+\subsection{Root Mean Square}
+calculate_rms
+Especially popular with EMG signal processing.
 
-Maybe compare behaviour in fast and slow muscle contractions?
 
-\textcolor{blue}{""""The Influence of the sEMG Amplitude Estimation Technique on
-the EMG–Force Relationship (paper)"""" <= This paper explains difference between static and adaptive amplitude estimation techniques
-""""As a general consideration, the slowly varying nature of the force-tracking experiments
-that have been analyzed here puts the slower filters in a clear advantage with respect to the shorter time windows; moreover, the nature of the quality parameter (i.e., the correlation) is intrinsically higher for time signals that come from very long time windows that are consequently very smooth. Even with this advantage, and even by estimating an envelope that is less smooth, MWADA is comparable to those optimal solutions; as a consequence of this result, it is reasonable to suppose that the behavior of the adaptive algorithm is more consistent across different scenarios, in which the amplitude of the sEMG signal is varying with faster dynamics""""}
-
-\subsection{Static}
-\textcolor{red}{(TODO: INCLUDE STATIC ENVELOPE DETECTION METHOD INFORMATION)}
-
-\textcolor{red}{TODO: insert this source, it includes a lot of info about envelope detection https://www1.udel.edu/biology/rosewc/kaap686/notes/EMG%20analysis.pdf
-}
-
-\textcolor{brown}{\begin{itemize}
-    \item Moving average
-    \item Low-pass filter
-    \item RMS
-\end{itemize}}
-
-\subsection{Adaptive}
-\textcolor{brown}{\begin{itemize}
-    \item higher bandwidth detection for 'faster' response
-\end{itemize}}
-
-\textcolor{red}{(TODO: INCLUDE ADAPTIVE ESTIMATION INFORMATION WITH SOURCES)}
-fig:sEMG_fft_signalnoise_example
+\section{Standard sEMG signal processing}
+A conventional static sEMG signal processing chain is described in \cite{muscle_force_estimation}. The relevant steps are as follows:
+\begin{itemize}
+    \item Highpass filter to remove DC
     \item Bandpass filter 20-300 hz
     \item Notch filter at 50hz
     \item Half-wave rectification
     \item Lowpass filter for envelope detection
 \end{itemize}
 
-These steps constitute one of the methods that will be tested in this report.
+This signal processing chain will also be tested in this report and compared to alternative techniques.
