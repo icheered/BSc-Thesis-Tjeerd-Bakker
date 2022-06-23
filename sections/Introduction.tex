@@ -40,57 +40,18 @@ Lastly I would like to mention that static and adaptive filters are only a subse
 \section{Research goal}
 Given the plethora of methods that are available at each step of the signal-processing chain of sEMG signals, it is difficult to determine which method works best in which scenario.
 
-This report aims to give an overview of pre-whitening, different filtering techniques to increase SNR and different envelope detection techniques.
+This report aims to give an overview of pre-whitening, different filtering techniques to increase SNR and different envelope detection techniques. In figure \ref{fig:global_thesis_flowchart} a high-level overview of the signal processing chain is presented. 
 
-From the previous section the following conclusions can be made: \textcolor{red}{(TODO: CITATIONS, PRE-WHITENING)}
-\begin{itemize}
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[height=60mm]{images/global_thesis_flowchart.png}
+	\end{center}
+	\caption{High-level overview of the signal processing chain}
+	\label{fig:global_thesis_flowchart}
+\end{figure}
 
-
-    \item Real-time adaptive filters can be used to filter noise that has a a frequency spectrum that (partly) overlaps with the signal spectrum
-    \item Adaptive filters can achieve better results in unknown or dynamic environments than static filters
-    \item Adaptive filters can achieve similar results with fewer filter coefficients resulting in more memory-efficient filters with lower computational complexity \textcolor{red}{(CAN I SAY THIS?)}
-    \item IIR filters allow for reaching similar results to FIR filters with fewer filter coefficients and thus lower computational complexity
-    \item It is possible to create adaptive FIR filter for real-time sEMG signal processing
-\end{itemize}
-
-To expand upon this research, this project aims to determine the effectiveness of different real-time methods for improving sEMG SNR and amplitude detection for force estimation.
-
-
-\begin{itemize}
-    \item The effect that pre-whitening has on SNR
-    \item Performance of the following filters
-    \begin{itemize}
-        \item Static FIR filter
-        \item Static IIR filter (?)
-        \item (Wiener filter?)
-        \item Adaptive FIR filter
-        \item Adaptive IIR filter (Hasn't been done before)
-    \end{itemize}
-    \item Performance of following amplitude estimation techniques
-    \begin{itemize}
-        \item Static filtering
-        \item Adaptive filtering
-        \item Other technique?
-    \end{itemize}
-\end{itemize}
-
-\textcolor{red}{TODO Decide on exact contents of list, add a flow diagram explaining how all methods are tested}
 
 \section{Approach}
-The approach for this project consists of two sections: Evaluate the effectiveness of different techniques to increase SNR, and evaluate different amplitude estimation techniques for force estimation.
+The approach for this project consists of two main steps: Evaluate filter performance on sEMG signals, and evaluate the influence of whitening and different envelope extraction techniques on the lag and error of an estimated force signal.
 
-To assess the performance of different filters, a signal sample containing only amplifier and environment noise, and a signal sample containing only (primarily) sEMG signal are acquired. The noise is added to the signal with different amplifications \textcolor{red}{(CHANGE WORDING!)} and subsequently filtered using different methods to evaluate the filter's performance at different input SNR levels.
-
-To compare the different amplitude estimation techniques a measurement is taken of the sEMG activity of a subject and the force the subject is applying onto a testing setup using a calibrated load-cell. By estimating the applied force from the sEMG signal using different amplitude estimation techniques and comparing the results to the measured force it is possible to draw conclusions about responsiveness and accuracy of the techniques used.
-
-
-
-\textcolor{brown}{
-Expected results:
-\begin{itemize}
-    \item Pre-whitening increases SNR across all filtering techniques
-    \item Wiener filtering works best on simulated signal but adaptive filter performs better on signal with changing amplitude or environment (due to its adaptibility)
-    \item It would be cool to get IIR adaptive filter working in time, but chances are slim I can get it stable before the deadline
-    \item Not sure what I expect for differen envelope detection techniques
-\end{itemize}
-}
+The filters are assessed by signal to noise ratio (SNR) and signal integrity. Different envelope estimation techniques are evaluated by their lag and error compared to a simulated modulation. The combination of whitening, different filtering techniques, and different envelope extraction techniques is also evaluated through a measurement setup consisting of a 20kg load cell and a multi-channel EMG sensor. This setup is subsequently used to estimate the force from the sEMG signals and compare it to the force measured using the load cell.
