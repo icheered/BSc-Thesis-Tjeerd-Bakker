@@ -1,0 +1,72 @@
+\chapter{Simulation}
+This portion of the report describes the effect that different methods have on increasing the SNR of the measured signal. Even though pre-whitening is a pre-processing step it is not expected to yield an increase SNR by itself, but rather to make the filtering more effective.
+
+For all filters hold that the measured signal and noise is first high-passed with a cutoff frequency of 0.1Hz to remove DC bias \textcolor{red}{(OR remove offset?)}
+
+\section{Method}
+
+\begin{equation}
+    \frac{\text{FFT}(sig \;\; after)}{\text{FFT}(sig \;\;  before)} - \frac{\text{FFT}(noise \;\;  after)}{\text{FFT}(noise \;\;  before)} = \frac{1}{1} - \frac{0}{1} = 1
+\end{equation}
+
+\textcolor{red}{Todo: Insert image of measurement setup, and example input signal with portions labeled as $noise/signal/reference_noise$}
+
+
+To reliably compare different filtering techniques it is required to use a reference signal that stays consistent across simulations. Acquiring the reference signal was done by using \textcolor{red}{(INSERT HARDWARE)} attached with two electrodes to the bicep to measure a period of maximum voluntary contraction (MVC) along with a period of 0\% MVC (zero muscle contraction). The period of 0\% MVC is used as a noise floor onto which the 100\% MVC is superimposed at different amplifications. Since the frequency spectrum of an sEMG signal stays consistent across different levels of contraction \textcolor{red}{(NEED SOURCE)} it is possible to assess each filter's performance at different SNR levels.
+
+\textcolor{red}{Insert measurement settings of Octopus}
+
+\begin{itemize}
+    \item Length of signal and noise
+    \item Plot of signal and noise
+\end{itemize}
+
+\textcolor{red}{Insert flowchart of different measurement combinations}
+
+\section{Pre-whitening}
+Explain in what way pre-whitening is calculated / applied.
+\section{Filters}
+\subsection{Static filter}
+
+\begin{itemize}
+    \item Length of static filter
+    \item Static filter type
+    \item IIR/FIR? 
+\end{itemize}
+
+Explain the static filter parameters. Use fvtool to plot filter behaviour of static filters.
+
+\subsection{Wiener filter}
+
+\textcolor{red}{TODO: Add this book (page 538-540), got it from Martijn: https://websites.pmc.ucsc.edu/~fnimmo/eart290c_17/NumericalRecipesinF77.pdf}
+
+
+
+Explain the calculation used for the Wiener filter
+Explain the steps used to calculate the coefficients for the wiener filter. Explain length of static filter. 
+\subsection{Adaptive}
+
+!! For adaptive filter use separate noise section than the sample signal uses otherwise it will have perfect SNR !!
+
+Show the adaptive filter error over time for different test signals, response time, frequency range.
+
+\section{Results and conclusion}
+
+Compare how well the static and adaptive filter work, for which frequency range it can be applied
+
+
+\chapter{Measurements}
+This chapter of the report is concerned with comparing different techniques of estimating the EMG amplitude.
+
+\section{Experimental setup}
+The actual measuring of force data. Mention that 600g was used in an initial experiment but it yielded odd data (list possible sources: muscle contraction was very little, lot of noise in room, shield maybe not working, LOFF not working, too many channels?), so a heavier load cell was used for more correct estimation.
+
+What did I measure, how did I measure it, where did I measure it. What did I record, what do I expect to see?
+
+Mention hardware used (adc, load cell,) and calibration tests done.
+\section{Measurement results}
+Data that was NOT working, data that WAS working, notable characteristics of the data
+
+
+\section{Conclusion}
+Draw numeric conclusion from data, in which situations is which filter how much better?
