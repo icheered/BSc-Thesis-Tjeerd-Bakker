@@ -41,10 +41,17 @@ So to summarize the basic concept of force estimation:
 	\label{fig:sEMG_fft_signalnoise_example}
 \end{figure}
 
-\textcolor{red}{< IMAGE OF ANATOMY OF MUSCLE >}
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[height=60mm]{images/muscle_anatomy.png}
+	\end{center}
+	\caption{Anatomy of a muscle \cite{muscle_anatomy}}
+	\label{fig:muscle_anatomy}
+\end{figure}
 
 
 \textcolor{red}{(TODO: ADD SOURCE!!!, ADD FIGURES, REFER TO FIGURES IN TEXT)}
+Figure \ref{fig:muscle_anatomy} illustrates the anatomy of a muscle which may be useful in this section.
 A large skeletal muscle such as the bicep consists of hundreds of thousands of small muscle fibers. These muscle fibers are divided into groups called motor units, and each motor unit is connected to a motor neuron which is a special type of very long brain cell that runs through the spinal cord. A contraction of a skeletal muscle is the result of many muscle fibers contracting individually and repeatedly. The contraction of these muscle fibers is the result of an action potential caused by the motor neuron, and this action potential is a measurable (but very small) voltage. When measuring the surface EMG of a contracting skeletal muscle the result is the aggregate of the small voltages from all contracting muscle fibers. This manifests itself into a signal resembling white noise where the amplitude of the noise correlates to the number of contracting muscle fibers and thus to the amount of contraction the skeletal muscle experiences. This is shown in \ref{fig:sEMG_signal_example} where a maximum voluntary contraction (MVC) is measured from a bicep.
 
 So to summarize: to determine the degree of contraction of a skeletal muscle we simply need to determine the amplitude of the noise at the surface of the muscle.
@@ -57,9 +64,7 @@ The ratio between how much of the measured signal is actual desired signal and h
 
 \section{Filters}
 % Introduce basic concept of filters
-At a fundamental level filters are simply a tool to remove something unwanted (noise) that is mixed with something wanted (signal). In signal processing filtering is achieved by decomposing a measured signal into repeating patterns and subsequently deciding which patterns should be included and which patterns should be removed. 
-
-\textcolor{red}{< Image of signal and FFT of signal >}
+At a fundamental level filters are simply a tool to remove something unwanted (noise) that is mixed with something wanted (signal). In signal processing filtering is achieved by decomposing a measured signal into repeating patterns and subsequently deciding which patterns should be included and which patterns should be removed. Figure \ref{fig:filter_example} displays how a time-domain signal can be represented in the frequency domain to display informationa bout which frequencies are present in the signal.
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -90,7 +95,8 @@ If a filter is static (e.g. high-pass, low-pass, band-pass, or band-stop) it sim
 \end{figure}
 
 A Wiener filter is a static filter that removes the frequency contents of noise from the frequency contents of a signal. In other words, the Wiener filter attenuates the frequencies that are present in noise so that when the filter is applied to a signal that is polluted by the same noise it effectively removes the noise. This is done by measuring two things: The signal that is corrupted by noise, and the noise separately. For example when measuring an sEMG signal an additional channel is used to measure the signal of a non-contracting muscle to gather only the present noise. \textcolor{red}{(SOURCE)}
-The Wiener filter requires both the signal and the noise to be stationary, i.e. the spectral density does not change over time, and results in a linear time-invariant filter. \textcolor{red}{((Wikipedia, stationary process), (https://askanydifference.com/difference-between-stationary-and-non-stationary-signals/))}
+The Wiener filter requires both the signal and the noise to be stationary, i.e. the spectral density does not change over time, and results in a linear time-invariant filter \cite{wiki:Stationary_process} \cite{difference_stationary_nonstationary}.  
+
 \textcolor{brown}{\begin{itemize}
     \item Wiener-Hopf Equation
     \item Mean Square Error definition
@@ -101,8 +107,7 @@ The Wiener filter requires both the signal and the noise to be stationary, i.e. 
 
 Adaptive filters expand on the idea of using knowledge of the spectral domain to create a filter by only using a subset of the input data (last $n$ samples). By re-calculating the filter coefficients with new data it is possible to update the filter to match a changing spectral density. 
 
-Adaptive filters are applied in the same way as static filters by just multiplying the filter with measurements. However, the  method of finding the filter coefficients is different. Instead of deciding beforehand what frequencies you want to have removed, you measure the noise and determine its frequency spectrum. Then you tune the filter coefficients to remove these frequencies from the measurements (which also includes noise) leaving only the desired signal. This filter is used in environments where the noise frequency spectrum is not known beforehand, or when the frequency behaviour of the noise may change over time. Common applications of adaptive filters include speech recognition and noise-cancelling headphones!
-\textcolor{red}{($https://www.researchgate.net/publication/330902230_Performance_of_Wiener_Filter_and_Adaptive_Filter_for_Noise_Cancellation_in_Real-Time_Environment$)}
+Adaptive filters are applied in the same way as static filters by just multiplying the filter with measurements. However, the  method of finding the filter coefficients is different. Instead of deciding beforehand what frequencies you want to have removed, you measure the noise and determine its frequency spectrum. Then you tune the filter coefficients to remove these frequencies from the measurements (which also includes noise) leaving only the desired signal. This filter is used in environments where the noise frequency spectrum is not known beforehand, or when the frequency behaviour of the noise may change over time. Common applications of adaptive filters include speech recognition and noise-cancelling headphones! \cite{wiener_vs_adaptive_realtime_noisecancellation}
 
 \textcolor{red}{(TODO: MATHEMATICAL DEFINITION OF FINDING COEFFICIENTS IN ADAPTIVE FILTERS) }
 
@@ -121,9 +126,16 @@ The previously discussed filters were all described as Finite Impulse Response (
 
 An Infinite Impulse Response filter calculates the output using two sets of filter coefficients. The first set of filter coefficients is used to multiply with the input just like a FIR filter, but the second set of filter coefficients is used to multiply with previous \textit{outputs}. This means that there is now a feedback loop in the system, and a system with feedback can become unstable. Unstable in this case means that there is a possibility of positive feedback loop where increasing output values result in future output values also increasing, eventually going to infinity. Even though this feedback and possible instability may sound like a downside, it also results in shorter filter length and thus fewer computations required per filter operation. This could especially provide beneficial in low memory and low compute power environments like in prostheses \cite{fir_vs_iir}.
 
-Both static and adaptive filters can be implemented as both FIR or IIR filters. An adaptive IIR filter offers the potential to meet desired performance levels with much less computational complexity. However, the possibility for the system to become unstable combined with the fact that filter coefficients are adjusted automatically leads to a high-risk high-reward scenario due to a loss of control and hard to predict behaviour.  \textcolor{red}{(Boek over adaptive IIR filters: http://dsp-book.narod.ru/DSPMW/23.PDF)}
+Both static and adaptive filters can be implemented as both FIR or IIR filters. An adaptive IIR filter offers the potential to meet desired performance levels with much less computational complexity. However, the possibility for the system to become unstable combined with the fact that filter coefficients are adjusted automatically leads to a high-risk high-reward scenario due to a loss of control and hard to predict behaviour. Background material on adaptive IIR materials can be found in chapter 23 of the Signal Processing Handbook \cite{digital_signal_processing_handbook}.
 
-\textcolor{red}{(TODO: MATHEMATICAL DEFINITIONS OF FIR/IIR/ADAPTIVE)}
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[height=60mm]{images/fir_vs_iir_diagram.jpg}
+	\end{center}
+	\caption{A diagram displaying the difference between Finite impulse response filters, only using previous input, and Infinite impulse response filters, using previous inputs and previous outputs resulting in a feedback loop \cite{fir_vs_iir_diagram}}
+	\label{fig:fir_vs_iir_diagram}
+\end{figure}
+
 
 \section{Pre-whitening}
 Back in 1948 a mathematician, electrical engineer, and cryptographer named C.E. Shannon published a pioneering paper that formed the basis of information theory \cite{shannon}. In this paper it is shown that repetition does not carry information, and that the maximum information transfer occurs when a signal is truly random. Imagine a signal with only a single frequency component. After measuring a few samples of the signal the conlusion is drawn that this is a 50Hz signal. Since it is possible to predict the value of every future measurement of the signal after drawing this conclusion it becomes unnecessary to continue measuring the signal because it will not give any new information. A repeating pattern is predictable, and predictable events carry no information.
