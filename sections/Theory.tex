@@ -130,7 +130,7 @@ Both static and adaptive filters can be implemented as both FIR or IIR filters. 
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[height=60mm]{images/fir_vs_iir_diagram.jpg}
+		\includegraphics[height=60mm]{images/fir_vs_iir_diagram.png}
 	\end{center}
 	\caption{A diagram displaying the difference between Finite impulse response filters, only using previous input, and Infinite impulse response filters, using previous inputs and previous outputs resulting in a feedback loop \cite{fir_vs_iir_diagram}}
 	\label{fig:fir_vs_iir_diagram}
@@ -179,23 +179,26 @@ To summarize: Whitening reduces the power of repeating frequencies and increase 
 	\label{fig:amplitude_estimation_example}
 \end{figure}
 
-As mentioned earlier the amplitude of a measured sEMG signal scales approximately linear with how much a skeletal muscle is contracted \cite{adaptive_filter_dry_electrode}. If we mirror the negative part of the sEMG signal onto the positive part (i.e. taking the absolute value), a line can be drawn from peak to peak to create a smooth curve that represents the contraction of a muscle. This is called an envelope and an example can be found in figure \ref{fig:envelope_wikipedia}. Applying this concept to an sEMG signal can be found in figure \ref{fig:amplitude_estimation_example}
+As mentioned earlier the amplitude of a measured sEMG signal scales approximately linear with how much a skeletal muscle is contracted \cite{adaptive_filter_dry_electrode}. Since the raw EMG signal consists of stochastic and unpredictable noise it is difficult to draw conclusions about the degree of muscle contraction when solely looking at individual samples \cite{semg_signals_analysis_and_applications}. By drawing an outline of the peaks of the signal a much more informative picture can be drawn. This is called an envelope and an illustration of this process can be found in figure \ref{fig:envelope_wikipedia}. In the case of more random sEMG signals it is preferred to perform full wave rectification on the signal before calculating the envelope so that all of the signal energy is taken into account \cite{semg_signals_analysis_and_applications}. Applying this concept to an sEMG signal can be found in figure \ref{fig:amplitude_estimation_example}.
 
 Computationally envelope detection can be achieved in a number of different methods where "speed", or how much the detected envelope lags behind the true signal envelope, is traded against accuracy or noisiness \cite{dsp_good_bad_ugly}. A few different envelope detection techniques are discussed in \cite{rose2011electromyogram}.
 
-\subsection{Finite Impulse Response filter}
-calculate_moving_average
+\subsection{Moving average}
+A moving average filter is a special type of FIR filter with coefficients that are all have the value of $\frac{1}{n}$ where $n$ is the number of samples over which the average is taken. Thus the value of every smoothened sample is calculated to be the average of the previous $n$ samples. The upside of a moving average filter is that is is very simple to implement and introduces zero phase shift. A downside of a moving average filter is that it lags behind the signal by its very definition: a change in a static signal level is only properly reflected after $n$ samples. The sEMG signal must also be rectified before this method can be applied because EMG signal has approximately zero mean due to its oscillatory behaviour \cite{rose2011electromyogram}. 
 
-\subsection{Infinite Impulse Response filter}
-calculate_butterworth
+\subsection{IIR Lowpass filter}
+A lowpass filter such as a Butterworth or Chebyshev can be used to determine the envelope of a rectified signal in a more 'responsive' (less lag) method compared to a moving average filter. The downside of this filter is that it introduces phase shift unless applied in forward and backward direction \cite{rose2011electromyogram} which is not possible in real-time signals without introducing a static delay of a number of samples that equals the number of filter coefficients.
 
 \subsection{Root Mean Square}
-calculate_rms
-Especially popular with EMG signal processing.
+The Root Mean Square (RMS) of a signal is the square root of average power of a signal for a given period of time, a definition is given in equation \ref{eq:rms}. A useful property of RMS is that when it is applied to a signal with Gaussian distribution the RMS amplitude of the source is the same as the standard deviation of the distribution \cite{rms_standard_deviation}. In other words this means that RMS can extract the signal power of all frequencies in a signal in the time-domain if the frequencies are normally distributed.Since the probability density of surface EMG is approximately Gaussian, RMS should theoretically be the maximum likelihood estimator of EMG amplitude \cite{semg_signals_analysis_and_applications}.
 
+\begin{equation}
+    RMS = \sqrt{\frac{1}{n} (x[1]^2 + x[2]^2 + \cdots + x[n]^2)}
+    \label{eq:rms}
+\end{equation}
 
 \section{Standard sEMG signal processing}
-A conventional static sEMG signal processing chain is described in \cite{muscle_force_estimation}. The relevant steps are as follows:
+A conventional static real-time sEMG signal processing chain is described in \cite{muscle_force_estimation}. The relevant steps are as follows:
 \begin{itemize}
     \item Highpass filter to remove DC
     \item Bandpass filter 20-300 hz

@@ -6,7 +6,11 @@ This section of the report describes the testing of seperate signal processing s
     \item Envelope estimation
 \end{itemize}
 
-Unless specified otherwise, all signals in subsequent sections will be high-passed with a cutoff frequency of 1Hz to remove DC bias.
+Unless specified otherwise
+\begin{itemize}
+    \item all signals will be high-passed with a cutoff frequency of 1Hz to remove DC bias before any operation is applied
+    \item all measured sEMG signals were acquired during isometric contraction
+\end{itemize}
 
 \section{Pre-whitening}
 \cite{time_series_analysis_methods}

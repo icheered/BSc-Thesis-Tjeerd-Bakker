@@ -38,9 +38,8 @@ Lastly I would like to mention that static and adaptive filters are only a subse
 "In many cases, ML model predictions have been found to be objectionable and violating their original expectations after deployment. A key reason is that ML models are often complex black-boxes and thus have varying, unknown failure modes that are revealed only after deployment" \cite{microsoft_machine_learning_reliable}.
 
 \section{Research goal}
-Given the plethora of methods that are available at each step of the signal-processing chain of sEMG signals, it is difficult to determine which method works best in which scenario.
-
-This report aims to give an overview of pre-whitening, different filtering techniques to increase SNR and different envelope detection techniques. In figure \ref{fig:global_thesis_flowchart} a high-level overview of the signal processing chain is presented. 
+Even though a significant amount of research has been done into the digital processing of sEMG signals, an overview comparing different techniques is lacking. This report aims to give an overview of pre-whitening, different filtering techniques, and different envelope detection techniques. The overaching goal is comparing each method with the goal of \textit{real-time} force estimation. 
+In figure \ref{fig:global_thesis_flowchart} a high-level overview of the signal processing chain is presented. 
 
 \begin{figure}[h!t]
 	\begin{center}
