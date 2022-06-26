@@ -116,15 +116,16 @@ Adaptive filters expand on the idea of using knowledge of the spectral domain to
 
 Adaptive filters are applied in the same way as static filters by just multiplying the filter with measurements. However, the  method of finding the filter coefficients is different. Instead of deciding beforehand what frequencies you want to have removed, you measure the noise and determine its frequency spectrum. Then you tune the filter coefficients to remove these frequencies from the measurements (which also includes noise) leaving only the desired signal. This filter is used in environments where the noise frequency spectrum is not known beforehand, or when the frequency behaviour of the noise may change over time. Common applications of adaptive filters include speech recognition and noise-cancelling headphones! \cite{wiener_vs_adaptive_realtime_noisecancellation}
 
-\textcolor{red}{(TODO: MATHEMATICAL DEFINITION OF FINDING COEFFICIENTS IN ADAPTIVE FILTERS) }
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[width=1.0\columnwidth]{images/adaptive_filter_block_diagram.png}
+	\end{center}
+	\caption{Block diagram of an adaptive filter \cite{adaptive_filter_block_diagram}}
+	\label{fig:wiener_filter_response}
+\end{figure}
 
-\textcolor{blue}{
-=> LMS algorhitm
-=> """"Instead of computing as suggested by
-Wiener-Hopf equation, in LMS the coefficients are adjusted
-from sample to sample in such a way as to minimize the MSE.... The LMS algorithm is based on steepest descent algorithm. ... """" => Wiener-hopf algorithm calculates $W_{opt}$ (Performance of Wiener Filter and Adaptive Filter for Noise Cancellation in Real-Time Environment, paper).}
+\textcolor{red}{Todo: Mathematical definition of finding coefficients of adaptive filter (or maybe do this in the simulation section?). }
 
-\textcolor{red}{< IMAGE OF ADAPTIVE FILTER DIAGRAM >}
 
 \subsection{FIR vs IIR}
 Another subdivision within filter design is concerned with the type of possible responses to a specific input (impulse) and whether or not this can go to infinity.
