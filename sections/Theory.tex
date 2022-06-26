@@ -26,7 +26,7 @@ So to summarize the basic concept of force estimation:
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[height=60mm]{images/sEMG_signal_example.png}
+		\includegraphics[width=1.0\columnwidth]{images/sEMG_signal_example.png}
 	\end{center}
 	\caption{sEMG signal measured from bicep during contraction}
 	\label{fig:sEMG_signal_example}
@@ -34,7 +34,7 @@ So to summarize the basic concept of force estimation:
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[height=60mm]{images/sEMG_fft_signalnoise_example.png}
+		\includegraphics[width=1.0\columnwidth]{images/sEMG_fft_signalnoise_example.png}
 	\end{center}
 	\caption{Frequency components of signal and noise in an sEMG signal. 
     Noise is taken to be 0-2s and Signal is taken to be 5-7s in \ref{fig:sEMG_signal_example}}
@@ -43,7 +43,7 @@ So to summarize the basic concept of force estimation:
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[height=60mm]{images/muscle_anatomy.png}
+		\includegraphics[width=1.0\columnwidth]{images/muscle_anatomy.png}
 	\end{center}
 	\caption{Anatomy of a muscle \cite{muscle_anatomy}}
 	\label{fig:muscle_anatomy}
@@ -68,7 +68,7 @@ At a fundamental level filters are simply a tool to remove something unwanted (n
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[height=60mm]{images/filter_example.png}
+		\includegraphics[width=1.0\columnwidth]{images/filter_example.png}
 	\end{center}
 	\caption{Filtering a signal. In the top-left figure there is a low-frequency signal polluted by a 50Hz signal. The frequency plot in the bottom-left shows these frequencies. By applying the low-pass filter as displayed in the bottom-left it is possible to filter out the higher 50Hz frequency. The resulting filtered signal can be seen in the top-right, showing that there is still a little bit of noise left. This is also visible in the bottom right showing the frequency contents of the signal after filtering}
 	\label{fig:filter_example}
@@ -84,9 +84,9 @@ By carefully choosing the number and value of filter coefficients it is possible
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[height=60mm]{images/wikipedia_fir_digital_filter.png}
+		\includegraphics[width=1.0\columnwidth]{images/wikipedia_fir_digital_filter.png}
 	\end{center}
-	\caption{The functioning of a digital filter. The filter coefficient at index $i$ is multiplied by the input that is delayed $i$ samples.}
+	\caption{The functioning of a digital filter. The filter coefficient at index $i$ is multiplied by the input that is delayed $i$ samples \cite{wikipedia:digital_fir_filter_image}}
 	\label{fig:wiki_digital_filter_working}
 \end{figure}
 
@@ -101,16 +101,16 @@ If a filter is static (e.g. high-pass, low-pass, band-pass, or band-stop) it sim
 	\label{fig:static_filters}
 \end{figure}
 
-A Wiener filter is a static filter that removes the frequency contents of noise from the frequency contents of a signal. In other words, the Wiener filter attenuates the frequencies that are present in noise so that when the filter is applied to a signal that is polluted by noise with the same frequency contents it effectively removes the noise. This is done by measuring two things: The signal that is corrupted by noise, and the noise separately. For example when measuring an sEMG signal an additional channel is used to measure the signal of a non-contracting muscle to gather only the present noise. \textcolor{red}{(SOURCE)}
-The Wiener filter requires both the signal and the noise to be stationary, i.e. the spectral density does not change over time, and results in a linear time-invariant filter \cite{wiki:Stationary_process} \cite{difference_stationary_nonstationary}.
+A Wiener filter is a static filter that removes the frequency contents of noise from the frequency contents of a signal. In other words, the Wiener filter attenuates the frequencies that are present in noise so that when the filter is applied to a signal that is polluted by noise with the same frequency contents it effectively removes the noise. This is done by measuring two things: The signal that is corrupted by noise, and the noise separately. For example when measuring an sEMG signal an additional channel is used to measure the signal of a non-contracting muscle to gather only the present noise.
+The Wiener filter requires both the signal and the noise to be stationary, i.e. the spectral density does not change over time, and results in a linear time-invariant filter \cite{wiki:Stationary_process} \cite{difference_stationary_nonstationary}. An example of the Wiener filter frequency response can be found in figure \ref{fig:wiener_filter_response}.
 
-\textcolor{brown}{\begin{itemize}
-    \item Wiener-Hopf Equation
-    \item Mean Square Error definition
-    \item Least Square Error algorithm
-\end{itemize}}
-
-\textcolor{red}{< IMAGE WITH FREQUENCY RESPONSE OF WIENER FILTER > }
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[width=1.0\columnwidth]{images/wiener_filter_response.png}
+	\end{center}
+	\caption{Sample values and frequency responses of a Wiener filter}
+	\label{fig:wiener_filter_response}
+\end{figure}
 
 Adaptive filters expand on the idea of using knowledge of the spectral domain to create a filter by only using a subset of the input data (last $n$ samples). By re-calculating the filter coefficients with new data it is possible to update the filter to match a changing spectral density. 
 
