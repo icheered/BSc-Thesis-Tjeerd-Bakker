@@ -12,13 +12,9 @@ However, this increased accuracy comes with a catch: Each electrode outputs a si
 This project aims to give an overview of the effectiveness of different EMG processing techniques. The effect of whitening the input signal, different filtering techniques, and different envelope detection techniques are discussed, with the overarching goal of performing force estimation from sEMG signals.
 
 \section{Related work}
-\textcolor{red}{
-(TODO: INSERT THIS PAPER: "The Influence of the sEMG Amplitude Estimation Technique on
-the EMG–Force Relationship (paper)")}
-
 There are a number of works on applying different filtering techniques in the medical field. Some interesting papers that closely relate to this assignment are discussed.
 
-An example that shows the effectiveness of adaptive filters for real-time signal processing is \cite{adaptive_filter_emg_noise_cancellation_ecg} which covers the removal of an EMG signal from an electrocardiogram (ECG, electrical activity around the heart) signal. This is notable because the signal spectra of EMG and ECG overlap to a large extend and are therefore notoriously hard to remove using static filters.
+An example that shows the effectiveness of adaptive filters for real-time signal processing is \cite{adaptive_filter_emg_noise_cancellation_ecg} which covers the removal of an EMG signal from an electrocardiogram (ECG, electrical activity around the heart) signal. This is notable because the signal spectra of EMG and ECG overlap to a large extend and are therefore notoriously hard to remove using static filters. Furthermore it is mentioned in \cite{influence_semg_amplitude_estimation_technique_on_emg_force_relationship} that adaptive filters might be the most suitable type of filters for estimating force from sEMG signals.
 
 The performance of adaptive filters and Wiener filters for noise cancellation in real-time environments in general has been tested in \cite{wiener_vs_adaptive_realtime_noisecancellation}. This report provides a solid groundwork for an intuitive understanding of wiener filters and adaptive filters which are used in this project.
 
