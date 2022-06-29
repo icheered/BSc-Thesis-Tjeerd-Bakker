@@ -8,7 +8,7 @@ This section of the report describes the testing of separate signal processing s
 
 Unless specified otherwise
 \begin{itemize}
-    \item all signals will be high-passed with a cutoff frequency of 1Hz to remove DC bias before any operation is applied
+    \item all signals will be high-passed with a cutoff frequency of \SI{1}{\hertz} to remove DC bias before any operation is applied
     \item all measured sEMG signals were acquired during isometric contraction
 \end{itemize}
 
@@ -110,7 +110,7 @@ Again, the signal integrity was calculated for different filters and at differen
 	\label{fig:filter_signal_integrity_mvc}
 \end{figure}
 
-For the static filter a few different variations were tested. Looking at figure \ref{fig:sEMG_fft_signalnoise_example} it can be seen that beside the 50Hz peak in the noise spectrum there are additional peaks at multiples of 50Hz (100Hz, 150Hz, etc). Static filters were tested starting from no notch filters (Static 0), and going up to 4 notch filters (Static 4). Static 1 has a single notch filter at 50Hz, static 2 has a notch at 50Hz and one at 100Hz, etc. The resulting metrics can be seen in table \ref{tab:static_filter_snr_integrity}.
+For the static filter a few different variations were tested. Looking at figure \ref{fig:sEMG_fft_signalnoise_example} it can be seen that beside the \SI{50}{\hertz} peak in the noise spectrum there are additional peaks at multiples of \SI{50}{\hertz} (\SI{100}{\hertz}, \SI{150}{\hertz}, etc). Static filters were tested starting from no notch filters (Static 0), and going up to 4 notch filters (Static 4). Static 1 has a single notch filter at \SI{50}{\hertz}, static 2 has a notch at \SI{50}{\hertz} and one at \SI{100}{\hertz}, etc. The resulting metrics can be seen in table \ref{tab:static_filter_snr_integrity}.
 
 \begin{table} [h!]
     \begin{tabular}{c|c|c}
@@ -132,7 +132,7 @@ The construction of different envelope estimation techniques will be discussed i
 
 \subsection{Method}
 \subsubsection{IIR lowpass filter}
-A butterworth filter was used to construct an IIR lowpass filter. The performance of such a lowpass filter is defined by its cut-off frequency and the number of filter coefficients (or the filter order). It was empirically determined that the maximum frequency for switching between total relaxation and maximum voluntary contraction was around 5Hz and thus the cut-off frequency was varied from 1Hz-9Hz. The filter order was varied from 2-8 because the minimum possible filter order is 2 (a single filter coefficient provides no filtering, just scaling the signal with a constant), and a filter order >8 resulted in unstable behaviour.
+A butterworth filter was used to construct an IIR lowpass filter. The performance of such a lowpass filter is defined by its cut-off frequency and the number of filter coefficients (or the filter order). It was empirically determined that the maximum frequency for switching between total relaxation and maximum voluntary contraction was around \SI{5}{\hertz} and thus the cut-off frequency was varied from \SI{1}{\hertz}-\SI{9}{\hertz}. The filter order was varied from 2-8 because the minimum possible filter order is 2 (a single filter coefficient provides no filtering, just scaling the signal with a constant), and a filter order >8 resulted in unstable behaviour.
 
 \subsubsection{Moving average}
 The moving average filter only depends on the length of the filter. The range of values that are tested is chosen arbitrarily, but large enough to cover general usecases.
@@ -169,7 +169,7 @@ To properly evaluate the performance of the envelope detection techniques each m
 	\begin{center}
 		\includegraphics[width=1.0\columnwidth]{images/lagerror_iirfilter.png}
 	\end{center}
-	\caption{Lag and error of an IIR butterworth filter for different cut-off frequencies and filter lengths. Note that filters with a lower cut-off frequency and high number of filter coefficients become unstable which can be seen in the error-graph for cut-off frequencies 1-3Hz.}
+	\caption{Lag and error of an IIR butterworth filter for different cut-off frequencies and filter lengths. Note that filters with a lower cut-off frequency and high number of filter coefficients become unstable which can be seen in the error-graph for cut-off frequencies \SI{1}{\hertz}-\SI{3}{\hertz}.}
 	\label{fig:lagerror_iir}
 \end{figure}
 
