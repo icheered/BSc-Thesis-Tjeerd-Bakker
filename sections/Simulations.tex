@@ -1,5 +1,5 @@
 \chapter{Simulation}
-This section of the report describes the testing of seperate signal processing steps in a simulated environment. Each block as seen in figure \ref{fig:global_thesis_flowchart} will be tested individually, and the method and results will be discussion on a per-block basis:
+This section of the report describes the testing of separate signal processing steps in a simulated environment. Each block as seen in figure \ref{fig:global_thesis_flowchart} will be tested individually, and the method and results will be discussion on a per-block basis:
 \begin{itemize}
     \item Pre-whitening
     \item Filtering
@@ -40,10 +40,11 @@ It no work :(
 Each filter will be tested on a pre-recorded EMG signal sample and an environment noise sample to determine its effectiveness of removing noise while leaving the EMG signal intact. The contruction of each filter will be explained in the method, and the SNR performance and signal integrity of each filter will be discussed in the results. 
 
 \subsubsection{Static filter}
-A notch filter at 50Hz with quality factor 20 is applied. Then a high-pass filter with a cut-off frequency of 20Hz and a quality factor of 20 is applied, followed by a low-pass filter with a cut-off frequency of 300Hz and a quality factor of 20 is applied. These values follow from the theory in section \ref{section:standard_semg_processing}.
+A notch filter at \SI{50}{\hertz} with quality factor 20 is applied. Then a high-pass filter with a cut-off frequency of \SI{20}{\hertz} and a quality factor of 20 is applied, followed by a low-pass filter with a cut-off frequency of \SI{300}{\hertz} and a quality factor of 20 is applied. These values follow from the theory in section \ref{section:standard_semg_processing}.
 
 \subsubsection{Wiener filter}
 In ideal scenarios, the Wiener filter coefficients are calculated from a sample of pure signal and a sample of pure noise. The noise is taken to be the 'desired signal' since this this contains the frequency components the Wiener filter coefficients should approximate. The sum of the pure signal and the noise is taken to be the (polluted) 'input'.
+
 The autocorrelation of the input and the crosscorrelation between the input and the desired signal is calculated. These are used to calculate the optimal Wiener coefficients that minimize the mean-square error using the Wiener-hopf equation that can be seen in \ref{eq:wiener_hopf}. Here $R$ is the autocorrelation of the desired signal, and $p$ is the cross-correlation between the desired signal and input. 
 
 The number of Wiener filter coefficients have a strong influence on the performance of the filter as can be seen in figure \ref{fig:wiener_filter_length}. The explanation behind SNR calculation and signal integrity will be discussion in the 'Results' section.
@@ -69,7 +70,7 @@ The number of Wiener filter coefficients have a strong influence on the performa
 \textcolot{red}{Todo: write this}
 
 \subsection{Results}
-Each filter will be tested using two metrics: SNR and signal integrity. All filters are linear time invariant which means the superposition principle can be used to simplify SNR calculations \cite{wiki:lti_system}. The superposition principle simply states that filtering the sum of two signals is the same as filtering the signals individually and adding the results. An illustration of this can be seen in \ref{fig:filter_process}. A sample of noise data and a sample of EMG data is taken from \ref{fig:sEMG_signal_example} where noise is taken to be 0-2s and signal is taken to be 5-7s. The RMS of the filtered signal is divided by the RMS of the filtered noise to create a signal to noise ratio.
+Each filter will be tested using two metrics: SNR and signal integrity. All filters are linear time invariant which means the superposition principle can be used to simplify SNR calculations \cite{wiki:lti_system}. The superposition principle simply states that filtering the sum of two signals is the same as filtering the signals individually and adding the results. An illustration of this can be seen in \ref{fig:filter_process}. A sample of noise data and a sample of EMG data is taken from \ref{fig:sEMG_signal_example} where noise is taken to be 0-2s and signal is taken to be 5-\SI{7}{\second}. The RMS of the filtered signal is divided by the RMS of the filtered noise to create a signal to noise ratio.
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -79,17 +80,17 @@ Each filter will be tested using two metrics: SNR and signal integrity. All filt
 	\label{fig:filter_process}
 \end{figure}
 
-A property that might be of interest is each filters performance in different levels of Maximum Voluntary Contraction (MVC). This allows for insight into how well each filter functions in different levels of signal compared to the environment noise. This was realized by keeping the noise constant, but scaling the signal to different levels (from 1-100\%) to simulate different levels of MVC. The SNR of the filtered signal and filtered noise was divided by the reference SNR (SNR of input signal and input noise) to be able to draw a clear conlusion about the filters performance.
+A property that might be of interest is each filters performance in different levels of Maximum Voluntary Contraction (MVC). This allows for insight into how well each filter functions in different levels of signal compared to the environment noise. This was realized by keeping the noise constant, but scaling the signal to different levels (from 1-\SI{100}{\percent}) to simulate different levels of MVC. The SNR of the filtered signal and filtered noise was divided by the reference SNR (SNR of input signal and input noise) to be able to draw a clear conclusion about the filters performance.
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[width=1.0\columnwidth]{images/filter_snr_mvc.png}
+		\includegraphics[width=0.7\columnwidth]{images/filter_snr_mvc.png}
 	\end{center}
 	\caption{The SNR of each filter for different levels of MVC. It can be seen that there is no relation between a filters performance and the degree of contraction.}
 	\label{fig:filter_snr_mvc}
 \end{figure}
 
-SNR by itself is not a valid metric for judging a filters performance in this scenario. The purpose of improving SNR is the assumption that force can be estimated more accurately from a signal that contains primarly the signal generated by muscle contraction. However, a filter may be able to attenuate the signal and noise in such a way that the SNR is very high, but the signal is attenuated to such a degree that it no longer resembles the original signal that was generated by the muscle contraction. An example of this can be seen in figure \ref{fig:good_snr_bad_integrity}. To account for this, a new metric is introduced called 'Signal integrity'. By dividing a filters output frequency spectrum by the input frequency spectrum it is possible to determine how much the frequency spectrum has changed by the filter. If the resulting value of a frequency after this division is 1, the filter did not attenuate this frequency at all. If the result of this division is 0, then the frequency component has been removed entirely. Taking the mean of these values should give an indication of the degree of attenuation that a signal experiences when filtered. Doing this for both the signal and the noise seperately, a conclusion can be drawn about how much the frequency spectrum of the noise is attenuated \textit{more} than the frequency spectrum of the signal. The mathematical definiction of signal integrity can be found in equation \ref{eq:signal_integrity}. An ideal filter would not attenuate the frequency spectrum of the signal while completely nullifying the frequency spectrum of the noise. The resulting signal integrity value would be 1. If a filter does not attenuate the signal but neither attenuates the noise, the signal integrity value would be 0. If the filter attenuates the signal more than it attenuates the noise, the signal integrity value would be less than 0.
+SNR by itself is not a valid metric for judging a filters performance in this scenario. The purpose of improving SNR is the assumption that force can be estimated more accurately from a signal that contains primarily the signal generated by muscle contraction. However, a filter may be able to attenuate the signal and noise in such a way that the SNR is very high, but the signal is attenuated to such a degree that it no longer resembles the original signal that was generated by the muscle contraction. An example of this can be seen in figure \ref{fig:good_snr_bad_integrity}. To account for this, a new metric is introduced called 'Signal integrity'. By dividing a filters output frequency spectrum by the input frequency spectrum it is possible to determine how much the frequency spectrum has changed by the filter. If the resulting value of a frequency after this division is 1, the filter did not attenuate this frequency at all. If the result of this division is 0, then the frequency component has been removed entirely. Taking the mean of these values should give an indication of the degree of attenuation that a signal experiences when filtered. Doing this for both the signal and the noise separately, a conclusion can be drawn about how much the frequency spectrum of the noise is attenuated \textit{more} than the frequency spectrum of the signal. The mathematical definition of signal integrity can be found in equation \ref{eq:signal_integrity}. An ideal filter would not attenuate the frequency spectrum of the signal while completely nullifying the frequency spectrum of the noise. The resulting signal integrity value would be 1. If a filter does not attenuate the signal but neither attenuates the noise, the signal integrity value would be 0. If the filter attenuates the signal more than it attenuates the noise, the signal integrity value would be less than 0.
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -131,7 +132,7 @@ The construction of different envelope estimation techniques will be discussed i
 
 \subsection{Method}
 \subsubsection{IIR lowpass filter}
-A butterworth filter was used to construct an IIR lowpass filter. The performance of such a lowpass filter is defined by its cut-off frequency and the number of filter coefficients (or the filter order). It was imperically determined that the maximum frequency for switching between total relaxation and maximum voluntary contraction was around 5Hz and thus the cut-off frequency was varied from 1Hz-9Hz. The filter order was varied from 2-8 because the minimum possible filter order is 2 (a single filter coefficient provides no filtering, just scaling the signal with a constant), and a filter order >8 resulted in unstable behaviour.
+A butterworth filter was used to construct an IIR lowpass filter. The performance of such a lowpass filter is defined by its cut-off frequency and the number of filter coefficients (or the filter order). It was empirically determined that the maximum frequency for switching between total relaxation and maximum voluntary contraction was around 5Hz and thus the cut-off frequency was varied from 1Hz-9Hz. The filter order was varied from 2-8 because the minimum possible filter order is 2 (a single filter coefficient provides no filtering, just scaling the signal with a constant), and a filter order >8 resulted in unstable behaviour.
 
 \subsubsection{Moving average}
 The moving average filter only depends on the length of the filter. The range of values that are tested is chosen arbitrarily, but large enough to cover general usecases.
@@ -179,3 +180,17 @@ To properly evaluate the performance of the envelope detection techniques each m
 	\caption{Lag and error of RMS filter and moving average filter for different filter lengths}
 	\label{fig:lagerror_RMS_MA}
 \end{figure}
+
+\section{Force estimation}
+The measured sEMG signals from antagonistic muscles needs to be combined to form an estimate of the exerted force. Since this calculation is done in a consistent way throughout all measurements this section serves purely to provide some insight into the method of calculation.
+
+The previous step of envelope estimation is used to get a measure of muscle contraction. Exerted force around a joint is simply the difference between how much antagonistic contract. By measuring the sEMG from antagonistic muscles (such as bicep and tricep) and determining their envelope after processing, the estimated force is simply the difference between the two envelopes. However, this method does not directly result in an estimation of force but actually an estimation in the difference of muscle contraction. To correlate the difference in muscle contraction from antagonistic muscles to the exerted force, the muscle contraction needs to be scaled. The type of scaling required is approximately linear \cite{adaptive_filter_dry_electrode}. In reality is much more complex \textcolor{red}{(SOURCE)} but for the scope of this report a linear relation will be assumed. In figure \ref{fig:force_simulation} it is shown how the exerted force is estimated from simulated bicep and tricep sEMG. 
+
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[width=0.7\columnwidth]{images/force_simulation.png}
+	\end{center}
+	\caption{Process of estimating force from simulated sEMG (random Gaussian noise). The bicep envelope is calculated at the top, notice how during downwards force exertion the bicep still activates but to a lesser degree than during upwards force exertion. The same holds for the tricep in the bottom figure. The subplot on the right shows the envelope of the bicep, tricep, the difference between these two (identical to estimated force assuming linear scaling with factor 1), and the 'measured' force .}
+	\label{fig:force_simulation}
+\end{figure}
+

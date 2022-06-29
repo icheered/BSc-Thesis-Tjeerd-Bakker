@@ -26,7 +26,7 @@ So to summarize the basic concept of force estimation:
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[width=1.0\columnwidth]{images/sEMG_signal_example.png}
+		\includegraphics[width=0.7\columnwidth]{images/sEMG_signal_example.png}
 	\end{center}
 	\caption{sEMG signal measured from bicep during contraction}
 	\label{fig:sEMG_signal_example}
@@ -34,7 +34,7 @@ So to summarize the basic concept of force estimation:
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[width=1.0\columnwidth]{images/sEMG_fft_signalnoise_example.png}
+		\includegraphics[width=0.7\columnwidth]{images/sEMG_fft_signalnoise_example.png}
 	\end{center}
 	\caption{Frequency components of signal and noise in an sEMG signal. 
     Noise is taken to be 0-2s and Signal is taken to be 5-7s in \ref{fig:sEMG_signal_example}}
@@ -43,7 +43,7 @@ So to summarize the basic concept of force estimation:
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[width=1.0\columnwidth]{images/muscle_anatomy.png}
+		\includegraphics[width=0.7\columnwidth]{images/muscle_anatomy.png}
 	\end{center}
 	\caption{Anatomy of a muscle \cite{muscle_anatomy}}
 	\label{fig:muscle_anatomy}
@@ -52,7 +52,7 @@ So to summarize the basic concept of force estimation:
 \textcolor{red}{Todo: Find source that further explains muscles and EMG signals to refer to for further reading}
 
 Figure \ref{fig:muscle_anatomy} illustrates the anatomy of a muscle which may be useful in this section. 
-A large skeletal muscle such as the bicep consists of hundreds of thousands of small muscle fibers. These muscle fibers are divided into groups called motor units, and each motor unit is connected to a motor neuron which is a special type of very long brain cell that runs through the spinal cord. A contraction of a skeletal muscle is the result of many muscle fibers contracting individually and repeatedly. The contraction of these muscle fibers is the result of an action potential caused by the motor neuron, and this action potential is a measurable (but very small) voltage. When measuring the surface EMG of a contracting skeletal muscle the result is the aggregate of the small voltages from all contracting muscle fibers. This manifests itself into a signal resembling white noise where the amplitude of the noise correlates to the number of contracting muscle fibers and thus to the amount of contraction the skeletal muscle experiences. This is shown in \ref{fig:sEMG_signal_example} where a maximum voluntary contraction (MVC) is measured from a bicep.
+A large skeletal muscle such as the biceps consists of hundreds of thousands of small muscle fibers. These muscle fibers are divided into groups called motor units, and each motor unit is connected to a motor neuron which is a special type of very long brain cell that runs through the spinal cord. A contraction of a skeletal muscle is the result of many muscle fibers contracting individually and repeatedly. The contraction of these muscle fibers is the result of an action potential caused by the motor neuron, and this action potential is a measurable (but very small) voltage. When measuring the surface EMG of a contracting skeletal muscle the result is the aggregate of the small voltages from all contracting muscle fibers. This manifests itself into a signal resembling white noise where the amplitude of the noise correlates to the number of contracting muscle fibers and thus to the amount of contraction the skeletal muscle experiences. This is shown in \ref{fig:sEMG_signal_example} where a maximum voluntary contraction (MVC) is measured from a bicep.
  
 So to summarize: to determine the degree of contraction of a skeletal muscle we simply need to determine the amplitude of the noise at the surface of the muscle.
 
@@ -64,7 +64,7 @@ The ratio between how much of the measured signal is actual desired signal and h
 
 \section{Filters}
 % Introduce basic concept of filters
-At a fundamental level filters are simply a tool to remove something unwanted (noise) that is mixed with something wanted (signal). In signal processing filtering is achieved by decomposing a measured signal into repeating patterns and subsequently deciding which patterns should be included and which patterns should be removed. Figure \ref{fig:filter_example} displays how a time-domain signal can be represented in the frequency domain to display informationa bout which frequencies are present in the signal.
+At a fundamental level filters are simply a tool to remove something unwanted (noise) that is mixed with something wanted (signal). In signal processing filtering is achieved by decomposing a measured signal into repeating patterns and subsequently deciding which patterns should be included and which patterns should be removed. Figure \ref{fig:filter_example} displays how a time-domain signal can be represented in the frequency domain to display information about which frequencies are present in the signal.
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -84,7 +84,7 @@ By carefully choosing the number and value of filter coefficients it is possible
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[width=1.0\columnwidth]{images/wikipedia_fir_digital_filter.png}
+		\includegraphics[width=0.7\columnwidth]{images/wikipedia_fir_digital_filter.png}
 	\end{center}
 	\caption{The functioning of a digital filter. The filter coefficient at index $i$ is multiplied by the input that is delayed $i$ samples \cite{wikipedia:digital_fir_filter_image}}
 	\label{fig:wiki_digital_filter_working}
@@ -114,7 +114,7 @@ The Wiener filter requires both the signal and the noise to be stationary, i.e. 
 
 Adaptive filters expand on the idea of using knowledge of the spectral domain to create a filter by only using a subset of the input data (last $n$ samples). By re-calculating the filter coefficients with new data it is possible to update the filter to match a changing spectral density. 
 
-Adaptive filters are applied in the same way as static filters by just multiplying the filter with measurements. However, the  method of finding the filter coefficients is different. Instead of deciding beforehand what frequencies you want to have removed, you measure the noise and determine its frequency spectrum. Then you tune the filter coefficients to remove these frequencies from the measurements (which also includes noise) leaving only the desired signal. This filter is used in environments where the noise frequency spectrum is not known beforehand, or when the frequency behaviour of the noise may change over time. Common applications of adaptive filters include speech recognition and noise-cancelling headphones! \cite{wiener_vs_adaptive_realtime_noisecancellation}
+Adaptive filters are applied in the same way as static filters by just multiplying the filter with measurements. However, the method of finding the filter coefficients is different. Instead of deciding beforehand what frequencies you want to have removed, you measure the noise and determine its frequency spectrum. Then you tune the filter coefficients to remove these frequencies from the measurements (which also includes noise) leaving only the desired signal. This filter is used in environments where the noise frequency spectrum is not known beforehand, or when the frequency behaviour of the noise may change over time. Common applications of adaptive filters include speech recognition and noise-cancelling headphones! \cite{wiener_vs_adaptive_realtime_noisecancellation}
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -152,7 +152,7 @@ The polar opposite of a signal containing a single frequency that is therefore p
 
 Between the existance of a signal containing a single frequency, and a signal containing all frequencys (white noise), all other signals exist and have certain frequencies that are more 'present' than other frequencies. These signals have different degrees of predictability (and thus information density), and the degree of predictability is determined by how closely the frequency content resembles white noise.
 
-Whitening is a filtering technique that tries to equalize the presence of frequency components in a signal to approximate white noise and thus increase information density. It reduces the random error and yields a larger dynamic range because the small frequency components that contribute to the 'randomness' of the signal but not so much to the value of the measurement sample become more present \cite{time_series_analysis_methods} (Chapter: 5.4.9. Zero-Padding and Prewhitening). The serial correlation of the signal is decreased by reducing the presence of 'predictable' signals, which increases the randomness and thus information density \cite{serial_correlation_definition}. 
+Whitening is a filtering technique that tries to equalize the presence of frequency components in a signal to approximate white noise and thus increase information density. It reduces the random error and yields a larger dynamic range because the small frequency components that contribute to the 'randomness' of the signal but not so much to the value of the measurement sample become more present \cite[Ch. 5.4.9]{time_series_analysis_methods}. The serial correlation of the signal is decreased by reducing the presence of 'predictable' signals, which increases the randomness and thus information density \cite{serial_correlation_definition}. 
 
 This previous information manifests itself in sEMG signal processing by the fact that the measured sEMG signal is not white. Some frequency components are much more present than others, but all frequencies equally contribute to the indication of muscle contraction. To get a more accurate indication of muscle contraction the signal should be whitened to increase the information of each sample.
 
@@ -162,7 +162,7 @@ To summarize: Whitening reduces the power of repeating frequencies and increase 
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[width=0.7\columnwidth]{images/prewhitening_example.jpg}
+		\includegraphics[width=1.0\columnwidth]{images/prewhitening_example.jpg}
 	\end{center}
 	\caption{An example of whitening a signal. The indicated peak contains the 'random' signal of interest. By whitening the powerful lower frequencies it is possible to give the information-carrying peak more presence on the signal \cite{time_series_analysis_methods}}
 	\label{fig:whitening_example}
@@ -192,13 +192,13 @@ As mentioned earlier the amplitude of a measured sEMG signal scales approximatel
 Computationally envelope detection can be achieved in a number of different methods where "speed", or how much the detected envelope lags behind the true signal envelope, is traded against accuracy or noisiness \cite{dsp_good_bad_ugly}. A few different envelope detection techniques are discussed in \cite{rose2011electromyogram}.
 
 \subsection{Moving average}
-A moving average filter is a special type of FIR filter with coefficients that are all have the value of $\frac{1}{n}$ where $n$ is the number of samples over which the average is taken. Thus the value of every smoothened sample is calculated to be the average of the previous $n$ samples. The upside of a moving average filter is that is is very simple to implement and introduces zero phase shift. A downside of a moving average filter is that it lags behind the signal by its very definition: a change in a static signal level is only properly reflected after $n$ samples. The sEMG signal must also be rectified before this method can be applied because EMG signal has approximately zero mean due to its oscillatory behaviour \cite{rose2011electromyogram}. 
+A moving average filter is a special type of FIR filter with coefficients that are all have the value of $\frac{1}{n}$ where $n$ is the number of samples over which the average is taken. Thus the value of every smoothened sample is calculated to be the average of the previous $n$ samples. The upside of a moving average filter is that is is very simple to implement and introduces zero phase shift. A downside of a moving average filter is that it lags behind the signal by its very definition: a change in a static signal level is only properly reflected after $n$ samples. The sEMG signal must also be rectified before this method can be applied because EMG signal has approximately zero mean due to its oscillatory behaviour \cite{rose2011electromyogram}.
 
 \subsection{IIR Lowpass filter}
 A lowpass filter such as a Butterworth or Chebyshev can be used to determine the envelope of a rectified signal in a more 'responsive' (less lag) method compared to a moving average filter. The downside of this filter is that it introduces phase shift unless applied in forward and backward direction \cite{rose2011electromyogram} which is not possible in real-time signals without introducing a static delay of a number of samples that equals the number of filter coefficients.
 
 \subsection{Root Mean Square}
-The Root Mean Square (RMS) of a signal is the square root of average power of a signal for a given period of time, a definition is given in equation \ref{eq:rms}. A useful property of RMS is that when it is applied to a signal with Gaussian distribution the RMS amplitude of the source is the same as the standard deviation of the distribution \cite{rms_standard_deviation}. In other words this means that RMS can extract the signal power of all frequencies in a signal in the time-domain if the frequencies are normally distributed.Since the probability density of surface EMG is approximately Gaussian, RMS should theoretically be the maximum likelihood estimator of EMG amplitude \cite{semg_signals_analysis_and_applications}.
+The Root Mean Square (RMS) of a signal is the square root of average power of a signal for a given period of time, a definition is given in equation \ref{eq:rms}. A useful property of RMS is that when it is applied to a signal with Gaussian distribution the RMS amplitude of the source is the same as the standard deviation of the distribution \cite{rms_standard_deviation}. In other words this means that RMS can extract the signal power of all frequencies in a signal in the time-domain if the frequencies are normally distributed. Since the probability density of surface EMG is approximately Gaussian, RMS should theoretically be the maximum likelihood estimator of EMG amplitude \cite{semg_signals_analysis_and_applications}.
 
 \begin{equation}
     RMS = \sqrt{\frac{1}{n} (x[1]^2 + x[2]^2 + \cdots + x[n]^2)}
@@ -209,8 +209,8 @@ The Root Mean Square (RMS) of a signal is the square root of average power of a 
 A conventional static real-time sEMG signal processing chain is described in \cite{muscle_force_estimation}. The relevant steps are as follows:
 \begin{itemize}
     \item Highpass filter to remove DC
-    \item Bandpass filter 20-300 hz
-    \item Notch filter at 50hz
+    \item Bandpass filter 20-\SI{300}{\hertz}
+    \item Notch filter at \SI{50}{\hertz}
     \item Half-wave rectification
     \item Lowpass filter for envelope detection
 \end{itemize}
