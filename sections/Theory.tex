@@ -53,7 +53,7 @@ So to summarize the basic concept of force estimation:
 \textcolor{red}{Todo: Find source that further explains muscles and EMG signals to refer to for further reading}
 
 Figure \ref{fig:muscle_anatomy} illustrates the anatomy of a muscle which may be useful in this section. 
-A large skeletal muscle such as the biceps consists of hundreds of thousands of small muscle fibers. These muscle fibers are divided into groups called motor units, and each motor unit is connected to a motor neuron which is a special type of very long brain cell that runs through the spinal cord. A contraction of a skeletal muscle is the result of many muscle fibers contracting individually and repeatedly. The contraction of these muscle fibers is the result of an action potential caused by the motor neuron, and this action potential is a measurable (but very small) voltage. When measuring the surface EMG of a contracting skeletal muscle the result is the aggregate of the small voltages from all contracting muscle fibers. This manifests itself into a signal resembling white noise where the amplitude of the noise correlates to the number of contracting muscle fibers and thus to the amount of contraction the skeletal muscle experiences. This is shown in figure \ref{fig:sEMG_signal_example} where a maximum voluntary contraction (MVC) is measured from a bicep.
+A large skeletal muscle such as the biceps consists of hundreds of thousands of small muscle fibers. These muscle fibers are divided into groups called motor units, and each motor unit is connected to a motor neuron which is a special type of very long brain cell that runs through the spinal cord. A contraction of a skeletal muscle is the result of many muscle fibers contracting individually and repeatedly. The contraction of these muscle fibers is the result of an action potential caused by the motor neuron, and this action potential is a measurable (but very small) voltage. When measuring the surface EMG of a contracting skeletal muscle the result is the aggregate of the small voltages from all contracting muscle fibers. This manifests itself into a signal resembling white noise where the amplitude of the noise correlates to the number of contracting muscle fibers and thus to the amount of contraction the skeletal muscle experiences. An illustration of the form of the measured sEMG is shown in figure \ref{fig:sEMG_signal_example} where a maximum voluntary contraction (MVC) is measured from a bicep.
  
 So to summarize: to determine the degree of contraction of a skeletal muscle we simply need to determine the amplitude of the noise at the surface of the muscle.
 
@@ -119,14 +119,14 @@ The Wiener filter requires both the signal and the noise to be stationary, i.e. 
 
 Adaptive filters is a class of filters where the filter coefficients are adjusted over time to attempt to find an optimal solution even without knowing the signal properties beforehand \cite{adaptive_filter_and_applications}. A Wiener filter can be turned into an adaptive Wiener filter by re-calculating the filter coefficients with new data to match a changing spectral density. 
 
-Adaptive filters are applied in the same way as static filters by just multiplying the filter with measurements. However, the method of finding the filter coefficients is different. Instead of deciding beforehand what frequencies you want to have removed, you measure the signal and the noise and determine their frequency spectrum. Then you tune the filter coefficients to remove the noise components from the measurement while leaving the signal unaffected. This filter is used in environments where the noise frequency spectrum is not known beforehand, or when the frequency behaviour of the noise may change over time. Common applications of adaptive filters include speech recognition, echo cancellation, and headphones employing active noise cancellation! \cite{active_noise_cancellation_wiener_filter} \cite{wiener_vs_adaptive_realtime_noisecancellation}
+Adaptive filters are applied in the same way as static filters by just multiplying the filter with measurements. However, the method of finding the filter coefficients is different. Instead of deciding beforehand what frequencies you want to have removed, you measure the signal and the noise and determine their frequency spectrum. Then you tune the filter coefficients to remove the noise components from the measurement while leaving the signal unaffected. This filter is used in environments where the noise frequency spectrum is not known beforehand, or when the frequency behaviour of the noise may change over time. Common applications of adaptive filters include speech recognition, echo cancellation, and headphones employing active noise cancellation! \cite{active_noise_cancellation_wiener_filter} \cite{wiener_vs_adaptive_realtime_noisecancellation}. An block-diagram of an adaptive filter is given in figure \ref{fig:adaptive_filter_diagram}.
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[width=1.0\columnwidth]{images/adaptive_filter_block_diagram.png}
+		\includegraphics[width=0.7\columnwidth]{images/adaptive_filter_block_diagram.png}
 	\end{center}
 	\caption{Block diagram of an adaptive filter \cite{adaptive_filter_block_diagram}}
-	\label{fig:wiener_filter_response}
+	\label{fig:adaptive_filter_diagram}
 \end{figure}
 
 \textcolor{red}{Todo: Mathematical definition of finding coefficients of adaptive filter (or maybe do this in the simulation section?). }
@@ -201,10 +201,28 @@ Since the raw EMG signal consists of stochastic and unpredictable noise it is di
 Computationally envelope detection can be achieved in a number of different methods where "speed", or how much the detected envelope lags behind the true signal envelope, is traded against accuracy or noisiness \cite{dsp_good_bad_ugly}. A few different envelope detection techniques are discussed in \cite{rose2011electromyogram}.
 
 \subsection{Moving average}
-A moving average filter is a special type of FIR filter with coefficients that are all have the value of $\frac{1}{n}$ where $n$ is the number of samples over which the average is taken. Thus the value of every smoothened sample is calculated to be the average of the previous $n$ samples. The upside of a moving average filter is that is is very simple to implement and introduces zero phase shift. A downside of a moving average filter is that it lags behind the signal by its very definition: a change in a static signal level is only properly reflected after $n$ samples. The sEMG signal must also be rectified before this method can be applied because EMG signal has approximately zero mean due to its oscillatory behaviour \cite{rose2011electromyogram}.
+A moving average filter is a special type of FIR filter with coefficients that all have the value of $\frac{1}{n}$ where $n$ is the number of samples over which the average is taken. Thus the value of every smoothened sample is calculated to be the average of the previous $n$ samples. The upside of a moving average filter is that it introduces no phase distortion \cite{fir_filter_properties}, is very simple to implement, and require only addition to apply which is much faster than multiplication \cite{smith_moving_average_filters}. An illustration of the phase shift of a moving average filter is shown in figure \ref{movingaverage_phaseshift}. A downside of a moving average filter is that it lags behind the signal by its very definition: a change in a static signal level is only properly reflected after $n$ samples.  The sEMG signal must also be rectified before this method can be applied because EMG signal has approximately zero mean due to its oscillatory behaviour \cite{rose2011electromyogram}.
+
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[width=0.7\columnwidth]{images/lowpassfilter_phaseshift.png}
+	\end{center}
+	\caption{Frequency response of a moving average filter. This particular filter consists of 100 coefficients all equal to 0.01. Notice how the filter has linear phase which indicates that there is no phase distortion due to the time delay of frequencies relative to another \cite{fir_filter_properties}}
+	\label{fig:movingaverage_phaseshift}
+\end{figure}
+
+
 
 \subsection{IIR Lowpass filter}
-A lowpass filter such as a Butterworth or Chebyshev can be used to determine the envelope of a rectified signal in a more 'responsive' (less lag) method compared to a moving average filter. The downside of this filter is that it introduces phase shift unless applied in forward and backward direction \cite{rose2011electromyogram} which is not possible in real-time signals without introducing a static delay of a number of samples that equals the number of filter coefficients.
+A lowpass filter such as a Butterworth or Chebyshev can be used to determine the envelope of a rectified signal in a more 'responsive' (less lag) method compared to a moving average filter. The downside of this filter is that it introduces phase shift (as can be seen in figure \ref{fig:iirfilter_phaseshift}) unless applied in forward and backward direction \cite{rose2011electromyogram} which is not possible in real-time signals without introducing a static delay of a number of samples that equals the number of filter coefficients.
+
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[width=0.7\columnwidth]{images/iirfilter_phaseshift.png}
+	\end{center}
+	\caption{Frequency response of an infinite impulse response (butterworth) low-pass filter. The filter has a cut-off frequency of \SI{1}{Hz} and has a length of 3. Notice how the phase delay is \textit{not} linear and thus phase distortion is introduced}
+	\label{fig:iirfilter_phaseshift}
+\end{figure}
 
 \subsection{Root Mean Square}
 The Root Mean Square (RMS) of a signal is the square root of average power of a signal for a given period of time, a definition is given in equation \ref{eq:rms}. A useful property of RMS is that when it is applied to a signal with Gaussian distribution the RMS amplitude of the source is the same as the standard deviation of the distribution \cite{rms_standard_deviation}. In other words this means that RMS can extract the signal power of all frequencies in a signal in the time-domain if the frequencies are normally distributed. Since the probability density of surface EMG is approximately Gaussian, RMS should theoretically be the maximum likelihood estimator of EMG amplitude \cite{semg_signals_analysis_and_applications}.
