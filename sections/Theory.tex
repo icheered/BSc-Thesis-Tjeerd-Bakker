@@ -1,10 +1,11 @@
 \chapter{Theory}
 I will attempt to explain all theory required to understand this project using a top-down approach. By first explaining the big picture in which this research project is located we hope to avoid the reader getting lost in the details and misunderstanding the purpose of this report. 
 
-\section{Force estimation}
+\section{Force estimation from sEMG}
 When moving a limb the most intuitive way of describing it is a change in position, moving your hand from A to B. However, a more objective way of describing this movement is in terms of forces applied on a mass:
 \begin{itemize}
-    \item Muscles contract
+    \item Brain makes decision to move a limb and sends a signal through motor neurons
+    \item The synaptic input received from the motor neuron makes muscles contract
     \item This causes a force to be applied on a mass, or a torque around a pivot point
     \item This force results in an acceleration in a certain direction
     \item This acceleration is maintained for a certain period of time
@@ -52,7 +53,7 @@ So to summarize the basic concept of force estimation:
 \textcolor{red}{Todo: Find source that further explains muscles and EMG signals to refer to for further reading}
 
 Figure \ref{fig:muscle_anatomy} illustrates the anatomy of a muscle which may be useful in this section. 
-A large skeletal muscle such as the biceps consists of hundreds of thousands of small muscle fibers. These muscle fibers are divided into groups called motor units, and each motor unit is connected to a motor neuron which is a special type of very long brain cell that runs through the spinal cord. A contraction of a skeletal muscle is the result of many muscle fibers contracting individually and repeatedly. The contraction of these muscle fibers is the result of an action potential caused by the motor neuron, and this action potential is a measurable (but very small) voltage. When measuring the surface EMG of a contracting skeletal muscle the result is the aggregate of the small voltages from all contracting muscle fibers. This manifests itself into a signal resembling white noise where the amplitude of the noise correlates to the number of contracting muscle fibers and thus to the amount of contraction the skeletal muscle experiences. This is shown in \ref{fig:sEMG_signal_example} where a maximum voluntary contraction (MVC) is measured from a bicep.
+A large skeletal muscle such as the biceps consists of hundreds of thousands of small muscle fibers. These muscle fibers are divided into groups called motor units, and each motor unit is connected to a motor neuron which is a special type of very long brain cell that runs through the spinal cord. A contraction of a skeletal muscle is the result of many muscle fibers contracting individually and repeatedly. The contraction of these muscle fibers is the result of an action potential caused by the motor neuron, and this action potential is a measurable (but very small) voltage. When measuring the surface EMG of a contracting skeletal muscle the result is the aggregate of the small voltages from all contracting muscle fibers. This manifests itself into a signal resembling white noise where the amplitude of the noise correlates to the number of contracting muscle fibers and thus to the amount of contraction the skeletal muscle experiences. This is shown in figure \ref{fig:sEMG_signal_example} where a maximum voluntary contraction (MVC) is measured from a bicep.
  
 So to summarize: to determine the degree of contraction of a skeletal muscle we simply need to determine the amplitude of the noise at the surface of the muscle.
 
@@ -74,12 +75,7 @@ At a fundamental level filters are simply a tool to remove something unwanted (n
 	\label{fig:filter_example}
 \end{figure}
 
-% Explain difference between analog digital and continuous and discrete
-The physical world is inherently analog. Any property that changes from one value to another (such as a change in as wind speed, water level, voltage or age) will at some point have been equal to any value between the start and end value; Between 1 and 2 Volt there are infinite values with infinite decimals \textcolor{red}{(SOURCE)}. Computers sadly don't have infinite memory to store all these values and therefore to measure a continuous signal it needs to be sampled at equidistant points in time. This turns an analog continuous signal into a digital discrete signal. Even though filtering is possible in the analog domain, it is much less complicated and more flexible to filter in the digital domain \textcolor{red}{(NEED CITATION)}.
-
-\textcolor{red}{< Image of analog vs digital as illustration of above text >}
-
-In the digital domain the basic concept of a filter is as simple as it is magical. A filter (usually) consists simply of a set of values called the filter coefficients. The input (measurements) is multiplied with the filter coefficients to create the output. That is, the latest measurement is multiplied with the first filter coefficient, the previous measurement is multiplied with the second filter coefficient, and so on. This can also be interpreted as multiplying each filter coefficients with a delays input sample. Figure \ref{fig:wiki_digital_filter_working} shows the working and standard notation of a digital filter.
+In the digital domain the basic concept of a finite-impulse response (FIR) filter is as simple as it is magical. A filter consists simply of a set of values called the filter coefficients. The input (measurements) is multiplied with the filter coefficients to create the output. That is, the latest measurement is multiplied with the first filter coefficient, the previous measurement is multiplied with the second filter coefficient, and so on. This can also be interpreted as multiplying each filter coefficients with a delays input sample. Figure \ref{fig:wiki_digital_filter_working} shows the working and standard notation of a digital filter.
 By carefully choosing the number and value of filter coefficients it is possible to attenuate specific frequencies while not influencing other frequencies such as the effect shown in \ref{fig:filter_example}.
 
 \begin{figure}[h!t]
@@ -91,7 +87,7 @@ By carefully choosing the number and value of filter coefficients it is possible
 \end{figure}
 
 \subsection{Static filters, Wiener filter, Adaptive filters}
-If a filter is static (e.g. high-pass, low-pass, band-pass, or band-stop) it simply means that the amount of filter coefficients and the values of the filter coefficients are predetermined. These filters are very popular due to their simplicity in terms of finding the value of the filter coefficients. If a signal is expected to be between 90 and 100 Hz, a bandpass filter can be created even before the signal is measured that removes all signal components \textit{except} those between 90 and 100 Hz just by multiplying some values together. 
+The main difference between the different presented filter types is the way of calculating the filter coefficients. If a filter is static (e.g. high-pass, low-pass, band-pass, or band-stop) it simply means that the amount of filter coefficients and the values of the filter coefficients are predetermined. These filters are very popular due to their simplicity in terms of finding the value of the filter coefficients. 
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -101,8 +97,17 @@ If a filter is static (e.g. high-pass, low-pass, band-pass, or band-stop) it sim
 	\label{fig:static_filters}
 \end{figure}
 
-A Wiener filter is a static filter that removes the frequency contents of noise from the frequency contents of a signal. In other words, the Wiener filter attenuates the frequencies that are present in noise so that when the filter is applied to a signal that is polluted by noise with the same frequency contents it effectively removes the noise. This is done by measuring two things: The signal that is corrupted by noise, and the noise separately. For example when measuring an sEMG signal an additional channel is used to measure the signal of a non-contracting muscle to gather only the present noise.
-The Wiener filter requires both the signal and the noise to be stationary, i.e. the spectral density does not change over time, and results in a linear time-invariant filter \cite{wiki:Stationary_process} \cite{difference_stationary_nonstationary}. An example of the Wiener filter frequency response can be found in figure \ref{fig:wiener_filter_response}.
+A Wiener filter is a static filter that removes the frequency contents of noise from the frequency contents of a signal \cite{wiki:Wiener_filter} \cite{lecture_adaptive_filters_1}. In other words, the Wiener filter attenuates the frequencies that are present in noise so that when the filter is applied to a signal that is polluted by noise with the same frequency contents it effectively removes the noise. It is the optimal solution in terms of mean square error to a statically filtering additive noise from a signal. The mathematical representation of the optimal filter is given in equation \ref{eq:wiener_filter}. This is done by measuring two things: The signal that is corrupted by noise, and the noise separately. For example when measuring an sEMG signal an additional channel is used to measure the signal of a non-contracting muscle to gather only the present noise.
+
+\begin{equation}
+    H_{opt}(z) = \frac{\Phi_{ss}(z)}{\Phi_{ss}(z) + \Phi_{vv}(z)}
+    \caption{Frequency domain representation of the Wiener solution frequency behaviour. $\Phi_{ss}(z)$ is the z-domain representation of the signal, and $\Phi_{vv}(z)$ is the z-domain representation of the noise \cite{stanford_wiener_filter} }
+    \label{eq:wiener_filter}
+\end{equation}
+
+
+The Wiener filter requires both the signal and the noise to be stationary, i.e. the spectral density does not change over time, and results in a linear time-invariant filter \cite{stationary_processes_definition} \cite{difference_stationary_nonstationary}. As an example a Wiener filter was made from the signal as seen in figure \ref{fig:sEMG_signal_example}. The time span from 0-2 seconds is taken as the 'noise', and the signal+noise from 5-7 seconds is taken to be 'signal'. From these a Wiener filter is constructed and can be seen in figure \ref{fig:wiener_filter_response}.
+
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -112,9 +117,9 @@ The Wiener filter requires both the signal and the noise to be stationary, i.e. 
 	\label{fig:wiener_filter_response}
 \end{figure}
 
-Adaptive filters expand on the idea of using knowledge of the spectral domain to create a filter by only using a subset of the input data (last $n$ samples). By re-calculating the filter coefficients with new data it is possible to update the filter to match a changing spectral density. 
+Adaptive filters is a class of filters where the filter coefficients are adjusted over time to attempt to find an optimal solution even without knowing the signal properties beforehand \cite{adaptive_filter_and_applications}. A Wiener filter can be turned into an adaptive Wiener filter by re-calculating the filter coefficients with new data to match a changing spectral density. 
 
-Adaptive filters are applied in the same way as static filters by just multiplying the filter with measurements. However, the method of finding the filter coefficients is different. Instead of deciding beforehand what frequencies you want to have removed, you measure the noise and determine its frequency spectrum. Then you tune the filter coefficients to remove these frequencies from the measurements (which also includes noise) leaving only the desired signal. This filter is used in environments where the noise frequency spectrum is not known beforehand, or when the frequency behaviour of the noise may change over time. Common applications of adaptive filters include speech recognition and noise-cancelling headphones! \cite{wiener_vs_adaptive_realtime_noisecancellation}
+Adaptive filters are applied in the same way as static filters by just multiplying the filter with measurements. However, the method of finding the filter coefficients is different. Instead of deciding beforehand what frequencies you want to have removed, you measure the signal and the noise and determine their frequency spectrum. Then you tune the filter coefficients to remove the noise components from the measurement while leaving the signal unaffected. This filter is used in environments where the noise frequency spectrum is not known beforehand, or when the frequency behaviour of the noise may change over time. Common applications of adaptive filters include speech recognition, echo cancellation, and headphones employing active noise cancellation! \cite{active_noise_cancellation_wiener_filter} \cite{wiener_vs_adaptive_realtime_noisecancellation}
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -134,7 +139,7 @@ The previously discussed filters were all described as Finite Impulse Response (
 
 An Infinite Impulse Response filter calculates the output using two sets of filter coefficients. The first set of filter coefficients is used to multiply with the input just like a FIR filter, but the second set of filter coefficients is used to multiply with previous \textit{outputs}. This means that there is now a feedback loop in the system, and a system with feedback can become unstable. Unstable in this case means that there is a possibility of positive feedback loop where increasing output values result in future output values also increasing, eventually going to infinity. Even though this feedback and possible instability may sound like a downside, it also results in shorter filter length and thus fewer computations required per filter operation. This could especially provide beneficial in low memory and low compute power environments like in prostheses \cite{fir_vs_iir}.
 
-Both static and adaptive filters can be implemented as both FIR or IIR filters. An adaptive IIR filter offers the potential to meet desired performance levels with much less computational complexity. However, the possibility for the system to become unstable combined with the fact that filter coefficients are adjusted automatically leads to a high-risk high-reward scenario due to a loss of control and hard to predict behaviour. Background material on adaptive IIR materials can be found in chapter 23 of the Signal Processing Handbook \cite{digital_signal_processing_handbook}.
+Both static and adaptive filters can be implemented as both FIR or IIR filters. An adaptive IIR filter offers the potential to meet desired performance levels with much less computational complexity. However, the possibility for the system to become unstable combined with the fact that filter coefficients are adjusted automatically leads to a high-risk high-reward scenario due to a loss of control and hard to predict behaviour \cite{digital_signal_processing_handbook}.
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -146,13 +151,15 @@ Both static and adaptive filters can be implemented as both FIR or IIR filters. 
 
 
 \section{Pre-whitening}
-Back in 1948 a mathematician, electrical engineer, and cryptographer named C.E. Shannon published a pioneering paper that formed the basis of information theory \cite{shannon}. In this paper it is shown that repetition does not carry information, and that the maximum information transfer occurs when a signal is truly random. Imagine a signal with only a single frequency component. After measuring a few samples of the signal the conlusion is drawn that this is a 50Hz signal. Since it is possible to predict the value of every future measurement of the signal after drawing this conclusion it becomes unnecessary to continue measuring the signal because it will not give any new information. A repeating pattern is predictable, and predictable events carry no information.
+Most  papers that mention the use of whitening only state the definition of the process, and something along the lines of "including a temporal whitening filter prior to demodulation and smoothing improves the performance of the amplitude estimate" \cite{single_site_emg_amplitude_estimation}\cite{adaptive_whitening}\cite{emg_whitening}. However, an intuitive explanation of \textit{why} whitening works is lacking. So to understand the reasoning behind whitening we need to take a short detour to the world of computer science and information science.
 
-The polar opposite of a signal containing a single frequency that is therefore predictable and carries little information is a signal that contains all frequencies an equal amount. This is called a white noise signal and carries the maximum amount of information because there exists no repetition and therefore every sample carries new, unpredictable information.
+Back in 1948 a mathematician, electrical engineer, and cryptographer named C.E. Shannon published a pioneering paper that formed the basis of information theory \cite{shannon}. In this paper it is shown that repetition does not carry information, and that the maximum information transfer occurs when a signal is truly random. Imagine a signal with only a single frequency component. After measuring a few samples of the signal the conclusion is drawn that this is a \SI{50}{\hertz} signal. Since it is possible to predict the value of every future measurement of the signal after drawing this conclusion it becomes unnecessary to continue measuring the signal because it will not give any new information. A repeating pattern is predictable, and predictable events carry no information.
 
-Between the existance of a signal containing a single frequency, and a signal containing all frequencys (white noise), all other signals exist and have certain frequencies that are more 'present' than other frequencies. These signals have different degrees of predictability (and thus information density), and the degree of predictability is determined by how closely the frequency content resembles white noise.
+The polar opposite of a signal containing a single frequency (and therefore predictable and carries little information) is a signal that contains all frequencies an equal amount. This is called a white noise signal and carries the maximum amount of information because there exists no repetition and therefore every sample carries new, unpredictable information.
 
-Whitening is a filtering technique that tries to equalize the presence of frequency components in a signal to approximate white noise and thus increase information density. It reduces the random error and yields a larger dynamic range because the small frequency components that contribute to the 'randomness' of the signal but not so much to the value of the measurement sample become more present \cite[Ch. 5.4.9]{time_series_analysis_methods}. The serial correlation of the signal is decreased by reducing the presence of 'predictable' signals, which increases the randomness and thus information density \cite{serial_correlation_definition}. 
+Between the existence of a signal containing a single frequency, and a signal containing all frequencies (white noise), all other signals exist and have certain frequencies that are more 'present' than other frequencies. These signals have different degrees of predictability (and thus information density), and the degree of predictability is determined by how closely the frequency content resembles white noise.
+
+Whitening is a filtering technique that tries to equalize the presence of frequency components in a signal to approximate white noise and thus increase information density. It reduces the random error and yields a larger dynamic range because the small frequency components that contribute to the 'randomness' of the signal but not so much to the value of the measurement sample become more present \cite[Ch. 5.4.9]{time_series_analysis_methods}\cite{single_site_emg_amplitude_estimation}. The serial correlation of the signal is decreased by reducing the presence of 'predictable' signals, which increases the randomness and thus information density \cite{serial_correlation_definition}. 
 
 This previous information manifests itself in sEMG signal processing by the fact that the measured sEMG signal is not white. Some frequency components are much more present than others, but all frequencies equally contribute to the indication of muscle contraction. To get a more accurate indication of muscle contraction the signal should be whitened to increase the information of each sample.
 
@@ -183,11 +190,13 @@ To summarize: Whitening reduces the power of repeating frequencies and increase 
 	\begin{center}
 		\includegraphics[width=1.0\columnwidth]{images/amplitude_force_estimation_example.png}
 	\end{center}
-	\caption{On the left a time-domain sEMG signal. On the right an example of force estimation is presented. By taking the absolute value of the sEMG signal on the left, calculating the envelope, and recognizing that the force is a linearly scaled version of the envelope it is possible to estimate the force from the sEMG signal.}
+	\caption{On the left a time-domain sEMG signal. On the right an example of force estimation is presented. By taking the absolute value of the sEMG signal on the left and calculating the envelope it is possible to make an estimation of muscle contraction. The next step would be force estimation but this requires two antagonistic muscles. This is discussed more in-depth in section \ref{section:force_estimation}}
 	\label{fig:amplitude_estimation_example}
 \end{figure}
 
-As mentioned earlier the amplitude of a measured sEMG signal scales approximately linear with how much a skeletal muscle is contracted \cite{adaptive_filter_dry_electrode}. Since the raw EMG signal consists of stochastic and unpredictable noise it is difficult to draw conclusions about the degree of muscle contraction when solely looking at individual samples \cite{semg_signals_analysis_and_applications}. By drawing an outline of the peaks of the signal a much more informative picture can be drawn. This is called an envelope and an illustration of this process can be found in figure \ref{fig:envelope_wikipedia}. In the case of more random sEMG signals it is preferred to perform full wave rectification on the signal before calculating the envelope so that all of the signal energy is taken into account \cite{semg_signals_analysis_and_applications}. Applying this concept to an sEMG signal can be found in figure \ref{fig:amplitude_estimation_example}.
+The relation between the amplitude of a measured sEMG signal, the degree of contraction of a skeletal muscle and the exerted force is very complicated. However, the relationship between force and EMG amplitude during isometric contractions is usually linear or close to linear  \cite{interpreting_muscle_function_from_emg} \cite{adaptive_filter_dry_electrode}. This is the reason that in this report it is assumed that there exists a linear relation between force and sEMG signals.
+
+Since the raw EMG signal consists of stochastic and unpredictable noise it is difficult to draw conclusions about the degree of muscle contraction when solely looking at individual samples \cite{semg_signals_analysis_and_applications}. By drawing an outline of the peaks of the signal a much more informative picture can be drawn. This is called an envelope and an illustration of this process can be found in figure \ref{fig:envelope_wikipedia}. In the case of more random sEMG signals it is preferred to perform full wave rectification on the signal before calculating the envelope so that all of the signal energy is taken into account \cite{semg_signals_analysis_and_applications}. Applying this concept to an sEMG signal can be found in figure \ref{fig:amplitude_estimation_example}.
 
 Computationally envelope detection can be achieved in a number of different methods where "speed", or how much the detected envelope lags behind the true signal envelope, is traded against accuracy or noisiness \cite{dsp_good_bad_ugly}. A few different envelope detection techniques are discussed in \cite{rose2011electromyogram}.
 
@@ -208,7 +217,7 @@ The Root Mean Square (RMS) of a signal is the square root of average power of a 
 \section{Standard sEMG signal processing}\label{section:standard_semg_processing}
 A conventional static real-time sEMG signal processing chain is described in \cite{muscle_force_estimation}. The relevant steps are as follows:
 \begin{itemize}
-    \item Highpass filter to remove DC
+    \item Remove DC component from sig
     \item Bandpass filter 20-\SI{300}{\hertz}
     \item Notch filter at \SI{50}{\hertz}
     \item Half-wave rectification
