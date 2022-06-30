@@ -6,11 +6,7 @@ This section of the report describes the testing of separate signal processing s
     \item Envelope estimation
 \end{itemize}
 
-Unless specified otherwise
-\begin{itemize}
-    \item all signals will be high-passed with a cutoff frequency of \SI{1}{\hertz} to remove DC bias before any operation is applied
-    \item all measured sEMG signals were acquired during isometric contraction
-\end{itemize}
+Unless specified otherwise all signals will be high-passed with a cutoff frequency of \SI{1}{\hertz} to remove DC bias before any operation is applied
 
 \section{Pre-whitening}
 A whitening filter is a digital filter with a frequency response that is (ideally) the inverse of the frequency contents of an sEMG signal. 
@@ -32,13 +28,28 @@ The whitening filter is then created by taking the FFT of the time-domain test s
 In \ref{fig:whitening_simulation} it can be seen that the whitening filter functions as expected. In the center subplot the 'ideal' result can be seen (multiplication in the frequency domain), and in subplot 5 the result from convolution in the time domain is shown. In subplot 5 a smoothened version of the filtered signal FFT is added to display that the signal power has a mean that approximates white noise. This filter was made using a Savitzky-Golay filter with a window length of 31 and a polynomial order of 3.
 
 \section{Filtering}
+Due to the difficulty of creating a simulated signal that has the frequency contents of an sEMG signal and environmental noise, a pre-recorded sample of sEMG of a bicep going through maximum voluntary contraction was used to test the filters. This sample is not used for force estimation because there is no way to validate the degree of contraction, and purely the frequency contents of the signal are of interest. The sample that is used can be seen in figure \ref{fig:sEMG_signal_example}. 
 
 \textcolor{red}{Insert measurement settings of Octopus}
 
-Each filter will be tested on a pre-recorded EMG signal sample and an environment noise sample to determine its effectiveness of removing noise while leaving the EMG signal intact. The construction of each filter will be explained in the method, and the SNR performance and signal integrity of each filter will be discussed in the results. 
+The construction of each filter will be explained in the method, and the SNR performance and signal integrity of each filter will be discussed in the results. 
 
 \subsubsection{Static filter}
-A notch filter at \SI{50}{\hertz} with quality factor 20 is applied. Then a high-pass filter with a cut-off frequency of \SI{20}{\hertz} and a quality factor of 20 is applied, followed by a low-pass filter with a cut-off frequency of \SI{300}{\hertz} and a quality factor of 20 is applied. These values follow from the theory in section \ref{section:standard_semg_processing}.
+The theory from section \ref{section:standard_semg_processing} specifies the removal of DC frequencies, a notch filter at \SI{50}{Hz}, and a bandpass filter between \SI{20}{Hz} and \SI{300}{Hz}. Looking at the noise spectrum in figure \ref{fig:sEMG_fft_signalnoise_example} it can be seen that there also exist significant peaks at \SI{100}{Hz} and \SI{150}{Hz}. For this reason, additional notch filters are constructed to target these frequencies. The total frequency response of the concatenated filters can be seen in figure \ref{fig:staticfilter_frequencyresponse}.
+\begin{itemize}
+    \item IIR Notch filters at \SI{50}{Hz}, \SI{100}{Hz}, \SI{150}{Hz}. All have a Q-factor of 10, are constructed as numerator/denominator pairs and applied using scipy's lfilter.
+    \item The bandpass filter consists of a highpass filter with a cut-off frequency of \SI{20}{Hz} and a lowpass filter with a cut-off frequency of \SI{300}{Hz}. Both filters are of length 5, are constructed as numerator/denominator pairs, and applied using scipy's lfilter.
+\end{itemize}
+
+\subsection{Method}
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[width=1.0\columnwidth]{images/staticfilter_frequencyresponse.png}
+	\end{center}
+	\caption{Static filter frequency response. This plot was created by determining the frequency responses of each individual filter, then multiplying the amplitudes and adding the phase shifts}
+	\label{fig:staticfilter_frequencyresponse}
+\end{figure}
+
 
 \subsubsection{Wiener filter}
 In ideal scenarios, the Wiener filter coefficients are calculated from a sample of pure signal and a sample of pure noise. The noise is taken to be the 'desired signal' since this this contains the frequency components the Wiener filter coefficients should approximate. The sum of the pure signal and the noise is taken to be the (polluted) 'input'.
@@ -54,7 +65,6 @@ The number of Wiener filter coefficients have a strong influence on the performa
     \label{eq:wiener_hopf}
 \end{equation}
 
-\subsection{Method}
 \begin{figure}[h!t]
 	\begin{center}
 		\includegraphics[width=1.0\columnwidth]{images/wiener_filter_length.png}
@@ -64,8 +74,19 @@ The number of Wiener filter coefficients have a strong influence on the performa
 \end{figure}
 
 \subsubsection{Adaptive Wiener filter}
+The method of calculation to obtain the filter coefficients for the adaptive Wiener filter is identical to the one presented in the Wiener filter. The difference with this method is that instead of taking a large signal sample and noise sample to calculating the filter coefficients and using those on the entire signal, the filter coefficients are repeatedly recalculated over the latest sample set. This leaves the question: How often should the coefficients be recalculated and over how many samples should the filter coefficients be calculated?
 
-\textcolot{red}{Todo: write this}
+Using the previously discussed prerecorded sample that can be seen in figure \ref{fig:sEMG_signal_example} various combinations of window size (number of samples from which the coefficients are calculated) and 'blocks' per window (how many samples are skipped before recalculating the filter coefficients) were tested. The results can be found in figure \ref{fig:adaptive_wiener_windowsize}. For the comparison between different filters, a window length of 500 was used in combination with 1 block per window. In other words, every 500 samples the Wiener filter coefficients are calculated using the last 500 samples.
+
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[width=1.0\columnwidth]{images/adaptive_wiener_windowsize.png}
+	\end{center}
+	\caption{SNR and Signal integrity of an adaptive wiener filter using different combinations of window size and blocks per window. It should be noted that each signal has been smoothened using a Savitzky-Golay filter with a window length of 31 and a polynomial order of 3. This is done to make the difference in performance between different blocks per window clearer, without filtering the signals have a larger deviation that makes the lines unreadable.
+	It can be seen that the number of blocks per window does not have a big influence on the SNR or signal integrity. The SNR seems to have a somewhat linear relation with the window size, while the signal integrity peaks around a window size of 500 samples.}
+	\label{fig:adaptive_wiener_windowsize}
+\end{figure}
+
 
 \subsection{Results}
 Each filter will be tested using two metrics: SNR (eq \ref{eq:rms}) and signal integrity (definition of this will be given shortly). All filters are linear time invariant which means the superposition principle can be used to simplify SNR calculations \cite{linear_systems_theory}. The superposition principle simply states that filtering the sum of two signals is the same as filtering the signals individually and adding the results. An illustration of this can be seen in \ref{fig:filter_process}. A sample of noise data and a sample of EMG data is taken from \ref{fig:sEMG_signal_example} where noise is taken to be 0-2s and signal is taken to be 5-\SI{7}{\second}. The RMS of the filtered signal is divided by the RMS of the filtered noise to create a signal to noise ratio.

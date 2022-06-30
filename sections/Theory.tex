@@ -13,7 +13,7 @@ When moving a limb the most intuitive way of describing it is a change in positi
     \item Your limb has arrived at a new location.
 \end{itemize}
 
-Understanding this reasoning of moving a limb in terms of forces being applied by contracting muscles is vital because it forms the basis for recognizing a user's intent. EMG can be used to measure the degree of contraction of a muscle, and by measuring the degree of contraction of two antagonistic muscles it is possible to calculate how much force is applied in a certain direction which signals a desire for this limb to move. Even if the limb is not present and replaced by a prosthesis this idea of forces moving a mass will still apply, and thus EMG can be used as a human-machine interface.
+Understanding this reasoning of moving a limb in terms of forces being applied by contracting muscles is vital because it forms the basis for recognizing a user's intent. EMG can be used to measure the degree of contraction of a muscle, and by measuring the degree of contraction of two antagonistic muscles it is possible to calculate how much force applied in a certain direction which signals a desire for this limb to move. Even if the limb is not present and replaced by a prosthesis this idea of forces moving a mass will still apply, and thus EMG can be used as a human-machine interface.
 
 So to summarize the basic concept of force estimation:
 \begin{itemize}
@@ -190,7 +190,7 @@ To summarize: Whitening reduces the power of repeating frequencies and increase 
 	\begin{center}
 		\includegraphics[width=1.0\columnwidth]{images/amplitude_force_estimation_example.png}
 	\end{center}
-	\caption{On the left a time-domain sEMG signal. On the right an example of force estimation is presented. By taking the absolute value of the sEMG signal on the left and calculating the envelope it is possible to make an estimation of muscle contraction. The next step would be force estimation but this requires two antagonistic muscles. This is discussed more in-depth in section \ref{section:force_estimation}}
+	\caption{On the left a time-domain sEMG signal. On the right an example of envelope estimation is presented. By taking the absolute value of the sEMG signal on the left and calculating the envelope it is possible to make an estimation of muscle contraction. The next step would be force estimation but this requires two antagonistic muscles. This is discussed more in-depth in section \ref{section:force_estimation}}
 	\label{fig:amplitude_estimation_example}
 \end{figure}
 
@@ -205,7 +205,7 @@ A moving average filter is a special type of FIR filter with coefficients that a
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[width=0.7\columnwidth]{images/lowpassfilter_phaseshift.png}
+		\includegraphics[width=0.7\columnwidth]{images/movingaverage_phaseshift.png}
 	\end{center}
 	\caption{Frequency response of a moving average filter. This particular filter consists of 100 coefficients all equal to 0.01. Notice how the filter has linear phase which indicates that there is no phase distortion due to the time delay of frequencies relative to another \cite{fir_filter_properties}}
 	\label{fig:movingaverage_phaseshift}

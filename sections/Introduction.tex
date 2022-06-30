@@ -7,7 +7,7 @@ The electrical activity of a muscle can either be measured by probing the inside
 During the last 2 decades research has attempted to gather more accurate sEMG readings by increasing the number of electrodes on a muscle with a technique called high-density sEMG \cite{high_density_semg}. 
 This technique has allowed the measuring of spatial muscle activation in addition to time domain muscle activation. By measuring the muscle activation of a single muscle at multiple points it is theoretically possible to determine the behaviour of individual motor units \cite{high_density_semg_clinical_applications}.
 
-However, this increased accuracy comes with a catch: Each electrode outputs a single data stream that needs to be processed. Adding more electrodes means requiring more amplifier channels and smaller electrodes with higher impedances, both of which result in a more expensive amplifier. Additionally, having to process more data requires a faster signal processing chain that should retain original processing quality.
+However, this increased accuracy comes with a catch: Each electrode outputs a single data stream that needs to be processed. Adding more electrodes means requiring more amplifier channels and smaller electrodes with higher impedances, both of which results in a more expensive amplifier. Additionally, having to process more data requires a faster signal processing chain that should retain original processing quality.
 
 
 This project aims to give an overview of the effectiveness of different EMG processing techniques. The effect of whitening the input signal, different filtering techniques, and different envelope detection techniques are discussed, with the overarching goal of performing accurate force estimation from sEMG signals.
@@ -30,13 +30,12 @@ An important paper in the field of EMG signals is \cite{optimal_myoprocessor}. T
 There are several papers related to signal processing of sEMG signals.
 One outstanding example is \cite{adaptive_filter_dry_electrode} from 2019, where it is shown that adaptive filters are an effective solution to EMG signal processing. The paper presents the instrumentation scheme of a dry-electrode sEMG measurement setup and explains a method of creating real-time adaptive finite impulse response (FIR) filters. In essence it is very similar to what my research project attempts to achieve, but the report you are reading right now is aimed at comparing the performance between filters rather than the creation of one.
 
-Lastly I would like to mention that static and adaptive filters are only a subset of the available tools for sEMG signal processing. An emerging topic in this field is the use of machine learning methods for signal analysis. Applying machine learning could allow for very quick, efficient, and effective signal processing, with the downside of unexpected behaviour in certain situations. Where static filters and adaptive filters exhibit deterministic behaviour (which is difficult to confirm in the case of real-time adaptive filters), machine learning methods can be somewhat 'hit or miss'. \cite{ml_semg_processing_1}.
-\cite{ml_semg_processing_2}
+Lastly I would like to mention that static and adaptive filters are only a subset of the available tools for sEMG signal processing. An emerging topic in this field is the use of machine learning methods for signal analysis. Applying machine learning could allow for fast, efficient, and effective signal processing, with the downside of unexpected behaviour in certain situations. Where static filters and adaptive filters exhibit deterministic behaviour (which is difficult to confirm in the case of real-time adaptive filters), machine learning methods can be somewhat 'hit or miss'. \cite{ml_semg_processing_1,ml_semg_processing_2}.
 "In many cases, ML model predictions have been found to be objectionable and violating their original expectations after deployment. A key reason is that ML models are often complex black-boxes and thus have varying, unknown failure modes that are revealed only after deployment" \cite{microsoft_machine_learning_reliable}.
 
 \section{Research goal}
 Even though a significant amount of research has been done into the digital processing of sEMG signals, an overview comparing different techniques is lacking. This report aims to give an overview of pre-whitening, different filtering techniques, and different envelope detection techniques. The overaching goal is comparing each method with the goal of \textit{real-time} force estimation. 
-In figure \ref{fig:global_thesis_flowchart} a high-level overview of the signal processing chain is presented. 
+In Figure~\ref{fig:global_thesis_flowchart} a high-level overview of the signal processing chain is presented. 
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -50,4 +49,6 @@ In figure \ref{fig:global_thesis_flowchart} a high-level overview of the signal 
 \section{Approach}
 The approach for this project consists of two main topics: Evaluate filter performance on sEMG signals by assessing the signal to noise ratio (SNR) and signal integrity of the signal and noise before and after filtering, and evaluate the influence of whitening and different envelope extraction techniques on the lag and error (how close is the estimated signal to the 'true' signal) of a simulated force signal.
 
-The combination of whitening, different filtering techniques, and different envelope extraction techniques is also evaluated through a measurement setup consisting of a 20kg load cell and a multi-channel EMG sensor. This setup is subsequently used to estimate the force from the sEMG signals and compare it to the force measured using the load cell.
+The combination of whitening, different filtering techniques, and different envelope extraction techniques is also evaluated through a measurement setup consisting of a \SI{20}{\kilo\gram} load cell and a multi-channel EMG sensor. This setup is subsequently used to estimate the force from the sEMG signals and to compare it to the force measured using the load cell.
+
+.
