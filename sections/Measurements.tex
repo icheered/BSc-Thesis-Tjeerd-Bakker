@@ -38,7 +38,6 @@ The applied force followed the following pattern:
 
 \section{Measurement data}
 
-
 \begin{figure}[h!t]
 	\begin{center}
 		\includegraphics[width=1.0\columnwidth]{images/measurement_calibratie2_1k.png}
@@ -57,10 +56,11 @@ The applied force followed the following pattern:
 
 The calibration process required measuring the steady-state value to determine the offset. To relate the measured values to the applied force, an object of known weight was attached to the load cell. These processes can be seen in figure \ref{fig:calibration_1k}. The measured force is approximately 10x the measured signal ($1681g / 167.5 uV = 10.03$).
 
-Due to unknown reasons the amplifier was not able to capture both sEMG signals and the load cell signal at the same time which can be seen in figure \ref{fig:measurement_1k}. The load cell could be measured, but when attaching the the reference armband that the subject was wearing to 'Patient ground' on the amplifier the measured load cell signal was promptly nullified. Attaching the reference armband is required to measure sEMG signals, but connecting this armband makes it impossible to capture load cell information.
+Due to unknown reasons the amplifier was not able to capture both sEMG signals and the load cell signal at the same time which can be seen in figure \ref{fig:measurement_1k}. The load cell could be measured, but when attaching the reference armband that the subject was wearing to 'Patient ground' on the amplifier the measured load cell signal was promptly nullified. Attaching the reference armband is required to measure sEMG signals, but connecting this armband makes it impossible to capture load cell information.
 
 \section{Measurement processing result}
-Force is estimation, no way to compare it to actual force. Make relative comments.
+Even though it was not possible to compare the estimated force to an external measurement for validation, some comparative conclusions can still be drawn.
+
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -118,7 +118,3 @@ envelopes
 - frequency spectrum is from 10-25s
 - frequency plot is smoothened, moving average, n=50
 => weird IIR lowpass filter behaviour
-
-
-\section{Conclusion}
-Draw numeric conclusion from data, in which situations is which filter how much better?

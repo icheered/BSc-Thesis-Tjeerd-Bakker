@@ -30,8 +30,6 @@ In \ref{fig:whitening_simulation} it can be seen that the whitening filter funct
 \section{Filtering}
 Due to the difficulty of creating a simulated signal that has the frequency contents of an sEMG signal and environmental noise, a pre-recorded sample of sEMG of a bicep going through maximum voluntary contraction was used to test the filters. This sample is not used for force estimation because there is no way to validate the degree of contraction, and purely the frequency contents of the signal are of interest. The sample that is used can be seen in figure \ref{fig:sEMG_signal_example}. 
 
-\textcolor{red}{Insert measurement settings of Octopus}
-
 The construction of each filter will be explained in the method, and the SNR performance and signal integrity of each filter will be discussed in the results. 
 
 \subsubsection{Static filter}
@@ -46,19 +44,15 @@ The theory from section \ref{section:standard_semg_processing} specifies the rem
 	\begin{center}
 		\includegraphics[width=1.0\columnwidth]{images/staticfilter_frequencyresponse.png}
 	\end{center}
-	\caption{Static filter frequency response. This plot was created by determining the frequency responses of each individual filter, then multiplying the amplitudes and adding the phase shifts}
+	\caption{Frequency response of the static filter. This plot was created by determining the frequency responses of each individual filter, then multiplying the amplitudes and adding the phase shifts}
 	\label{fig:staticfilter_frequencyresponse}
 \end{figure}
 
 
 \subsubsection{Wiener filter}
-In ideal scenarios, the Wiener filter coefficients are calculated from a sample of pure signal and a sample of pure noise. The noise is taken to be the 'desired signal' since this this contains the frequency components the Wiener filter coefficients should approximate. The sum of the pure signal and the noise is taken to be the (polluted) 'input'.
-
-The autocorrelation of the input and the crosscorrelation between the input and the desired signal is calculated. These are used to calculate the optimal Wiener coefficients that minimize the mean-square error using the Wiener-hopf equation that can be seen in \ref{eq:wiener_hopf}. Here $R$ is the autocorrelation of the desired signal, and $p$ is the cross-correlation between the desired signal and input. 
+As discussed in section \ref{sec:filters_theory} the Wiener filter coefficients are constructed from the crosscorrelation vector between signal+noise ($d(n)$) and the noise ($v(n)$) and the autocorrelation of the noise as is presented in the Wiener-Hopf equation in equation \ref{eq:wiener_hopf} \cite{lecture_adaptive_filters_1}. 
 
 The number of Wiener filter coefficients have a strong influence on the performance of the filter as can be seen in figure \ref{fig:wiener_filter_length}. The explanation behind SNR calculation and signal integrity will be discussion in the 'Results' section.
-
-\textcolor{red}{Todo: To which extend should I include the mathematical calculations for the wiener filter?}
 
 \begin{equation}
     w_{opt} = R^{-1}P
@@ -74,7 +68,7 @@ The number of Wiener filter coefficients have a strong influence on the performa
 \end{figure}
 
 \subsubsection{Adaptive Wiener filter}
-The method of calculation to obtain the filter coefficients for the adaptive Wiener filter is identical to the one presented in the Wiener filter. The difference with this method is that instead of taking a large signal sample and noise sample to calculating the filter coefficients and using those on the entire signal, the filter coefficients are repeatedly recalculated over the latest sample set. This leaves the question: How often should the coefficients be recalculated and over how many samples should the filter coefficients be calculated?
+The method of calculation to obtain the filter coefficients for the adaptive Wiener filter is identical to the one presented in the Wiener filter. The difference with this method is that instead of taking a large signal sample and noise sample to calculating the filter coefficients and using those on the entire signal, the filter coefficients are repeatedly recalculated over the latest sample set. This allows the filter to adapt to changing statistical signal properties. This leaves the question: How often should the coefficients be recalculated and over how many samples should the filter coefficients be calculated?
 
 Using the previously discussed prerecorded sample that can be seen in figure \ref{fig:sEMG_signal_example} various combinations of window size (number of samples from which the coefficients are calculated) and 'blocks' per window (how many samples are skipped before recalculating the filter coefficients) were tested. The results can be found in figure \ref{fig:adaptive_wiener_windowsize}. For the comparison between different filters, a window length of 500 was used in combination with 1 block per window. In other words, every 500 samples the Wiener filter coefficients are calculated using the last 500 samples.
 
@@ -138,22 +132,23 @@ Again, the signal integrity was calculated for different filters and at differen
 	\label{fig:filter_signal_integrity_mvc}
 \end{figure}
 
-For the static filter a few different variations were tested. Looking at figure \ref{fig:sEMG_fft_signalnoise_example} it can be seen that beside the \SI{50}{\hertz} peak in the noise spectrum there are additional peaks at multiples of \SI{50}{\hertz} (\SI{100}{\hertz}, \SI{150}{\hertz}, etc). Static filters were tested starting from no notch filters (Static 0), and going up to 4 notch filters (Static 4). Static 1 has a single notch filter at \SI{50}{\hertz}, static 2 has a notch at \SI{50}{\hertz} and one at \SI{100}{\hertz}, etc. The resulting metrics can be seen in table \ref{tab:static_filter_snr_integrity}.
+For the static filter a few different variations were tested. Looking at figure \ref{fig:sEMG_fft_signalnoise_example} it can be seen that beside the \SI{50}{\hertz} peak in the noise spectrum there are additional peaks at multiples of \SI{50}{\hertz}. Different static filters were tested with different amounts of notch filters. The frequency response of these filters can be seen in figure \ref{fig:staticfilter_notches_frequencyresponse}. The resulting metrics can be seen in the chart  \ref{fig:staticfilter_notches_barchart}.
 
-\begin{table} [h!]
-    \begin{tabular}{c|c|c}
-        Filter type & SNR & Signal integrity\\
-        \hline
-        None & 1.0 & 0.0\\
-        Static 0 & 2.443 & 0.045\\
-        Static 1 & 5.796 & 0.015\\
-        Static 2 & 2.426 & 0.03\\
-        Static 3 & 2.433 & 0.044\\
-        Static 4 & 2.47 & 0.05\\
-    \end{tabular}
-    \caption{SNR and signal integrity for different static filters.}
-    \label{tab:static_filter_snr_integrity}
-\end{table}
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[width=0.7\columnwidth]{images/staticfilter_notches_frequencyresponse.png}
+	\end{center}
+	\caption{Frequency response of static filters with different amounts of notch filters. For the sake of illustration the amplitude graphs have been shifted vertically to clearly show the existence of notch filters in different lines, during simulations this shift was not present. }
+	\label{fig:staticfilter_notches_frequencyresponse}
+\end{figure}
+
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[width=0.7\columnwidth]{images/staticfilter_notches_barchart.png}
+	\end{center}
+	\caption{SNR and signal integrity of static filters with different numbers of Notch filters. }
+	\label{fig:staticfilter_notches_barchart}
+\end{figure}
 
 \section{Envelope estimation}
 The construction of different envelope estimation techniques will be discussed in the method section. The metric for testing performance with be discussed in the results section, as well as the results themselves.
@@ -234,7 +229,7 @@ The previous step of envelope estimation is used to get a measure of muscle cont
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[width=0.7\columnwidth]{images/force_simulation.png}
+		\includegraphics[width=1.0\columnwidth]{images/force_simulation.png}
 	\end{center}
 	\caption{Process of estimating force from simulated sEMG (random Gaussian noise). The bicep envelope is calculated at the top, notice how during downwards force exertion the bicep still activates but to a lesser degree than during upwards force exertion. The same holds for the tricep in the bottom figure. The subplot on the right shows the envelope of the bicep, tricep, the difference between these two (identical to estimated force assuming linear scaling with factor 1), and the 'measured' force .}
 	\label{fig:force_simulation}

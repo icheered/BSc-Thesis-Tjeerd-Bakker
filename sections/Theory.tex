@@ -13,7 +13,7 @@ When moving a limb the most intuitive way of describing it is a change in positi
     \item Your limb has arrived at a new location.
 \end{itemize}
 
-Understanding this reasoning of moving a limb in terms of forces being applied by contracting muscles is vital because it forms the basis for recognizing a user's intent. EMG can be used to measure the degree of contraction of a muscle, and by measuring the degree of contraction of two antagonistic muscles it is possible to calculate how much force applied in a certain direction which signals a desire for this limb to move. Even if the limb is not present and replaced by a prosthesis this idea of forces moving a mass will still apply, and thus EMG can be used as a human-machine interface.
+Understanding this reasoning of moving a limb in terms of forces being applied by contracting muscles is vital because it forms the basis for recognizing a user's intent. EMG can be used to measure the degree of contraction of a muscle, and by measuring the degree of contraction of two antagonistic muscles it is possible to calculate the amount of force applied in a certain direction which signals a desire for this limb to move. Even if the limb is not present and replaced by a prosthesis this idea of forces moving a mass will still apply, and thus EMG can be used as a human-machine interface.
 
 So to summarize the basic concept of force estimation:
 \begin{itemize}
@@ -86,7 +86,7 @@ By carefully choosing the number and value of filter coefficients it is possible
 	\label{fig:wiki_digital_filter_working}
 \end{figure}
 
-\subsection{Static filters, Wiener filter, Adaptive filters}
+\subsection{Static filters, Wiener filter, Adaptive filters}\label{sec:filters_theory}
 The main difference between the different presented filter types is the way of calculating the filter coefficients. If a filter is static (e.g. high-pass, low-pass, band-pass, or band-stop) it simply means that the amount of filter coefficients and the values of the filter coefficients are predetermined. These filters are very popular due to their simplicity in terms of finding the value of the filter coefficients. 
 
 \begin{figure}[h!t]
@@ -97,14 +97,86 @@ The main difference between the different presented filter types is the way of c
 	\label{fig:static_filters}
 \end{figure}
 
-A Wiener filter is a static filter that removes the frequency contents of noise from the frequency contents of a signal \cite{wiki:Wiener_filter} \cite{lecture_adaptive_filters_1}. In other words, the Wiener filter attenuates the frequencies that are present in noise so that when the filter is applied to a signal that is polluted by noise with the same frequency contents it effectively removes the noise. It is the optimal solution in terms of mean square error to a statically filtering additive noise from a signal. The mathematical representation of the optimal filter is given in equation \ref{eq:wiener_filter}. This is done by measuring two things: The signal that is corrupted by noise, and the noise separately. For example when measuring an sEMG signal an additional channel is used to measure the signal of a non-contracting muscle to gather only the present noise.
+A Wiener filter aims to produce an estimate of a target process by linear time-invariant filtering of a noisy signal using knowledge of the spectrum of the stationary noise and target process assuming additive noise \cite{wiki:Wiener_filter} \cite{lecture_adaptive_filters_1}. In other words, given a frequency spectrum of noise and a signal polluted by noise with the same frequency spectrum, a Wiener filter tries to produce the original signal. It is the optimal solution in terms of mean square error to statically filtering additive noise from a signal. Figure \ref{fig:wiener_filter_diagram} shows a diagram that illustrates how the Wiener filter is applied using a noise source and a signal+noise source.
+
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[width=1.0\columnwidth]{images/WienerFilterDiagram.png}
+	\end{center}
+	\caption{Diagram that illustrates the functioning of a Wiener filter. s(n) is the desired signal, and v(n) is the additive noise.}
+	\label{fig:wiener_filter_diagram}
+\end{figure}
+
+
+\begin{equ}[!ht]\label{eq:start_wiener}
+  \begin{equation}
+    \hat{s}(n) = (s(n) + v(n)) - \hat{v}(n) = d(n) - \boldsymbol{w}^T v(n)
+  \end{equation}
+\caption{$s(n)$ is the target signal, $v(n)$ is the additive noise. The goal of the Wiener filter is to find an estimate of the target signal $s(n)$ using spectral knowledge of $v(n)$ and of the additive combination of $s(n)+v(n)$. The target signal $s(n)$ is also called the 'error' as it is the part that is left over after applying the Wiener filter.}
+\end{equ}
+
+\begin{equ}[!ht]
+\begin{equation}
+    \hat{s}^2(n) = (d(n) - \boldsymbol{w}^T v(n))^2
+\end{equation}
+
+\begin{equation}
+    \hat{s}^2(n) = d^2(n) - 2d(n)\boldsymbol{w}^T v(n) + \boldsymbol{w}^T v(n)\boldsymbol{w}^T v(n)
+\end{equation}
+
+\begin{equation}
+    \hat{s}^2(n) = d^2(n) - 2 \boldsymbol{w}^T d(n) v(n) + \boldsymbol{w}^T v(n) v^T(n) \boldsymbol{w}
+\end{equation}
+\caption{Calculate the square of the error}
+\end{equ}
+
+\begin{equ}[!ht]
+\begin{equation}
+    E(\hat{s}^2(n)) = E(d^2(n)) - 2 \boldsymbol{w}^T E(d(n) v(n)) + \boldsymbol{w}^T E(v(n) v^T(n)) \boldsymbol{w}
+\end{equation}
+\caption{Take the mean of both sides to end up with the Mean Square Error (MSE)}
+\end{equ}
+
+
+\begin{equ}[!ht]
+\begin{align*}
+&J(\boldsymbol{w}) \                  &=& E(\hat{s}^2(n))  &=& \text{MSE (scalar)} \\
+&\sigma^2 \           &=& E(d^2(n))        &=& \text{Power of }d(n) \text{ (scalar)} \\
+&\boldsymbol{p} \      &=& E(d(n) v(n))     &=& \text{M-by-1 Crosscorrelation vector between } d(n) \text{ and } v(n)  \\
+&\boldsymbol{R} \      &=& E(v(n) v^T(n))  &=& \text{M-by-M Autocorrelation matrix of } v(n)
+\end{align*}
+\caption{Redefine terms of the equation}
+\end{equ}
+
+\begin{equ}[!ht]
+\begin{equation}
+    J(\boldsymbol{w}) = \sigma^2 - 2 \boldsymbol{w}^T \boldsymbol{p} + \boldsymbol{w}^T \boldsymbol{R} \boldsymbol{w}
+\end{equation}
+\caption{Insert redefined terms into the equation to form the total equation for Mean Square Error}
+\end{equ}
+
+\begin{equ}[!ht]
+\begin{equation}
+    J(\boldsymbol{w}) = \sigma^2 - 2 \boldsymbol{w}^T \boldsymbol{p} + \boldsymbol{w}^T \boldsymbol{R} \boldsymbol{w}
+\end{equation}
+\caption{Insert redefined terms into the equation to form the total equation for Mean Square Error}
+\end{equ}
+
+\begin{equ}[!ht]\label{eq:end_wiener}
+\begin{equation}
+    \frac{\delta J}{\delta w_i} = 0, i = 0, 1, ... M-1 \ \rightarrow \ \boldsymbol{R} \boldsymbol{w_{opt}} = \boldsymbol{p} \ \rightarrow \ \boldsymbol{w_{opt}} = \boldsymbol{R}^{-1}\boldsymbol{p}
+\end{equation}
+\caption{To find the filter coefficients that result in minimum MSE we take the derivative of the MSE with respect to each filter coefficient. The derivation of this process is quite lengthy but can be found in \cite{proakis_manolakis_1996}. The resulting final solution is called the Wiener-Hopf equation \cite{lecture_adaptive_filters_1} and is also shown in equation \ref{eq:wiener_hopf}}
+\end{equ}
+
+
+The mathematical derivation for finding the optimal filter coefficients is given in equations \ref{eq:start_wiener} to \ref{eq:end_wiener}. The conclusion is that the optimal filter coefficients are calculated by multiplying (dot-product) the inverse of the autocorrelation of signal+noise and the crosscorrelation between signal+noise and noise. In sEMG, the signal+noise is measured at the point of muscle contraction while the noise can be measured seperately from a different bodypart that does not experience contraction. This seperately measured noise has similar frequency characteristics as the noise included in the signal+noise as it experiences the same amplifier noise and environment noise. The resulting frequency domain behaviour can be defined by equation \ref{eq:wiener_filter_frequency_behaviour}\cite{stanford_wiener_filter}.
 
 \begin{equation}
     H_{opt}(z) = \frac{\Phi_{ss}(z)}{\Phi_{ss}(z) + \Phi_{vv}(z)}
     \caption{Frequency domain representation of the Wiener solution frequency behaviour. $\Phi_{ss}(z)$ is the z-domain representation of the signal, and $\Phi_{vv}(z)$ is the z-domain representation of the noise \cite{stanford_wiener_filter} }
-    \label{eq:wiener_filter}
+    \label{eq:wiener_filter_frequency_behaviour}
 \end{equation}
-
 
 The Wiener filter requires both the signal and the noise to be stationary, i.e. the spectral density does not change over time, and results in a linear time-invariant filter \cite{stationary_processes_definition} \cite{difference_stationary_nonstationary}. As an example a Wiener filter was made from the signal as seen in figure \ref{fig:sEMG_signal_example}. The time span from 0-2 seconds is taken as the 'noise', and the signal+noise from 5-7 seconds is taken to be 'signal'. From these a Wiener filter is constructed and can be seen in figure \ref{fig:wiener_filter_response}.
 
@@ -128,8 +200,6 @@ Adaptive filters are applied in the same way as static filters by just multiplyi
 	\caption{Block diagram of an adaptive filter \cite{adaptive_filter_block_diagram}}
 	\label{fig:adaptive_filter_diagram}
 \end{figure}
-
-\textcolor{red}{Todo: Mathematical definition of finding coefficients of adaptive filter (or maybe do this in the simulation section?). }
 
 
 \subsection{FIR vs IIR}
