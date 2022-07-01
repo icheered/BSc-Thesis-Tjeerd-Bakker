@@ -108,27 +108,29 @@ A Wiener filter aims to produce an estimate of a target process by linear time-i
 \end{figure}
 
 
-\begin{equ}[!ht]\label{eq:start_wiener}
-  \begin{equation}
+% \begin{equ}[!ht]
+  \begin{equation}\label{eq:start_wiener}
     \hat{s}(n) = (s(n) + v(n)) - \hat{v}(n) = d(n) - \boldsymbol{w}^T v(n)
   \end{equation}
-\caption{$s(n)$ is the target signal, $v(n)$ is the additive noise. The goal of the Wiener filter is to find an estimate of the target signal $s(n)$ using spectral knowledge of $v(n)$ and of the additive combination of $s(n)+v(n)$. The target signal $s(n)$ is also called the 'error' as it is the part that is left over after applying the Wiener filter.}
-\end{equ}
+% \caption{$s(n)$ is the target signal, $v(n)$ is the additive noise. The goal of the Wiener filter is to find an estimate of the target signal $s(n)$ using spectral knowledge of $v(n)$ and of the additive combination of $s(n)+v(n)$. The target signal $s(n)$ is also called the 'error' as it is the part that is left over after applying the Wiener filter.}
+% \end{equ}
 
-\begin{equ}[!ht]
+% \begin{equ}[!ht]
+text1
 \begin{equation}
     \hat{s}^2(n) = (d(n) - \boldsymbol{w}^T v(n))^2
 \end{equation}
-
+text2
 \begin{equation}
     \hat{s}^2(n) = d^2(n) - 2d(n)\boldsymbol{w}^T v(n) + \boldsymbol{w}^T v(n)\boldsymbol{w}^T v(n)
 \end{equation}
-
+text3
 \begin{equation}
     \hat{s}^2(n) = d^2(n) - 2 \boldsymbol{w}^T d(n) v(n) + \boldsymbol{w}^T v(n) v^T(n) \boldsymbol{w}
 \end{equation}
-\caption{Calculate the square of the error}
-\end{equ}
+% \caption{Calculate the square of the error}
+% \end{equ}
+Calculate the square of the error
 
 \begin{equ}[!ht]
 \begin{equation}
@@ -162,8 +164,8 @@ A Wiener filter aims to produce an estimate of a target process by linear time-i
 \caption{Insert redefined terms into the equation to form the total equation for Mean Square Error}
 \end{equ}
 
-\begin{equ}[!ht]\label{eq:end_wiener}
-\begin{equation}
+\begin{equ}[!ht]
+\begin{equation}\label{eq:end_wiener}
     \frac{\delta J}{\delta w_i} = 0, i = 0, 1, ... M-1 \ \rightarrow \ \boldsymbol{R} \boldsymbol{w_{opt}} = \boldsymbol{p} \ \rightarrow \ \boldsymbol{w_{opt}} = \boldsymbol{R}^{-1}\boldsymbol{p}
 \end{equation}
 \caption{To find the filter coefficients that result in minimum MSE we take the derivative of the MSE with respect to each filter coefficient. The derivation of this process is quite lengthy but can be found in \cite{proakis_manolakis_1996}. The resulting final solution is called the Wiener-Hopf equation \cite{lecture_adaptive_filters_1} and is also shown in equation \ref{eq:wiener_hopf}}

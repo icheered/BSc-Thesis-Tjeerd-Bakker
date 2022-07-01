@@ -1,15 +1,6 @@
 \chapter*{Abstract}
-\textcolor{brown}{
-This bachelor thesis investigates to which extend adaptive filters can improve digital signal processing of surface Electromyography signals compared to standard static filters. < Insert more stuff once I finish the report > } \\
 
-Provide a concise summary of the research conducted. Include the conclusions reached and the potential implications of those conclusions. Your abstract should also:
+Surface Electromyography (sEMG) is the technique of measuring the electrical activity that forms on the skin surface in in response to a muscle contraction. sEMG signals can be used to determine the status of muscles and the movement intention and is therefore commonly used as a control interface for robotic prosthesis or in the medical field to monitor muscle activity. To convert the measured surface potential into a usable signal, the data needs to be processed to filter out noise and determine the envelope. Even though a lot of research has been done into various processing techniques, a general overview comparing the differences in performance of these techniques is lacking. This report aims to give insight into the degree of effectiveness of pre-whitening, various filtering methods, and multiple envelope estimation techniques. The goal is to find a combination of methods that can accurately estimate exerted force from the sEMG signals. The filtering methods that are compared are a static filter (bandpass and notch filters), a Wiener filter, and an adaptive Wiener filter. The envelope detection methods that are compared are a moving average filter, an infinite impulse response low-pass filter, and a root-mean-square filter. Each method has been applied in a simulated environment, and every combination of pre-whitening, filtering, and envelope detection has also been applied on a measured sEMG sample. The resulting force estimates are subsequently compared to force measurements obtained using a calibrated load cell. 
 
-Consist of a single paragraph up to 250 words, with correct grammar and unambiguous terminology.
-Be self-contained. No abbreviations, footnotes, references, or mathematical equations.
-Highlight what is unique in your work.
-Include 3-5 keywords or phrases that describe the research to help readers find your paper.
 
-1. What did you do?
-2. Why did you do it?
-3. What did you find?
-4. What do you conclude?
+Keywords: sEMG, force estimation, signal processing
