@@ -14,7 +14,7 @@ The 16 channel amplifier performs unipolar measurements. This means that each el
 
 The load cell has 4 relevant terminals. Two terminals are connected to the power supply to supply the load cell with power. The other two terminals are connected to the amplifier. The 'common' terminal of the power supply is connected to the 'Patient ground' on the amplifier.
 
-Sets of two electrodes are placed on the subjects right bicep, right tricep, and left arm. The electrodes were placed following SENIAM guidelines \cite{seniam}. Two electrodes per set is chosen to essentially capture more data. Since each electrode in a set measures almost identical sEMG signal the signals from the electordes can be averaged to reduce any present noise. The electrodes on the left arm are used to record a reference noise. It is expected that this reference noise has an identical frequency spectrum as the noise present in the sEMG signal since it is recorded at the same time, approximately same place, using the same amplifier, and can therefore be used in some of the presented filtering techniques. The reference signal is recorded using a TMSi provided armband that was wetted and connected to 'Patient ground' on the amplifier. A total measurement setup diagram is shown in figure \ref{fig:measurement_setup_diagram}. A photo of the measurement can be seen in Figure~\ref{fig:measurement_setup_photo}
+Sets of two electrodes are placed on the subjects right bicep, right tricep, and left arm. The electrodes were placed following SENIAM guidelines \cite{seniam}. Two electrodes per set is chosen to essentially capture more data. Since each electrode in a set measures almost identical sEMG signal the signals from the electordes can be averaged to reduce any present noise. The electrodes on the left arm are used to record a reference noise. It is expected that this reference noise has an identical frequency spectrum as the noise present in the sEMG signal since it is recorded at the same time, approximately same place, using the same amplifier, and can therefore be used in some of the presented filtering techniques. The reference signal is recorded using a TMSi provided armband that was soaked with water (for better connectivity) and connected to 'Patient ground' on the amplifier. A total measurement setup diagram is shown in figure \ref{fig:measurement_setup_diagram}. A photo of the measurement can be seen in Figure~\ref{fig:measurement_setup_photo}
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -48,7 +48,7 @@ The applied force followed the following pattern:
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[width=1.0\columnwidth]{images/measurement_calibratie3_1k.png}
+		\includegraphics[width=0.8\columnwidth]{images/measurement_calibratie3_1k.png}
 	\end{center}
 	\caption{Calibration measurement at \SI{1}{\kilo\hertz} sampling rate. The force has been lowpassed with a cut-off frequency of 10 Hz to remove large \SI{50}{\hertz} noise component. The offset was determined to be \SI{-30}{\micro\volt}. The weight op the object was \SI{1681}{\gram} which corresponds to a change of \SI{695}{\micro\volt}}.
 	\label{fig:calibration_1k}
@@ -56,47 +56,65 @@ The applied force followed the following pattern:
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[width=0.8\columnwidth]{images/measurement_meting3_1k.png}
+		\includegraphics[width=1.0\columnwidth]{images/measurement_meting3_1k.png}
 	\end{center}
-	\caption{Force measurements at \SI{1}{\kilo\hertz} sampling rate}
+	\caption{Force measurements and accompanying sEMG signals at \SI{1}{\kilo\hertz} sampling rate}
 	\label{fig:measurement_1k}
 \end{figure}
 
-The calibration process required measuring the steady-state value to determine the offset. To relate the measured values to the applied force, an object of known weight was attached to the load cell. These processes can be seen in figure \ref{fig:calibration_1k}. The measured force is approximately 10x the measured signal ($1681g / 167.5 uV = 10.03$).
+The calibration process required measuring the steady-state value to determine the offset. To relate the measured values to the applied force, an object of known weight was attached to the load cell. These processes can be seen in figure \ref{fig:calibration_1k}. The measured force in grams is approximately 2.41x the measured signal in micro Volt $\frac{1681}{695} = 2.41$).
 
-Due to unknown reasons the amplifier was not able to capture both sEMG signals and the load cell signal at the same time which can be seen in figure \ref{fig:measurement_1k}. The load cell could be measured, but when attaching the reference armband that the subject was wearing to 'Patient ground' on the amplifier the measured load cell signal was promptly nullified. Attaching the reference armband is required to measure sEMG signals, but connecting this armband makes it impossible to capture load cell information.
+All measurements were performed in bipolar electrode configuration and the measurement for a set of two electrodes was found by adding the results together. This removes the average signal that is present in all signals.
 
 \section{Measurement processing result}
-Even though it was not possible to compare the estimated force to an external measurement for validation, some comparisons between different techniques can still be made. 
+All combinations of whitening, filtering, and envelope detection were applied onto the signals as seen in figure \ref{fig:measurement_1k}. The combinations are indicated by the first letter of each processing method: 'w-s-r' means that Whitening was applied, the applied filter was a Static filter, and the envelope was determined using the RMS envelope detection. Further clarification can be found in table \ref{tab:abbreviation_explanation}.
+During processing it was noticed that some methods scaled the estimated force by large amounts and this resulted in high error rates. To still compare the accuracy of force estimation regardless of scaling factor the decision was made to intrude an intermediate step between measuring/compensating the lag and calculating the error. After accounting for the lag, a scaling factor is determined that minimizes the RMSE. The scaling factor is determined through the following algorithm:
+\begin{itemize}
+    \item Calculate the RMSE
+    \item Calculate the RMSE of a slightly amplified signal
+    \item Calculate the RMSE of a slightly reduced signal
+    \item Compare if amplifying or reducing the signal decreases the RMSE. If amplifying/reducing yields a lower RMSE, amplify/reduce the signal and repeat these steps. If amplifying and reducing both yield an RMSE lower than the current RMSE, the ideal scaling value has been found.
+\end{itemize}
+
+The estimated force is subsequently scaled by this scaling factor preperatory to calculating the RMSE value. For the RMSE calculation, the first 3 seconds and the last 3 seconds of the signals were discarded (after processing) because some processing steps did not yield their steady-state response in that time \cite{transient_response}. The results for lag, error, and scaling can be found in the bar-chart in figure \ref{fig:result_all_lagerrorscaling}. 
+
+\begin{table} [h!]
+\begin{tabular}{ccc}
+Index & Abbreviation & Full form \\
+\hline
+0 & w/n & Whitening / No whitening \\
+1 & n/s/w/a & No filter / Static filter / Wiener filter / Adaptive filter \\
+2 & m/i/r & Moving average envelope / IIR LP envelope / RMS envelope \\
+\end{tabular}
+\caption{Table for clarifying the abbreviations used in result bar charts}
+\label{tab:abbreviation_explanation}
+\end{table}
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[width=1.0\columnwidth]{images/measurement_prewhitening.png}
+	\noindent\makebox[\textwidth]{
+		\includegraphics[width=1.3\columnwidth]{images/result_all_lagerrorscaling.png}}
 	\end{center}
-	\caption{The effect of pre-whitening. Both signals were not filtered and used moving average for envelope detection. The whitening filter was created from the period of 10-25 seconds in the time-domain plot. In the frequency plot it is shown that indeed a certain degree of whitening is applied, especially in the higher frequencies. It can be seen that whitening introduces an unexpected static delay in the time domain}
-	\label{fig:result_prewhitening}
+	\caption{This plot contains all relevant results for all different combinations of whitening, filters and envelope detection. The abbreviations are the first letter of the used technique for each step. Further clarification of these abbreviations can be found in table \ref{tab:abbreviation_explanation}}
+	\label{fig:result_all_lagerrorscaling}
 \end{figure}
+
+
+\textcolor{red}{Todo: insert whitening image}
 
 \begin{figure}[h!t]
 	\begin{center}
 		\includegraphics[width=1.0\columnwidth]{images/measurement_filtering.png}
 	\end{center}
-	\caption{The result of different filtering techniques. For both signals whitening was not applied and the envelope was detected using moving average. All plots in the frequency domain are smoothened using a moving average filter with $n=50$ to give more insight into the difference between filters. The Wiener filter appears to reduce the amplitude of high peaks while staying as responsive as the other filters. Comparatively little lag is introduced between the filters. The adaptive Wiener filter was excluded from this comparison due to strongly differing signal results that can be seen in Figure~\ref{fig:result_adaptive_filtering}}
+	\caption{\textcolor{red}{Todo: update this text}The result of different filtering techniques. For all signals whitening was not applied and the envelope was detected using moving average. All plots in the frequency domain are smoothened using a moving average filter with $n=10$ to give more insight into the difference between filters. The Wiener filter appears to reduce the amplitude of high peaks while staying as responsive as the other filters. Comparatively little lag is introduced between the filters. The adaptive Wiener filter was excluded from this comparison due to strongly differing signal results that can be seen in Figure~\ref{fig:result_adaptive_filtering}}
 	\label{fig:result_filtering}
 \end{figure}
 
-\begin{figure}[h!t]
-	\begin{center}
-		\includegraphics[width=1.0\columnwidth]{images/measurement_adaptive_filtering.png}
-	\end{center}
-	\caption{Comparing adaptive Wiener filtering to no filtering. For both signals whitening was not applied and the envelope was detected using moving average. All plots in the frequency domain are smoothened using a moving average filter with $n=50$ to give more insight into the difference between filters. The amplitude of negative force appears to be strongly amplified, while the positive force seems to be attenuated. Especially in the later sections (40 seconds) there appears to be little correlation between the unfiltered signal and the signal filtered using Adaptive Wiener filtering. In the frequency this amplification can also be noticed across all frequencies.}
-	\label{fig:result_adaptive_filtering}
-\end{figure}
 
 \begin{figure}[h!t]
 	\begin{center}
 		\includegraphics[width=1.0\columnwidth]{images/measurement_envelopes.png}
 	\end{center}
-	\caption{Result of different envelope estimation techniques. For all signals whitening was not applied and no filter was applied. All plots in the frequency domain are smoothened using a moving average filter with $n=50$ to give more insight into the difference between envelopes. The RMS envelope detection attenuates the higher frequencies more than the moving average technique. Furthermore the IIR Lowpass filter has a frequency response unlike the moving average or RMS technique, but this frequency response is in line with simulations as seen in Figure~\ref{fig:iir_frequencyresponse_coefficients}}
+	\caption{\textcolor{red}{Todo: update this text, update image}Result of different envelope estimation techniques. For all signals whitening was not applied and no filter was applied. All plots in the frequency domain are smoothened using a moving average filter with $n=10$ to give more insight into the difference between envelopes. The RMS envelope detection attenuates the higher frequencies more than the moving average technique. Furthermore the IIR Lowpass filter has a frequency response unlike the moving average or RMS technique, but this frequency response is in line with simulations as seen in Figure~\ref{fig:iir_frequencyresponse_coefficients}}
 	\label{fig:result_envelopes}
 \end{figure}

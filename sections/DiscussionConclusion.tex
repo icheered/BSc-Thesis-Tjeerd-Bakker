@@ -1,5 +1,15 @@
 \chapter{Discussion and conclusion}
 \section{Discussion}
+The research question presented in the introduction states the goal of finding the best combination of whitening, filtering, and envelope detection to estimate force from sEMG. 
+
+From the measurement results presented in figure \ref{fig:result_all_lagerrorscaling} the conclusion can be drawn that a processing chain consisting of no pre-whitening, no filtering, and infinite impulse response butterworth lowpass filter for envelope detection yields the best accuracy for force estimating. It has the lowest error rate of all techniques and introduces no lag.
+
+This gives the suggestion that improving the signal to noise ratio of an sEMG signal does not result in a better estimation of the applied force. It should be noted that these conclusions are drawn from a single measurement at a single location and thus may yield different results in different environments. 
+
+Another interesting observation can be made from the Lag comparison subplot in figure \ref{fig:result_all_lagerrorscaling}: only signal processing chains that use whitening appear to introduce lag.
+
+
+
 => Beantwoorden van onderzoeksvraag
 
 => We make this conclusion but that only holds under these cirumstances

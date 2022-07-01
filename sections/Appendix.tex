@@ -1,19 +1,25 @@
-\chapter{Appendix 1} \label{app:one}
-Tip: Make a copy of this document, since this is a manual of the template. This
-will prevent losing the document while modifying it. (And probably breaking
-it.)
+\chapter{Appendix 1} \label{app:whitening}
 
-\section{Required TexLive packages} 
-The following packages are required for TeX Live 2012 and 2013 (tested under Ubuntu) 
-\begin{verbatim} 
-texlive
-texlive-lang-dutch     -> Dutch hypenation
-                          (old TeX Live distributions, 2013-)
-texlive-lang-europeans -> Dutch hypenation (amongst others)
-                          (new Tex Live distributions 2013+)
-texlive-latex-extra
-texlive-fonts-extra    -> fourier
-texlive-humanities     -> lineno
-texlive-pstricks       -> pstricks (2013+?)
-                          (not really used in the template??)
-\end{verbatim}
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[width=1.0\columnwidth]{images/result_whitening_sourcephase.png}
+	\end{center}
+	\caption{Lag, error, and scaling of different filtering and envelope techniques with whitening applied. The whitening filter is constructed from the desired frequency amplitude response and a phase. The frequency response is determined as described in the simulation section \ref{sec:whitening}, and the phase is set to the phase of the input signal that was used to construct the whitening filter.}
+	\label{fig:result_whitening_sourcephase}
+\end{figure}
+
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[width=1.0\columnwidth]{images/result_whitening_linearphase.png}
+	\end{center}
+	\caption{Lag, error, and scaling of different filtering and envelope techniques with whitening applied. The whitening filter is constructed from the desired frequency amplitude response and a phase. The frequency response is determined as described in the simulation section \ref{sec:whitening}, and the phase is set to linear phase.}
+	\label{fig:result_whitening_sourcephase}
+\end{figure}
+
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[width=1.0\columnwidth]{images/result_whitening_zerophase.png}
+	\end{center}
+	\caption{Lag, error, and scaling of different filtering and envelope techniques with whitening applied. The whitening filter is constructed from the desired frequency amplitude response and a phase. The frequency response is determined as described in the simulation section \ref{sec:whitening}, and the phase is set to zero phase.}
+	\label{fig:result_whitening_sourcephase}
+\end{figure}

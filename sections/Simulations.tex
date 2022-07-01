@@ -8,7 +8,7 @@ This section of the report describes the testing of separate signal processing s
 
 Unless specified otherwise all signals will be high-passed with a cutoff frequency of \SI{1}{\hertz} to remove DC bias before any operation is applied
 
-\section{Pre-whitening}
+\section{Pre-whitening}\label{sec:whitening}
 A whitening filter is a digital filter with a frequency response that is (ideally) the inverse of the frequency contents of an sEMG signal. 
 
 \subsection{Method}
@@ -30,7 +30,7 @@ In \ref{fig:whitening_simulation} it can be seen that the whitening filter funct
 \section{Filtering}
 Due to the difficulty of creating a simulated signal that has the frequency contents of an sEMG signal and environmental noise, a pre-recorded sample of sEMG of a bicep going through maximum voluntary contraction was used to test the filters. This sample is not used for force estimation because there is no way to validate the degree of contraction, and purely the frequency contents of the signal are of interest. The sample that is used can be seen in figure \ref{fig:sEMG_signal_example}. 
 
-The construction of each filter will be explained in the method, and the SNR performance and signal integrity of each filter will be discussed in the results. 
+The construction of each filter will be explained in the method, and the SNR performance and bandwidth of each filter will be discussed in the results. 
 
 \subsubsection{Static filter}
 The theory from section \ref{section:standard_semg_processing} specifies the removal of DC frequencies, a notch filter at \SI{50}{Hz}, and a bandpass filter between \SI{20}{Hz} and \SI{300}{Hz}. Looking at the noise spectrum in figure \ref{fig:sEMG_fft_signalnoise_example} it can be seen that there also exist significant peaks at \SI{100}{Hz} and \SI{150}{Hz}. For this reason, additional notch filters are constructed to target these frequencies. The total frequency response of the concatenated filters can be seen in figure \ref{fig:staticfilter_frequencyresponse}.
@@ -52,7 +52,7 @@ The theory from section \ref{section:standard_semg_processing} specifies the rem
 \subsubsection{Wiener filter}
 As discussed in section \ref{sec:filters_theory} the Wiener filter coefficients are constructed from the crosscorrelation vector between signal+noise ($d(n)$) and the noise ($v(n)$) and the autocorrelation of the noise as is presented in the Wiener-Hopf equation in equation \ref{eq:wiener_hopf} \cite{lecture_adaptive_filters_1}. 
 
-The number of Wiener filter coefficients have a strong influence on the performance of the filter as can be seen in figure \ref{fig:wiener_filter_length}. The explanation behind SNR calculation and signal integrity will be discussion in the 'Results' section.
+The number of Wiener filter coefficients have a strong influence on the performance of the filter as can be seen in figure \ref{fig:wiener_filter_length}. The explanation behind SNR calculation and bandwidth will be discussion in the 'Results' section.
 
 \begin{equation}
     w_{opt} = R^{-1}P
@@ -63,7 +63,7 @@ The number of Wiener filter coefficients have a strong influence on the performa
 	\begin{center}
 		\includegraphics[width=1.0\columnwidth]{images/wiener_filter_length.png}
 	\end{center}
-	\caption{The effect of the number of Wiener filter coefficients on the SNR and signal integrity}
+	\caption{The effect of the number of Wiener filter coefficients on the SNR and bandwidth}
 	\label{fig:wiener_filter_length}
 \end{figure}
 
@@ -76,14 +76,14 @@ Using the previously discussed prerecorded sample that can be seen in figure \re
 	\begin{center}
 		\includegraphics[width=1.0\columnwidth]{images/adaptive_wiener_windowsize.png}
 	\end{center}
-	\caption{SNR and Signal integrity of an adaptive wiener filter using different combinations of window size and blocks per window. It should be noted that each signal has been smoothened using a Savitzky-Golay filter with a window length of 31 and a polynomial order of 3. This is done to make the difference in performance between different blocks per window clearer, without filtering the signals have a larger deviation that makes the lines unreadable.
-	It can be seen that the number of blocks per window does not have a big influence on the SNR or signal integrity. The SNR seems to have a somewhat linear relation with the window size, while the signal integrity peaks around a window size of 500 samples.}
+	\caption{SNR and bandwidth of an adaptive wiener filter using different combinations of window size and blocks per window. It should be noted that each signal has been smoothened using a Savitzky-Golay filter with a window length of 31 and a polynomial order of 3. This is done to make the difference in performance between different blocks per window clearer, without filtering the signals have a larger deviation that makes the lines unreadable.
+	It can be seen that the number of blocks per window does not have a big influence on the SNR or bandwidth. The SNR seems to have a somewhat linear relation with the window size, while the bandwidth peaks around a window size of 500 samples.}
 	\label{fig:adaptive_wiener_windowsize}
 \end{figure}
 
 
 \subsection{Results}
-Each filter will be tested using two metrics: SNR (eq \ref{eq:rms}) and signal integrity (definition of this will be given shortly). All filters are linear time invariant which means the superposition principle can be used to simplify SNR calculations \cite{linear_systems_theory}. The superposition principle simply states that filtering the sum of two signals is the same as filtering the signals individually and adding the results. An illustration of this can be seen in \ref{fig:filter_process}. A sample of noise data and a sample of EMG data is taken from \ref{fig:sEMG_signal_example} where noise is taken to be 0-2s and signal is taken to be 5-\SI{7}{\second}. The RMS of the filtered signal is divided by the RMS of the filtered noise to create a signal to noise ratio.
+Each filter will be tested using two metrics: SNR (eq \ref{eq:rms}) and Bandwidth (definition of this will be given shortly). All filters are linear time invariant which means the superposition principle can be used to simplify SNR calculations \cite{linear_systems_theory}. The superposition principle simply states that filtering the sum of two signals is the same as filtering the signals individually and adding the results. An illustration of this can be seen in \ref{fig:filter_process}. A sample of noise data and a sample of EMG data is taken from \ref{fig:sEMG_signal_example} where noise is taken to be 0-2s and signal is taken to be 5-\SI{7}{\second}. The RMS of the filtered signal is divided by the RMS of the filtered noise to create a signal to noise ratio.
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -103,40 +103,31 @@ A property that might be of interest is each filters performance in different le
 	\label{fig:filter_snr_mvc}
 \end{figure}
 
-SNR by itself is not a valid metric for judging a filters performance in this scenario. The purpose of improving SNR is the assumption that force can be estimated more accurately from a signal that contains primarily the signal generated by muscle contraction. However, a filter may be able to attenuate the signal and noise in such a way that the SNR is very high, but the signal is attenuated to such a degree that it no longer resembles the original signal that was generated by the muscle contraction. An example of this can be seen in figure \ref{fig:good_snr_bad_integrity}. To account for this, a new metric is introduced called 'Signal integrity', of which the mathematical definition is given in equation \ref{eq:signal_integrity}. By dividing a filters output frequency spectrum by the input frequency spectrum (each frequency component in the before-fft divided by its corresponding after-fft counterpart) it is possible to determine how much the frequency spectrum has changed by the filter. If the resulting value of a frequency after this division is 1, the filter did not attenuate this frequency at all. If the result of this division is 0, then the frequency component has been removed entirely. 
-
-Taking the mean of these values should give an indication of the degree of attenuation that a signal experiences when filtered. Doing this for both the signal and the noise separately, a conclusion can be drawn about how much the frequency spectrum of the noise is attenuated \textit{more} than the frequency spectrum of the signal. 
-
-An ideal filter would not attenuate the frequency spectrum of the signal while completely nullifying the frequency spectrum of the noise. The resulting signal integrity value would be 1. If a filter does not attenuate the signal but neither attenuates the noise, the signal integrity value would be 0. If the filter attenuates the signal more than it attenuates the noise, the signal integrity value would be less than 0.
-
-\begin{equation}
-    Filter integrity = \frac{\text{FFT}(sig \;\; after)}{\text{FFT}(sig \;\;  before)} / \frac{\text{FFT}(noise \;\;  after)}{\text{FFT}(noise \;\;  before)}
-    \label{eq:signal_integrity}
-\end{equation}
+SNR by itself is not a valid metric for judging a filters performance in this scenario. The purpose of improving SNR is the assumption that force can be estimated more accurately from a signal that contains primarily the signal generated by muscle contraction. However, a filter may be able to attenuate the signal and noise in such a way that the SNR is very high, but the signal is attenuated to such a degree that it no longer resembles the original signal that was generated by the muscle contraction. An example of this can be seen in figure \ref{fig:good_snr_bad_integrity}. A measure to define how much the frequency spectrum has changed is the bandwidth. Typically the bandwidth of a signal is defined as the range of frequencies between two frequency points outside of which the signal is attenuated more than a specific threshold value \cite{bandwidth_definition}. This definition is not applicable to this problem as the frequencies that are 'present' in an sEMG signal are not necessarily consecutive. Therefore the bandwidth of an sEMG signal will be defined as the number of frequency components that are larger than the mean of the frequency spectrum. With this metric, a frequency spectrum such as the one seen in figure \ref{fig:good_snr_bad_integrity} will have a low bandwidth because most frequencies are below the mean.
 
 \begin{figure}[h!t]
 	\begin{center}
 		\includegraphics[width=1.0\columnwidth]{images/good_snr_bad_integrity.png}
 	\end{center}
-	\caption{Example of filtering that results in good SNR but bad signal integrity.}
+	\caption{Example of filtering that results in good SNR but bad bandwidth.}
 	\label{fig:good_snr_bad_integrity}
 \end{figure}
 
-Again, the signal integrity was calculated for different filters and at different levels of MVC. The results can be seen in figure \ref{fig:filter_signal_integrity_mvc}.
+Again, the bandwidth was calculated for different filters and at different levels of MVC. The results can be seen in figure \ref{fig:filter_bw_mvc}.
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[width=0.7\columnwidth]{images/filter_signal_integrity_mvc.png}
+		\includegraphics[width=0.7\columnwidth]{images/filter_bw_mvc.png}
 	\end{center}
-	\caption{The signal integrity of each filter for different levels of MVC. It can be seen that there is no relation between a filters performance and the degree of contraction}
-	\label{fig:filter_signal_integrity_mvc}
+	\caption{The bandwidth of each filter for different levels of MVC. It can be seen that there is no relation between a filters performance and the degree of contraction}
+	\label{fig:filter_bw_mvc}
 \end{figure}
 
 For the static filter a few different variations were tested. Looking at figure \ref{fig:sEMG_fft_signalnoise_example} it can be seen that beside the \SI{50}{\hertz} peak in the noise spectrum there are additional peaks at multiples of \SI{50}{\hertz}. Different static filters were tested with different amounts of notch filters. The frequency response of these filters can be seen in figure \ref{fig:staticfilter_notches_frequencyresponse}. The resulting metrics can be seen in the chart  \ref{fig:staticfilter_notches_barchart}.
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[width=0.7\columnwidth]{images/staticfilter_notches_frequencyresponse.png}
+		\includegraphics[width=1.0\columnwidth]{images/staticfilter_notches_frequencyresponse.png}
 	\end{center}
 	\caption{Frequency response of static filters with different amounts of notch filters. For the sake of illustration the amplitude graphs have been shifted vertically to clearly show the existence of notch filters in different lines, during simulations this shift was not present. }
 	\label{fig:staticfilter_notches_frequencyresponse}
@@ -144,9 +135,9 @@ For the static filter a few different variations were tested. Looking at figure 
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[width=0.7\columnwidth]{images/staticfilter_notches_barchart.png}
+		\includegraphics[width=1.0\columnwidth]{images/staticfilter_notches_barchart.png}
 	\end{center}
-	\caption{SNR and signal integrity of static filters with different numbers of Notch filters. }
+	\caption{SNR and bandwidth of static filters with different numbers of Notch filters. }
 	\label{fig:staticfilter_notches_barchart}
 \end{figure}
 
@@ -181,7 +172,7 @@ The moving average filter only depends on the length of the filter, figure \ref{
 Similar to the moving average filter, the behaviour of the RMS filter is solely determined by the length of the filter. The same range of filter lengths was chosen as for the moving average filter so that the performance could be directly plotted against each other.
 
 \subsection{Results}
-There are two seperate metrics that need to be measured when comparing envelope estimation techniques. The first one is how 'fast' a techniques is, and the second is how 'good' the technique is. The first metric gives information about how much the 'detected' signal lags behind the 'true' signal. The second metric is the quality of the envelope estimate when accounting for the lag. 
+There are two seperate metrics that need to be measured when comparing envelope estimation techniques. The first one is how 'fast' a techniques is, and the second is how 'good' the technique is. The first metric gives information about how much the 'detected' signal lags behind the 'true' signal. The second metric is the quality of the envelope estimate when accounting for the lag.
 
 The lag is detected by calculating the cross-correlation between the true signal and the envelope estimate. Cross-correlation is a metric that determines the similarity between two signals as a function of displacement of one signal relative to another \cite{wiki:cross_correlation}. Since the 'true' signal and the estimated signal are most similar when their displacement equals the lag, a detectable peak is formed in the cross correlation function. The left subplot in figure \ref{fig:envelope_estimation_method} displays a 'true' signal (measured force), and a simulated estimation of this signal (estimated force) that lags behind the true signal. The cross-correlation is also plotted that has a peak at \SI{100}{\milli\second}, which is the exact amount of lag between the two signals. The right subplot shows the two signals where the estimated signal has shifted to account for the lag. At this point the error can be determined by subtracting the true signal from the estimated signal, and the root-mean-square-error can be calculated. 
 
