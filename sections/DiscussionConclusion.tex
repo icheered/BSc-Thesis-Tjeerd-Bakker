@@ -4,11 +4,20 @@ The research question presented in the introduction states the goal of finding t
 
 From the measurement results presented in figure \ref{fig:result_all_lagerrorscaling} the conclusion can be drawn that a processing chain consisting of no pre-whitening, no filtering, and infinite impulse response butterworth lowpass filter for envelope detection yields the best accuracy for force estimating. It has the lowest error rate of all techniques and introduces no lag.
 
-This gives the suggestion that improving the signal to noise ratio of an sEMG signal does not result in a better estimation of the applied force. It should be noted that these conclusions are drawn from a single measurement at a single location and thus may yield different results in different environments. 
+This indicates that improving the signal to noise ratio of an sEMG signal does not result in a better estimation of the applied force. It should be noted that these conclusions are drawn from a single measurement at a single location and thus may yield different results in different environments. 
 
-Another interesting observation can be made from the Lag comparison subplot in figure \ref{fig:result_all_lagerrorscaling}: only signal processing chains that use whitening appear to introduce lag.
+Another interesting observation can be made from the Lag comparison subplot in figure \ref{fig:result_all_lagerrorscaling}: only signal processing chains that use whitening appear to introduce lag. This could be caused by the phase delay that is introduced by the whitening filter. If the filter were to have a linear phase then all frequencies would be equally delayed resulting in a constant group delay. If this filter did not have linear phase but instead introduces a stronger phase delay in higher frequencies, then the total delay would become more apparent when amplifying these higher frequencies \cite{phase_delay_frequencies}. The amplification of higher frequencies does happen in the whitening filter as can be seen in the simulation in \ref{fig:whitening_simulation}, and the time domain plot shows signs of introduction of delay in the filtered signal which can stem from making higher frequencies with more phase delay more prominent. In the simulations the phase of the whitening filter was set to the phase of the input signal ('source' of filter). In the appendix are the results of constructing the whitening filter using zero-phase, linear-phase, and negative input signal phase \ref{fig:result_whitening_linearphase} \ref{fig:result_whitening_negative_sourcephase}\ref{fig:result_whitening_sourcephase}\ref{fig:result_whitening_zerophase}. Intuitively it would be expected that using negative source phase would counteract this introduced delay, but as can be seen in appendix figure \ref{fig:result_whitening_negative_sourcephase} this does not appear to be the case.
+
+A reason why other processing steps do not seem to introduce delay when not paired with whitening could be that lag is calculated using the cross-correlation between the measured force and the estimated force. If the estimated force accurately follows the measured force, there would exist a clear peak in the cross-correlation which indicates the lag.
 
 
+
+
+=> Other signals noise is larger than lag 
+
+
+=> Combination of adaptive + whitening == very very bad
+- instability of IIR filter
 
 => Beantwoorden van onderzoeksvraag
 
