@@ -77,7 +77,7 @@ Using the previously discussed prerecorded sample that can be seen in figure \re
 		\includegraphics[width=1.0\columnwidth]{images/adaptive_wiener_windowsize.png}
 	\end{center}
 	\caption{SNR and bandwidth of an adaptive wiener filter using different combinations of window size and blocks per window. It should be noted that each signal has been smoothed using a Savitzky-Golay filter with a window length of 31 and a polynomial order of 3. This is done to make the difference in performance between different blocks per window clearer, without filtering the signals have a larger deviation that makes the lines unreadable.
-	It can be seen that the number of blocks per window does not have a big influence on the SNR or bandwidth. The SNR seems to have a somewhat linear relation with the window size, while the bandwidth peaks around a window size of 500 samples.}
+	The SNR seems to have a linear relation with the window size, and the bandwidth seems to have an inverse linear relationship to window size. The odd blocks-per-window that stand out in the bandwidth plot (3, 6, 7, 9 blocks per window) are caused by the fact that the division of window size by blocks per window did not yield an integer.}
 	\label{fig:adaptive_wiener_windowsize}
 \end{figure}
 
