@@ -43,6 +43,49 @@ The applied force followed the following pattern:
 \end{itemize}
 
 \section{Measurement data}
+The following configuration parameters were chosen based on simulation results:
+\begin{itemize}
+    \item Whitening
+    \begin{itemize}
+        \item \textcolor{red}{Do this}
+    \end{itemize}
+    \item Filtering
+    \begin{itemize}
+        \item Static filter 
+        \begin{itemize}
+            \item 3 notch filters at \SI{50}{\hertz}, \SI{100}{\hertz}, and \SI{150}{\hertz} with q-factor of 10
+            \item low-pass Butterworth filter with cut-off frequency of \SI{20}{\hertz} and length 5
+            \item high-pass Butterworth filter with cut-off frequency of \SI{300}{\hertz} and length 5
+        \end{itemize}
+        \item Wiener filter
+        \begin{itemize}
+            \item 200 filter terms
+        \end{itemize}
+        \item Adaptive Wiener filter
+        \begin{itemize}
+            \item Window-size of 500 (number of samples from which the filter coefficients are calculated)
+            \item 1 block per window (how many samples to skip before recalculating the filter coefficients)
+        \end{itemize}
+    \end{itemize}
+    \item Envelope detection
+        \begin{itemize}
+            \item Moving average envelope detection
+        \begin{itemize}
+            \item \textcolor{red}{Do this}
+        \end{itemize}
+        \item IIR LP filter
+        \begin{itemize}
+            \item \textcolor{red}{Do this}
+        \end{itemize}
+        \item RMS
+        \begin{itemize}
+            \item \textcolor{red}{Do this}
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+3 notch filters at \SI{50}{\hertz}, \SI{100}{\hertz}, and \SI{150}{\hertz}  with q-factor of 10, Band-pass filter consisting of a high-pass filter with cut-off frequency of \SI{20}{\hertz} and a low-pass filter with a cut-off frequency of
+
 
 \begin{figure}[h!t]
 	\begin{center}

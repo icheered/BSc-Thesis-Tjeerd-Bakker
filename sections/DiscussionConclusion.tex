@@ -8,7 +8,7 @@ A perhaps much more intriguing result stemming from the lag subplot in figure \r
 
 One processing step that stands out in the error plot of figure \ref{fig:result_all_lagerrorscaling} is adaptive filtering. It can be seen that applying an adaptive Wiener filter results in a large error in both the whitened and non-whitened scenario. Looking at the adaptive filter in the whiten scenario in figure \ref{fig:result_prewhitening} it can be seen that a unusually large peak appears at one of the contractions, which is a similar behaviour seen in figure \ref{fig:result_filtering}. This may indicate that the adaptive Wiener filter manages to selectivity amplify frequencies that are very characteristic of a specific portion of muscle contraction, resulting in sudden large amplification when this is detected. This suggestion is further supported by the fact that the adaptive filters show less lag than other filtering techniques. In combination with whitening the lag is less than halve of other filtering methods that use whitening and with the same envelope detection methods. Two of the three signal processing combinations that present the most negative lag are also using adaptive Wiener filtering.
 
-Lastly it seems that the IIR Butterworth lowpass filter for envelope detection introduces a significant amount of lag compared to moving average or RMS envelope detection. This is consistent across all filters and whitening as can be seen in the lag subplot in figure \ref{fig:result_all_lagerrorscaling}.
+Lastly it seems that the IIR Butterworth lowpass filter for envelope detection introduces a significant amount of lag compared to moving average or RMS envelope detection. This is consistent across all filters and whitening as can be seen in the lag subplot in figure \ref{fig:result_all_lagerrorscaling}. This is also consistent with simulations as seen in figures \ref{fig:lagerror_RMS_MA} and \ref{fig:lagerror_iir} given the 
 
 \section{Research question}
 The research question presented in the introduction states the goal of finding the best combination of whitening, filtering, and envelope detection to estimate force from sEMG. 
@@ -29,4 +29,14 @@ The conclusion drawn from comparing different envelope estimation techniques is 
 Lastly, whitening introduced significant lag across all filters and envelope detection methods.
 
 \section{Recommendations}
+One area where the results presented in this report can be improved is by using a larger data set to apply the processing techniques to. Since the techniques were only validated using a single long measurement it is very well possible that the techniques function differently in different environments or with different hardware.
+
+=> algorithm adaptive adaptivity
+
+This report also assumed a linear relation between the sEMG and the 
+
+This report has given insight into the performance of different processing techniques but has omitted the computational complexity that is required to apply them in real-time such as robotic prostheses \cite{semg_application_prosthesis} which have limited processing power. 
+
+
+
 Further research, suggestions for better results

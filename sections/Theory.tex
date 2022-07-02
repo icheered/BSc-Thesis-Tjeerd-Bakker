@@ -44,16 +44,14 @@ So to summarize the basic concept of force estimation:
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[width=0.7\columnwidth]{images/muscle_anatomy.png}
+		\includegraphics[width=0.7\columnwidth]{images/anatomy_of_a_muscle_cell.jpg}
 	\end{center}
-	\caption{Anatomy of a muscle \cite{muscle_anatomy}}
+	\caption{Anatomy of a muscle cell \cite{human_anatomy_physiology}}
 	\label{fig:muscle_anatomy}
 \end{figure}
 
-\textcolor{red}{Todo: Find source that further explains muscles and EMG signals to refer to for further reading}
-
 Figure \ref{fig:muscle_anatomy} illustrates the anatomy of a muscle which may be useful in this section. 
-A large skeletal muscle such as the biceps consists of hundreds of thousands of small muscle fibers. These muscle fibers are divided into groups called motor units, and each motor unit is connected to a motor neuron which is a special type of very long brain cell that runs through the spinal cord. A contraction of a skeletal muscle is the result of many muscle fibers contracting individually and repeatedly. The contraction of these muscle fibers is the result of an action potential caused by the motor neuron, and this action potential is a measurable (but very small) voltage. When measuring the surface EMG of a contracting skeletal muscle the result is the aggregate of the small voltages from all contracting muscle fibers. This manifests itself into a signal resembling white noise where the amplitude of the noise correlates to the number of contracting muscle fibers and thus to the amount of contraction the skeletal muscle experiences. An illustration of the form of the measured sEMG is shown in figure \ref{fig:sEMG_signal_example} where a maximum voluntary contraction (MVC) is measured from a bicep.
+Large skeletal muscles such as the biceps consists of hundreds of thousands of small muscle fibers. These muscle fibers are divided into groups called motor units, and each motor unit is connected to a motor neuron which is a special type of very long brain cell that runs through the spinal cord. A contraction of a skeletal muscle is the result of many muscle fibers contracting individually and repeatedly \cite{human_anatomy_physiology}. The contraction of these muscle fibers is the result of an action potential caused by the motor neuron, and this action potential is a measurable (but very small) voltage. When measuring the surface EMG of a contracting skeletal muscle the result is the aggregate of the small voltages from all contracting muscle fibers. This manifests itself into a signal resembling white noise where the amplitude of the noise correlates to the number of contracting muscle fibers and thus to the amount of contraction the skeletal muscle experiences. An illustration of the form of the measured sEMG is shown in figure \ref{fig:sEMG_signal_example} where a maximum voluntary contraction (MVC) is measured from a biceps.
  
 So to summarize: to determine the degree of contraction of a skeletal muscle we simply need to determine the amplitude of the noise at the surface of the muscle.
 
@@ -242,7 +240,7 @@ Since the raw EMG signal consists of stochastic and unpredictable noise it is di
 Computationally envelope detection can be achieved in a number of different methods where "speed", or how much the detected envelope lags behind the true signal envelope, is traded against accuracy or noisiness \cite{dsp_good_bad_ugly}. A few different envelope detection techniques are discussed in \cite{rose2011electromyogram}.
 
 \subsection{Moving average}
-A moving average filter is a special type of FIR filter with coefficients that all have the value of $\frac{1}{n}$ where $n$ is the number of samples over which the average is taken. Thus the value of every smoothed sample is calculated to be the average of the previous $n$ samples. The upside of a moving average filter is that it introduces no phase distortion \cite{fir_filter_properties}, is very simple to implement, and require only addition to apply which is much faster than multiplication \cite{smith_moving_average_filters}. An illustration of the phase shift of a moving average filter is shown in figure \ref{movingaverage_phaseshift}. A downside of a moving average filter is that it lags behind the signal by its very definition: a change in a static signal level is only properly reflected after $n$ samples.  The sEMG signal must also be rectified before this method can be applied because EMG signal has approximately zero mean due to its oscillatory behaviour \cite{rose2011electromyogram}.
+A moving average filter is a special type of FIR filter with coefficients that all have the value of $\frac{1}{n}$ where $n$ is the number of samples over which the average is taken. Thus the value of every smoothed sample is calculated to be the average of the previous $n$ samples. The upside of a moving average filter is that it introduces no phase distortion \cite{fir_filter_properties}, is very simple to implement, and require only addition to apply which is much faster than multiplication \cite{smith_moving_average_filters}. An illustration of the phase shift of a moving average filter is shown in figure \ref{fig:movingaverage_phaseshift}. An intuitive downside of a moving average filter is that its output lags behind the signal: a change in a static signal level is only properly reflected after $n$ samples. The sEMG signal must also be rectified before this method can be applied because EMG signal has approximately zero mean due to its oscillatory behaviour \cite{rose2011electromyogram}.
 
 \begin{figure}[h!t]
 	\begin{center}
