@@ -80,7 +80,7 @@ By carefully choosing the number and value of filter coefficients it is possible
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[width=0.7\columnwidth]{images/wikipedia_fir_digital_filter.png}
+		\includegraphics[width=0.4\columnwidth]{images/wikipedia_fir_digital_filter.png}
 	\end{center}
 	\caption{The functioning of a digital filter. The filter coefficient at index $i$ is multiplied by the input that is delayed $i$ samples \cite{wikipedia:digital_fir_filter_image}}
 	\label{fig:wiki_digital_filter_working}
@@ -89,99 +89,68 @@ By carefully choosing the number and value of filter coefficients it is possible
 \subsection{Static filters, Wiener filter, Adaptive filters}\label{sec:filters_theory}
 The main difference between the different presented filter types is the way of calculating the filter coefficients. If a filter is static (e.g. high-pass, low-pass, band-pass, or band-stop) it simply means that the amount of filter coefficients and the values of the filter coefficients are predetermined. These filters are very popular due to their simplicity in terms of finding the value of the filter coefficients. 
 
-\begin{figure}[h!t]
-	\begin{center}
-		\includegraphics[width=1.0\columnwidth]{images/Davis_intro_to_filters_filter_types.png}
-	\end{center}
-	\caption{Frequency responses of the common 4 static filters \cite{intro_to_static_filters}}
-	\label{fig:static_filters}
-\end{figure}
-
 A Wiener filter aims to produce an estimate of a target process by linear time-invariant filtering of a noisy signal using knowledge of the spectrum of the stationary noise and target process assuming additive noise \cite{wiki:Wiener_filter} \cite{lecture_adaptive_filters_1}. In other words, given a frequency spectrum of noise and a signal polluted by noise with the same frequency spectrum, a Wiener filter tries to produce the original signal. It is the optimal solution in terms of mean square error to statically filtering additive noise from a signal. Figure \ref{fig:wiener_filter_diagram} shows a diagram that illustrates how the Wiener filter is applied using a noise source and a signal+noise source.
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[width=1.0\columnwidth]{images/WienerFilterDiagram.png}
+		\includegraphics[width=0.7\columnwidth]{images/WienerFilterDiagram.png}
 	\end{center}
 	\caption{Diagram that illustrates the functioning of a Wiener filter. s(n) is the desired signal, and v(n) is the additive noise.}
 	\label{fig:wiener_filter_diagram}
 \end{figure}
 
-
-% \begin{equ}[!ht]
+$s(n)$ is the target signal, $v(n)$ is the additive noise. The goal of the Wiener filter is to find an estimate $\hat{s}(n)$ of the target signal $s(n)$ using spectral knowledge of $v(n)$ and of the additive combination of $s(n)+v(n)$. The target signal estimate $\hat{s}(n)$ is also called the 'error' as it is the part that is left over after applying the Wiener filter.
   \begin{equation}\label{eq:start_wiener}
     \hat{s}(n) = (s(n) + v(n)) - \hat{v}(n) = d(n) - \boldsymbol{w}^T v(n)
   \end{equation}
-% \caption{$s(n)$ is the target signal, $v(n)$ is the additive noise. The goal of the Wiener filter is to find an estimate of the target signal $s(n)$ using spectral knowledge of $v(n)$ and of the additive combination of $s(n)+v(n)$. The target signal $s(n)$ is also called the 'error' as it is the part that is left over after applying the Wiener filter.}
-% \end{equ}
-
-% \begin{equ}[!ht]
-text1
+Calculate the square of the error \cite{lecture_adaptive_filters_1}
 \begin{equation}
     \hat{s}^2(n) = (d(n) - \boldsymbol{w}^T v(n))^2
 \end{equation}
-text2
 \begin{equation}
     \hat{s}^2(n) = d^2(n) - 2d(n)\boldsymbol{w}^T v(n) + \boldsymbol{w}^T v(n)\boldsymbol{w}^T v(n)
 \end{equation}
-text3
 \begin{equation}
     \hat{s}^2(n) = d^2(n) - 2 \boldsymbol{w}^T d(n) v(n) + \boldsymbol{w}^T v(n) v^T(n) \boldsymbol{w}
 \end{equation}
-% \caption{Calculate the square of the error}
-% \end{equ}
-Calculate the square of the error
-
-\begin{equ}[!ht]
+Take the mean of both sides to end up with the Mean Square Error (MSE) \cite{lecture_adaptive_filters_1}
 \begin{equation}
     E(\hat{s}^2(n)) = E(d^2(n)) - 2 \boldsymbol{w}^T E(d(n) v(n)) + \boldsymbol{w}^T E(v(n) v^T(n)) \boldsymbol{w}
 \end{equation}
-\caption{Take the mean of both sides to end up with the Mean Square Error (MSE)}
-\end{equ}
-
-
-\begin{equ}[!ht]
+Redefine terms of the equation \cite{lecture_adaptive_filters_1}
 \begin{align*}
 &J(\boldsymbol{w}) \                  &=& E(\hat{s}^2(n))  &=& \text{MSE (scalar)} \\
 &\sigma^2 \           &=& E(d^2(n))        &=& \text{Power of }d(n) \text{ (scalar)} \\
 &\boldsymbol{p} \      &=& E(d(n) v(n))     &=& \text{M-by-1 Crosscorrelation vector between } d(n) \text{ and } v(n)  \\
 &\boldsymbol{R} \      &=& E(v(n) v^T(n))  &=& \text{M-by-M Autocorrelation matrix of } v(n)
 \end{align*}
-\caption{Redefine terms of the equation}
-\end{equ}
-
-\begin{equ}[!ht]
+Insert redefined terms into the equation to form the total equation for Mean Square Error \cite{lecture_adaptive_filters_1}
 \begin{equation}
     J(\boldsymbol{w}) = \sigma^2 - 2 \boldsymbol{w}^T \boldsymbol{p} + \boldsymbol{w}^T \boldsymbol{R} \boldsymbol{w}
 \end{equation}
-\caption{Insert redefined terms into the equation to form the total equation for Mean Square Error}
-\end{equ}
-
-\begin{equ}[!ht]
-\begin{equation}
-    J(\boldsymbol{w}) = \sigma^2 - 2 \boldsymbol{w}^T \boldsymbol{p} + \boldsymbol{w}^T \boldsymbol{R} \boldsymbol{w}
-\end{equation}
-\caption{Insert redefined terms into the equation to form the total equation for Mean Square Error}
-\end{equ}
-
-\begin{equ}[!ht]
+To find the filter coefficients that result in minimum MSE we take the derivative of the MSE with respect to each filter coefficient. The derivation of this process is quite lengthy but can be found in \cite{proakis_manolakis_1996}. The resulting final solution is called the Wiener-Hopf equation \cite{lecture_adaptive_filters_1} and is also shown in equation \ref{eq:wiener_hopf}
 \begin{equation}\label{eq:end_wiener}
-    \frac{\delta J}{\delta w_i} = 0, i = 0, 1, ... M-1 \ \rightarrow \ \boldsymbol{R} \boldsymbol{w_{opt}} = \boldsymbol{p} \ \rightarrow \ \boldsymbol{w_{opt}} = \boldsymbol{R}^{-1}\boldsymbol{p}
+    \frac{\delta J}{\delta w_i} = 0, i = 0, 1, ... M-1 \ \rightarrow \ \boldsymbol{R} \boldsymbol{w_{opt}} = \boldsymbol{p} \ \rightarrow \ \boldsymbol{w_{opt}} = \boldsymbol{R}^{-1}\boldsymbol{p} \text{\cite{lecture_adaptive_filters_1}}
 \end{equation}
-\caption{To find the filter coefficients that result in minimum MSE we take the derivative of the MSE with respect to each filter coefficient. The derivation of this process is quite lengthy but can be found in \cite{proakis_manolakis_1996}. The resulting final solution is called the Wiener-Hopf equation \cite{lecture_adaptive_filters_1} and is also shown in equation \ref{eq:wiener_hopf}}
-\end{equ}
 
 
-The mathematical derivation for finding the optimal filter coefficients is given in equations \ref{eq:start_wiener} to \ref{eq:end_wiener}. The conclusion is that the optimal filter coefficients are calculated by multiplying (dot-product) the inverse of the autocorrelation of signal+noise and the crosscorrelation between signal+noise and noise. In sEMG, the signal+noise is measured at the point of muscle contraction while the noise can be measured seperately from a different bodypart that does not experience contraction. This seperately measured noise has similar frequency characteristics as the noise included in the signal+noise as it experiences the same amplifier noise and environment noise. The resulting frequency domain behaviour can be defined by equation \ref{eq:wiener_filter_frequency_behaviour}\cite{stanford_wiener_filter}.
+The mathematical derivation for finding the optimal filter coefficients is given in equations \ref{eq:start_wiener} to \ref{eq:end_wiener}. The conclusion is that the optimal filter coefficients are calculated by multiplying (dot-product) the inverse of the auto-correlation of signal+noise and the cross-correlation between signal+noise and noise. In sEMG, the signal+noise is measured at the point of muscle contraction while the noise can be measured separately from a different body part that does not experience contraction. This separately measured noise has similar frequency characteristics as the noise included in the signal+noise as it experiences the same amplifier noise and environment noise. The resulting frequency domain definition of the optimal Wiener filter is defined in equation \ref{eq:wiener_filter_frequency_behaviour}\cite{stanford_wiener_filter}.
 
 \begin{equation}
-    H_{opt}(z) = \frac{\Phi_{ss}(z)}{\Phi_{ss}(z) + \Phi_{vv}(z)}
-    \caption{Frequency domain representation of the Wiener solution frequency behaviour. $\Phi_{ss}(z)$ is the z-domain representation of the signal, and $\Phi_{vv}(z)$ is the z-domain representation of the noise \cite{stanford_wiener_filter} }
+    H_{opt}(z) = \frac{\Phi_{s}(z)}{\Phi_{s}(z) + \Phi_{v}(z)}
     \label{eq:wiener_filter_frequency_behaviour}
 \end{equation}
 
-The Wiener filter requires both the signal and the noise to be stationary, i.e. the spectral density does not change over time, and results in a linear time-invariant filter \cite{stationary_processes_definition} \cite{difference_stationary_nonstationary}. As an example a Wiener filter was made from the signal as seen in figure \ref{fig:sEMG_signal_example}. The time span from 0-2 seconds is taken as the 'noise', and the signal+noise from 5-7 seconds is taken to be 'signal'. From these a Wiener filter is constructed and can be seen in figure \ref{fig:wiener_filter_response}.
+Assuming that the calculated Wiener filter approximates the optimal Wiener filter, multiplying the filter (in frequency domain) with the signal+noise input will result in an approximation of the signal as seen below.
 
+\begin{align}
+    \hat{\Phi_{s}}(z) & \ = \ \hat{H_{opt}}(z) \ \cdot \ (\Phi_{s}(z) + \Phi_{v}(z)) \label{eq:wiener_filter_frequency_application_1} \\
+    & \ = \ \frac{\hat{\Phi_{s}}(z)}{\hat{\Phi_{s}}(z) + \hat{\Phi_{v}}(z)} \ \cdot \ (\Phi_{s}(z) + \Phi_{v}(z)) \label{eq:wiener_filter_frequency_application_2}\\
+    & \ \approx \ \Phi_{s}(z) \label{eq:wiener_filter_frequency_application_3}
+\end{align}
+
+The Wiener filter requires both the signal and the noise to be stationary, i.e. the spectral density does not change over time, and results in a linear time-invariant filter \cite{stationary_processes_definition} \cite{difference_stationary_nonstationary}. If the signal and noise were not stationary then the approximated frequency spectrum of signal+noise is not the same as the actual frequency spectrum of signal+noise which means they no longer cancel out in equation \ref{eq:wiener_filter_frequency_application_2} and equation \ref{eq:wiener_filter_frequency_application_3} no longer holds.
+As an example a Wiener filter was made from the signal as seen in figure \ref{fig:sEMG_signal_example}. The time span from 0-2 seconds is taken as the 'noise', and the time span from 5-7 seconds is taken to be signal+noise. From these a Wiener filter is constructed and can be seen in figure \ref{fig:wiener_filter_response}.
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -191,9 +160,9 @@ The Wiener filter requires both the signal and the noise to be stationary, i.e. 
 	\label{fig:wiener_filter_response}
 \end{figure}
 
-Adaptive filters is a class of filters where the filter coefficients are adjusted over time to attempt to find an optimal solution even without knowing the signal properties beforehand \cite{adaptive_filter_and_applications}. A Wiener filter can be turned into an adaptive Wiener filter by re-calculating the filter coefficients with new data to match a changing spectral density. 
+Adaptive filters is a class of filters where the filter coefficients are adjusted over time to attempt to find an optimal solution even without knowing the spectral properties of the signal beforehand \cite{adaptive_filter_and_applications}. A Wiener filter can be turned into an adaptive Wiener filter by re-calculating the filter coefficients with new data to match a changing spectral density. 
 
-Adaptive filters are applied in the same way as static filters by just multiplying the filter with measurements. However, the method of finding the filter coefficients is different. Instead of deciding beforehand what frequencies you want to have removed, you measure the signal and the noise and determine their frequency spectrum. Then you tune the filter coefficients to remove the noise components from the measurement while leaving the signal unaffected. This filter is used in environments where the noise frequency spectrum is not known beforehand, or when the frequency behaviour of the noise may change over time. Common applications of adaptive filters include speech recognition, echo cancellation, and headphones employing active noise cancellation! \cite{active_noise_cancellation_wiener_filter} \cite{wiener_vs_adaptive_realtime_noisecancellation}. An block-diagram of an adaptive filter is given in figure \ref{fig:adaptive_filter_diagram}.
+Adaptive filters are applied in the same way as static filters by just multiplying the filter with measurements. However, the method of finding the filter coefficients is different. Instead of deciding beforehand what frequencies will be removed, the signal and noise are measured to determine their frequency spectrum. Then the filter coefficients are tuned to remove the noise components from the measurement while leaving the signal unaffected. This filter is used in environments where the noise frequency spectrum is not known beforehand, or when the frequency behaviour of the noise may change over time. Common applications of adaptive filters include speech recognition, echo cancellation, and headphones employing active noise cancellation! \cite{active_noise_cancellation_wiener_filter} \cite{wiener_vs_adaptive_realtime_noisecancellation}. An block-diagram of an adaptive filter is given in figure \ref{fig:adaptive_filter_diagram}.
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -223,7 +192,7 @@ Both static and adaptive filters can be implemented as both FIR or IIR filters. 
 
 
 \section{Pre-whitening}
-Most  papers that mention the use of whitening only state the definition of the process, and something along the lines of "including a temporal whitening filter prior to demodulation and smoothing improves the performance of the amplitude estimate" \cite{single_site_emg_amplitude_estimation}\cite{adaptive_whitening}\cite{emg_whitening}. However, an intuitive explanation of \textit{why} whitening works is lacking. So to understand the reasoning behind whitening we need to take a short detour to the world of computer science and information science.
+Most  papers that mention the use of whitening only state the definition of the process, and something along the lines of "including a temporal whitening filter [...] improves the performance of the amplitude estimate" \cite{single_site_emg_amplitude_estimation}\cite{adaptive_whitening}\cite{emg_whitening}. However, an intuitive explanation of \textit{why} whitening works is lacking. So to understand the reasoning behind whitening we need to take a short detour to the world of computer science and information theory.
 
 Back in 1948 a mathematician, electrical engineer, and cryptographer named C.E. Shannon published a pioneering paper that formed the basis of information theory \cite{shannon}. In this paper it is shown that repetition does not carry information, and that the maximum information transfer occurs when a signal is truly random. Imagine a signal with only a single frequency component. After measuring a few samples of the signal the conclusion is drawn that this is a \SI{50}{\hertz} signal. Since it is possible to predict the value of every future measurement of the signal after drawing this conclusion it becomes unnecessary to continue measuring the signal because it will not give any new information. A repeating pattern is predictable, and predictable events carry no information.
 
@@ -273,7 +242,7 @@ Since the raw EMG signal consists of stochastic and unpredictable noise it is di
 Computationally envelope detection can be achieved in a number of different methods where "speed", or how much the detected envelope lags behind the true signal envelope, is traded against accuracy or noisiness \cite{dsp_good_bad_ugly}. A few different envelope detection techniques are discussed in \cite{rose2011electromyogram}.
 
 \subsection{Moving average}
-A moving average filter is a special type of FIR filter with coefficients that all have the value of $\frac{1}{n}$ where $n$ is the number of samples over which the average is taken. Thus the value of every smoothened sample is calculated to be the average of the previous $n$ samples. The upside of a moving average filter is that it introduces no phase distortion \cite{fir_filter_properties}, is very simple to implement, and require only addition to apply which is much faster than multiplication \cite{smith_moving_average_filters}. An illustration of the phase shift of a moving average filter is shown in figure \ref{movingaverage_phaseshift}. A downside of a moving average filter is that it lags behind the signal by its very definition: a change in a static signal level is only properly reflected after $n$ samples.  The sEMG signal must also be rectified before this method can be applied because EMG signal has approximately zero mean due to its oscillatory behaviour \cite{rose2011electromyogram}.
+A moving average filter is a special type of FIR filter with coefficients that all have the value of $\frac{1}{n}$ where $n$ is the number of samples over which the average is taken. Thus the value of every smoothed sample is calculated to be the average of the previous $n$ samples. The upside of a moving average filter is that it introduces no phase distortion \cite{fir_filter_properties}, is very simple to implement, and require only addition to apply which is much faster than multiplication \cite{smith_moving_average_filters}. An illustration of the phase shift of a moving average filter is shown in figure \ref{movingaverage_phaseshift}. A downside of a moving average filter is that it lags behind the signal by its very definition: a change in a static signal level is only properly reflected after $n$ samples.  The sEMG signal must also be rectified before this method can be applied because EMG signal has approximately zero mean due to its oscillatory behaviour \cite{rose2011electromyogram}.
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -285,14 +254,14 @@ A moving average filter is a special type of FIR filter with coefficients that a
 
 
 
-\subsection{IIR Lowpass filter}
-A lowpass filter such as a Butterworth or Chebyshev can be used to determine the envelope of a rectified signal in a more 'responsive' (less lag) method compared to a moving average filter. The downside of this filter is that it introduces phase shift (as can be seen in figure \ref{fig:iirfilter_phaseshift}) unless applied in forward and backward direction \cite{rose2011electromyogram} which is not possible in real-time signals without introducing a static delay of a number of samples that equals the number of filter coefficients.
+\subsection{IIR Low-pass filter}
+A low-pass filter such as a Butterworth or Chebyshev can be used to determine the envelope of a rectified signal in a more 'responsive' (less lag) method compared to a moving average filter. The downside of this filter is that it introduces phase shift (as can be seen in figure \ref{fig:iirfilter_phaseshift}) unless applied in forward and backward direction \cite{rose2011electromyogram} which is not possible in real-time signals without introducing a static delay of a number of samples that equals the number of filter coefficients.
 
 \begin{figure}[h!t]
 	\begin{center}
 		\includegraphics[width=0.7\columnwidth]{images/iirfilter_phaseshift.png}
 	\end{center}
-	\caption{Frequency response of an infinite impulse response (butterworth) low-pass filter. The filter has a cut-off frequency of \SI{1}{Hz} and has a length of 3. Notice how the phase delay is \textit{not} linear and thus phase distortion is introduced}
+	\caption{Frequency response of an infinite impulse response (Butterworth) low-pass filter. The filter has a cut-off frequency of \SI{1}{Hz} and has a length of 3. Notice how the phase delay is \textit{not} linear and thus phase distortion is introduced}
 	\label{fig:iirfilter_phaseshift}
 \end{figure}
 
@@ -308,10 +277,10 @@ The Root Mean Square (RMS) of a signal is the square root of average power of a 
 A conventional static real-time sEMG signal processing chain is described in \cite{muscle_force_estimation}. The relevant steps are as follows:
 \begin{itemize}
     \item Remove DC component from sig
-    \item Bandpass filter 20-\SI{300}{\hertz}
+    \item Band-pass filter 20-\SI{300}{\hertz}
     \item Notch filter at \SI{50}{\hertz}
     \item Half-wave rectification
-    \item Lowpass filter for envelope detection
+    \item Low-pass filter for envelope detection
 \end{itemize}
 
 This signal processing chain will also be tested in this report and compared to alternative techniques.

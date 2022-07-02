@@ -10,11 +10,11 @@ The measurement setup consists of the following components:
     \item Kendall H124SG Foam-Hydrogel ECG Electrodes 
 \end{itemize}
 
-The 16 channel amplifier performs unipolar measurements. This means that each electrode is connected to its own amplifier channel, and the measured values are compared to the value of a reference. The opposte of unipolar is bipolar which entails that the potential difference between two electrodes is amplified by a single amplifier channel \cite{tmsi_unipolar_bipolar}. 
+The 16 channel amplifier performs uni-polar measurements. This means that each electrode is connected to its own amplifier channel, and the measured values are compared to the value of a reference. The opposite of uni-polar is bipolar which entails that the potential difference between two electrodes is amplified by a single amplifier channel \cite{tmsi_unipolar_bipolar}. 
 
 The load cell has 4 relevant terminals. Two terminals are connected to the power supply to supply the load cell with power. The other two terminals are connected to the amplifier. The 'common' terminal of the power supply is connected to the 'Patient ground' on the amplifier.
 
-Sets of two electrodes are placed on the subjects right bicep, right tricep, and left arm. The electrodes were placed following SENIAM guidelines \cite{seniam}. Two electrodes per set is chosen to essentially capture more data. Since each electrode in a set measures almost identical sEMG signal the signals from the electordes can be averaged to reduce any present noise. The electrodes on the left arm are used to record a reference noise. It is expected that this reference noise has an identical frequency spectrum as the noise present in the sEMG signal since it is recorded at the same time, approximately same place, using the same amplifier, and can therefore be used in some of the presented filtering techniques. The reference signal is recorded using a TMSi provided armband that was soaked with water (for better connectivity) and connected to 'Patient ground' on the amplifier. A total measurement setup diagram is shown in figure \ref{fig:measurement_setup_diagram}. A photo of the measurement can be seen in Figure~\ref{fig:measurement_setup_photo}
+Sets of two electrodes are placed on the subjects right bicep, right triceps, and left arm. The electrodes were placed following SENIAM guidelines \cite{seniam}. Two electrodes per set is chosen to essentially capture more data. Since each electrode in a set measures almost identical sEMG signal the signals from the electrodes can be averaged to reduce any present noise. The electrodes on the left arm are used to record a reference noise. It is expected that this reference noise has an identical frequency spectrum as the noise present in the sEMG signal since it is recorded at the same time, approximately same place, using the same amplifier, and can therefore be used in some of the presented filtering techniques. The reference signal is recorded using a TMSi provided armband that was soaked with water (for better connectivity) and connected to 'Patient ground' on the amplifier. A total measurement setup diagram is shown in figure \ref{fig:measurement_setup_diagram}. A photo of the measurement can be seen in Figure~\ref{fig:measurement_setup_photo}
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -32,9 +32,7 @@ Sets of two electrodes are placed on the subjects right bicep, right tricep, and
 	\label{fig:measurement_setup_photo}
 \end{figure}
 
-A total of four signal sets were recorded. Two measurements of applying force to the load cell at a sampling rate of \SI{1000}{\hertz} and \SI{20000}{\hertz}, and two accompanying load cell calibration measurements where an object with known weight was attached to the load cell at the sampling frequencies.
-
-\textcolor{red}{Todo: Remove the part about 20k measurements if not used in the text}
+A single long measurement was taken at a sampling rate of \SI{1000}{\hertz} where force was applied following a predetermined pattern. This measurement is accompanied by a calibration measurements where an object with known weight was attached to the load cell at the sampling frequencies.
 
 The applied force followed the following pattern:
 \begin{itemize}
@@ -50,7 +48,7 @@ The applied force followed the following pattern:
 	\begin{center}
 		\includegraphics[width=0.8\columnwidth]{images/measurement_calibratie3_1k.png}
 	\end{center}
-	\caption{Calibration measurement at \SI{1}{\kilo\hertz} sampling rate. The force has been lowpassed with a cut-off frequency of 10 Hz to remove large \SI{50}{\hertz} noise component. The offset was determined to be \SI{-30}{\micro\volt}. The weight op the object was \SI{1681}{\gram} which corresponds to a change of \SI{695}{\micro\volt}}.
+	\caption{Calibration measurement at \SI{1}{\kilo\hertz} sampling rate. The force has been low-passed with a cut-off frequency of 10 Hz to remove large \SI{50}{\hertz} noise component. The offset was determined to be \SI{-30}{\micro\volt}. The weight op the object was \SI{1681}{\gram} which corresponds to a change of \SI{695}{\micro\volt}}.
 	\label{fig:calibration_1k}
 \end{figure}
 
@@ -76,7 +74,7 @@ During processing it was noticed that some methods scaled the estimated force by
     \item Compare if amplifying or reducing the signal decreases the RMSE. If amplifying/reducing yields a lower RMSE, amplify/reduce the signal and repeat these steps. If amplifying and reducing both yield an RMSE lower than the current RMSE, the ideal scaling value has been found.
 \end{itemize}
 
-The estimated force is subsequently scaled by this scaling factor preperatory to calculating the RMSE value. For the RMSE calculation, the first 3 seconds and the last 3 seconds of the signals were discarded (after processing) because some processing steps did not yield their steady-state response in that time \cite{transient_response}. The results for lag, error, and scaling can be found in the bar-chart in figure \ref{fig:result_all_lagerrorscaling}. 
+The estimated force is subsequently scaled by this scaling factor preparatory to calculating the RMSE value. For the RMSE calculation, the first 3 seconds and the last 3 seconds of the signals were discarded (after processing) because some processing steps did not yield their steady-state response in that time \cite{transient_response}. The results for lag, error, and scaling can be found in the bar-chart in figure \ref{fig:result_all_lagerrorscaling}. 
 
 \begin{table} [h!]
 \begin{tabular}{ccc}
@@ -104,17 +102,16 @@ Index & Abbreviation & Full form \\
 	\noindent\makebox[\textwidth]{
 		\includegraphics[width=1.3\columnwidth]{images/measurement_prewhitening.png}}
 	\end{center}
-	\caption{\textcolor{red}{Todo: update this text}This plot contains all relevant results for all different combinations of whitening, filters and envelope detection. The abbreviations are the first letter of the used technique for each step. Further clarification of these abbreviations can be found in table \ref{tab:abbreviation_explanation}}
+	\caption{This figure illustrates the effect that whitening of the sEMG signal has on the resulting envelope. The signals were not filtered and moving average was used for envelope detection. Both unfiltered and adaptive filtered versions show volatile behaviour compared to the non-whitened variant. The adaptive filter seems to amplify this behaviour as seen by the large spike around 13 seconds. In the frequency domain it can be seen that whitening results in a spectrum of larger amplitude compared to the non-whitened spectrum which seems to follow the measured force much more closely}
 	\label{fig:result_prewhitening}
 \end{figure}
 
-\textcolor{red}{Todo: insert whitening image}
 
 \begin{figure}[h!t]
 	\begin{center}
 		\includegraphics[width=1.0\columnwidth]{images/measurement_filtering.png}
 	\end{center}
-	\caption{\textcolor{red}{Todo: update this text}The result of different filtering techniques. For all signals whitening was not applied and the envelope was detected using moving average. All plots in the frequency domain are smoothened using a moving average filter with $n=10$ to give more insight into the difference between filters. The Wiener filter appears to reduce the amplitude of high peaks while staying as responsive as the other filters. Comparatively little lag is introduced between the filters. The adaptive Wiener filter was excluded from this comparison due to strongly differing signal results that can be seen in Figure~\ref{fig:result_adaptive_filtering}}
+	\caption{This figure illustrates the effect that different filtering techniques have on the resulting envelope. The signals were not whitened and moving average was used for envelope detection. The frequency plots have been smoothed using a moving average filter of length 10 to clearer show the difference in behaviour. The volatile behaviour that the adaptive Wiener filter exhibits in the time domain matches the behaviour found in figure \ref{fig:result_prewhitening}}
 	\label{fig:result_filtering}
 \end{figure}
 
@@ -123,6 +120,6 @@ Index & Abbreviation & Full form \\
 	\begin{center}
 		\includegraphics[width=1.0\columnwidth]{images/measurement_envelopes.png}
 	\end{center}
-	\caption{\textcolor{red}{Todo: update this text, update image}Result of different envelope estimation techniques. For all signals whitening was not applied and no filter was applied. All plots in the frequency domain are smoothened using a moving average filter with $n=10$ to give more insight into the difference between envelopes. The RMS envelope detection attenuates the higher frequencies more than the moving average technique. Furthermore the IIR Lowpass filter has a frequency response unlike the moving average or RMS technique, but this frequency response is in line with simulations as seen in Figure~\ref{fig:iir_frequencyresponse_coefficients}}
+	\caption{This figure illustrates the effect that different envelope estimation techniques have on sEMG signal. The signals were not whitened and not filtered. Even though all methods seem to provide almost identical behaviour in the time domain it can be seen from the frequency spectra that this only holds for moving average and root mean square envelope detection. IIR Butterworth low-pass filtering results in a more linear attenuation from the cut-off frequency on wards (set to 5Hz) which is in line with the simulations as seen in Figure~\ref{fig:iir_frequencyresponse_coefficients}}
 	\label{fig:result_envelopes}
 \end{figure}

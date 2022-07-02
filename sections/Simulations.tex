@@ -25,7 +25,7 @@ The whitening filter is then created by taking the FFT of the time-domain test s
 	\label{fig:whitening_simulation}
 \end{figure}
 
-In \ref{fig:whitening_simulation} it can be seen that the whitening filter functions as expected. In the center subplot the 'ideal' result can be seen (multiplication in the frequency domain), and in subplot 5 the result from convolution in the time domain is shown. In subplot 5 a smoothened version of the filtered signal FFT is added to display that the signal power has a mean that approximates white noise. This filter was made using a Savitzky-Golay filter with a window length of 31 and a polynomial order of 3.
+In \ref{fig:whitening_simulation} it can be seen that the whitening filter functions as expected. In the center subplot the 'ideal' result can be seen (multiplication in the frequency domain), and in subplot 5 the result from convolution in the time domain is shown. In subplot 5 a smoothed version of the filtered signal FFT is added to display that the signal power has a mean that approximates white noise. This filter was made using a Savitzky-Golay filter with a window length of 31 and a polynomial order of 3.
 
 \section{Filtering}
 Due to the difficulty of creating a simulated signal that has the frequency contents of an sEMG signal and environmental noise, a pre-recorded sample of sEMG of a bicep going through maximum voluntary contraction was used to test the filters. This sample is not used for force estimation because there is no way to validate the degree of contraction, and purely the frequency contents of the signal are of interest. The sample that is used can be seen in figure \ref{fig:sEMG_signal_example}. 
@@ -36,7 +36,7 @@ The construction of each filter will be explained in the method, and the SNR per
 The theory from section \ref{section:standard_semg_processing} specifies the removal of DC frequencies, a notch filter at \SI{50}{Hz}, and a bandpass filter between \SI{20}{Hz} and \SI{300}{Hz}. Looking at the noise spectrum in figure \ref{fig:sEMG_fft_signalnoise_example} it can be seen that there also exist significant peaks at \SI{100}{Hz} and \SI{150}{Hz}. For this reason, additional notch filters are constructed to target these frequencies. The total frequency response of the concatenated filters can be seen in figure \ref{fig:staticfilter_frequencyresponse}.
 \begin{itemize}
     \item IIR Notch filters at \SI{50}{Hz}, \SI{100}{Hz}, \SI{150}{Hz}. All have a Q-factor of 10, are constructed as numerator/denominator pairs and applied using scipy's lfilter.
-    \item The bandpass filter consists of a highpass filter with a cut-off frequency of \SI{20}{Hz} and a lowpass filter with a cut-off frequency of \SI{300}{Hz}. Both filters are of length 5, are constructed as numerator/denominator pairs, and applied using scipy's lfilter.
+    \item The bandpass filter consists of a high-pass filter with a cut-off frequency of \SI{20}{Hz} and a lowpass filter with a cut-off frequency of \SI{300}{Hz}. Both filters are of length 5, are constructed as numerator/denominator pairs, and applied using scipy's lfilter.
 \end{itemize}
 
 \subsection{Method}
@@ -50,7 +50,7 @@ The theory from section \ref{section:standard_semg_processing} specifies the rem
 
 
 \subsubsection{Wiener filter}
-As discussed in section \ref{sec:filters_theory} the Wiener filter coefficients are constructed from the crosscorrelation vector between signal+noise ($d(n)$) and the noise ($v(n)$) and the autocorrelation of the noise as is presented in the Wiener-Hopf equation in equation \ref{eq:wiener_hopf} \cite{lecture_adaptive_filters_1}. 
+As discussed in section \ref{sec:filters_theory} the Wiener filter coefficients are constructed from the cross-correlation vector between signal+noise ($d(n)$) and the noise ($v(n)$) and the auto-correlation of the noise as is presented in the Wiener-Hopf equation in equation \ref{eq:wiener_hopf} \cite{lecture_adaptive_filters_1}. 
 
 The number of Wiener filter coefficients have a strong influence on the performance of the filter as can be seen in figure \ref{fig:wiener_filter_length}. The explanation behind SNR calculation and bandwidth will be discussion in the 'Results' section.
 
@@ -76,7 +76,7 @@ Using the previously discussed prerecorded sample that can be seen in figure \re
 	\begin{center}
 		\includegraphics[width=1.0\columnwidth]{images/adaptive_wiener_windowsize.png}
 	\end{center}
-	\caption{SNR and bandwidth of an adaptive wiener filter using different combinations of window size and blocks per window. It should be noted that each signal has been smoothened using a Savitzky-Golay filter with a window length of 31 and a polynomial order of 3. This is done to make the difference in performance between different blocks per window clearer, without filtering the signals have a larger deviation that makes the lines unreadable.
+	\caption{SNR and bandwidth of an adaptive wiener filter using different combinations of window size and blocks per window. It should be noted that each signal has been smoothed using a Savitzky-Golay filter with a window length of 31 and a polynomial order of 3. This is done to make the difference in performance between different blocks per window clearer, without filtering the signals have a larger deviation that makes the lines unreadable.
 	It can be seen that the number of blocks per window does not have a big influence on the SNR or bandwidth. The SNR seems to have a somewhat linear relation with the window size, while the bandwidth peaks around a window size of 500 samples.}
 	\label{fig:adaptive_wiener_windowsize}
 \end{figure}
@@ -89,7 +89,7 @@ Each filter will be tested using two metrics: SNR (eq \ref{eq:rms}) and Bandwidt
 	\begin{center}
 		\includegraphics[width=1.0\columnwidth]{images/filter_process.png}
 	\end{center}
-	\caption{Illustration of testing of filters. Signal and noise are passed through the filter invidiually and the SNR is calculated for each filter.}
+	\caption{Illustration of testing of filters. Signal and noise are passed through the filter individually and the SNR is calculated for each filter.}
 	\label{fig:filter_process}
 \end{figure}
 
@@ -172,7 +172,7 @@ The moving average filter only depends on the length of the filter, figure \ref{
 Similar to the moving average filter, the behaviour of the RMS filter is solely determined by the length of the filter. The same range of filter lengths was chosen as for the moving average filter so that the performance could be directly plotted against each other.
 
 \subsection{Results}
-There are two seperate metrics that need to be measured when comparing envelope estimation techniques. The first one is how 'fast' a techniques is, and the second is how 'good' the technique is. The first metric gives information about how much the 'detected' signal lags behind the 'true' signal. The second metric is the quality of the envelope estimate when accounting for the lag.
+There are two separate metrics that need to be measured when comparing envelope estimation techniques. The first one is how 'fast' a techniques is, and the second is how 'good' the technique is. The first metric gives information about how much the 'detected' signal lags behind the 'true' signal. The second metric is the quality of the envelope estimate when accounting for the lag.
 
 The lag is detected by calculating the cross-correlation between the true signal and the envelope estimate. Cross-correlation is a metric that determines the similarity between two signals as a function of displacement of one signal relative to another \cite{wiki:cross_correlation}. Since the 'true' signal and the estimated signal are most similar when their displacement equals the lag, a detectable peak is formed in the cross correlation function. The left subplot in figure \ref{fig:envelope_estimation_method} displays a 'true' signal (measured force), and a simulated estimation of this signal (estimated force) that lags behind the true signal. The cross-correlation is also plotted that has a peak at \SI{100}{\milli\second}, which is the exact amount of lag between the two signals. The right subplot shows the two signals where the estimated signal has shifted to account for the lag. At this point the error can be determined by subtracting the true signal from the estimated signal, and the root-mean-square-error can be calculated. 
 
@@ -184,7 +184,7 @@ The lag is detected by calculating the cross-correlation between the true signal
 	\label{fig:envelope_estimation_method}
 \end{figure}
 
-The input signal was generated to be gaussian white noise since it has signal properties close to that of an sEMG signal, and is multiplied with a modulation that can be seen in the left subplot of figure \ref{fig:envelope_detection}. The envelope detection techniques are applied onto the input signal and the results are plotted in the right subplot of figure \ref{fig:envelope_detection}.
+The input signal was generated to be Gaussian white noise since it has signal properties close to that of an sEMG signal, and is multiplied with a modulation that can be seen in the left subplot of figure \ref{fig:envelope_detection}. The envelope detection techniques are applied onto the input signal and the results are plotted in the right subplot of figure \ref{fig:envelope_detection}.
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -194,13 +194,13 @@ The input signal was generated to be gaussian white noise since it has signal pr
 	\label{fig:envelope_detection}
 \end{figure}
 
-To properly evaluate the performance of the envelope detection techniques each method has been tested individually across the range of variables that were described in the previous method section and plotted against the resulting lag and error. The graph describing the performance of the IIR butterworth filter can be seen in figure \ref{fig:lagerror_iir}. The graph describing the performance of the moving average filter and the RMS filter can be seen in figure \ref{fig:lagerror_RMS_MA}.
+To properly evaluate the performance of the envelope detection techniques each method has been tested individually across the range of variables that were described in the previous method section and plotted against the resulting lag and error. The graph describing the performance of the IIR Butterworth filter can be seen in figure \ref{fig:lagerror_iir}. The graph describing the performance of the moving average filter and the RMS filter can be seen in figure \ref{fig:lagerror_RMS_MA}.
 
 \begin{figure}[h!t]
 	\begin{center}
 		\includegraphics[width=1.0\columnwidth]{images/lagerror_iirfilter.png}
 	\end{center}
-	\caption{Lag and error of an IIR butterworth filter for different cut-off frequencies and filter lengths. Note that filters with a lower cut-off frequency and high number of filter coefficients become unstable which can be seen in the error-graph for cut-off frequencies \SI{1}{\hertz}-\SI{3}{\hertz}. Additionally, the error in these graphs are all below 0.125. This is caused by the fact that the modulation is between 0 and 1, the error is <1 and the squared error is smaller still. So not the error value, but the \textit{relation between} = error values of different methods is the truly useful information here.}
+	\caption{Lag and error of an IIR Butterworth filter for different cut-off frequencies and filter lengths. Note that filters with a lower cut-off frequency and high number of filter coefficients become unstable which can be seen in the error-graph for cut-off frequencies \SI{1}{\hertz}-\SI{3}{\hertz}. Additionally, the error in these graphs are all below 0.125. This is caused by the fact that the modulation is between 0 and 1, the error is <1 and the squared error is smaller still. So not the error value, but the \textit{relation between} = error values of different methods is the truly useful information here.}
 	\label{fig:lagerror_iir}
 \end{figure}
 
@@ -216,13 +216,13 @@ To properly evaluate the performance of the envelope detection techniques each m
 
 The measured sEMG signals from antagonistic muscles needs to be combined to form an estimate of the exerted force. Since this calculation is done in a consistent way throughout all measurements this section serves purely to provide some insight into the method of calculation.
 
-The previous step of envelope estimation is used to get a measure of muscle contraction. Exerted force around a joint is simply the difference between how much antagonistic contract. By measuring the sEMG from antagonistic muscles (such as bicep and tricep) and determining their envelope after processing, the estimated force is simply the difference between the two envelopes. However, this method does not directly result in an estimation of force but actually an estimation in the difference of muscle contraction. To correlate the difference in muscle contraction from antagonistic muscles to the exerted force, the muscle contraction needs to be scaled. As previously mentioned, a linear relation between sEMG and force will be assumed \cite{adaptive_filter_dry_electrode} \cite{interpreting_muscle_function_from_emg}. In figure \ref{fig:force_simulation} it is shown how the exerted force is estimated from simulated bicep and tricep sEMG. 
+The previous step of envelope estimation is used to get a measure of muscle contraction. Exerted force around a joint is simply the difference between how much antagonistic contract. By measuring the sEMG from antagonistic muscles (such as bicep and triceps) and determining their envelope after processing, the estimated force is simply the difference between the two envelopes. However, this method does not directly result in an estimation of force but actually an estimation in the difference of muscle contraction. To correlate the difference in muscle contraction from antagonistic muscles to the exerted force, the muscle contraction needs to be scaled. As previously mentioned, a linear relation between sEMG and force will be assumed \cite{adaptive_filter_dry_electrode} \cite{interpreting_muscle_function_from_emg}. In figure \ref{fig:force_simulation} it is shown how the exerted force is estimated from simulated bicep and triceps sEMG. 
 
 \begin{figure}[h!t]
 	\begin{center}
 		\includegraphics[width=1.0\columnwidth]{images/force_simulation.png}
 	\end{center}
-	\caption{Process of estimating force from simulated sEMG (random Gaussian noise). The bicep envelope is calculated at the top, notice how during downwards force exertion the bicep still activates but to a lesser degree than during upwards force exertion. The same holds for the tricep in the bottom figure. The subplot on the right shows the envelope of the bicep, tricep, the difference between these two (identical to estimated force assuming linear scaling with factor 1), and the 'measured' force .}
+	\caption{Process of estimating force from simulated sEMG (random Gaussian noise). The bicep envelope is calculated at the top, notice how during downwards force exertion the bicep still activates but to a lesser degree than during upwards force exertion. The same holds for the triceps in the bottom figure. The subplot on the right shows the envelope of the bicep, triceps, the difference between these two (identical to estimated force assuming linear scaling with factor 1), and the 'measured' force .}
 	\label{fig:force_simulation}
 \end{figure}
 
