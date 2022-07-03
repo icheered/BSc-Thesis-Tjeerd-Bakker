@@ -92,15 +92,24 @@ As discussed in section \ref{sec:filters_theory} the Wiener filter coefficients 
     \label{eq:wiener_hopf}
 \end{equation}
 
-The number of Wiener filter coefficients have a strong influence on the performance of the filter as can be seen in Figure~\ref{fig:wiener_filter_length}. For the measurements section (\ref{sec:measurements}), a Wiener filter of length 200 was chosen as this is a middle ground for SNR and bandwidth.
+The number of Wiener filter coefficients have a strong influence on the performance of the filter as can be seen in Figure~\ref{fig:wiener_filter_length}. For the measurements section (\ref{sec:measurements}), a Wiener filter of length 500 was chosen as this is a middle ground for SNR and bandwidth.
 
 \begin{figure}[h!t]
 	\begin{center}
 		\includegraphics[width=1.0\columnwidth]{images/wiener_filter_length.png}
 	\end{center}
-	\caption{The effect of the number of Wiener filter coefficients on the SNR and bandwidth. Filter orders around 0-10 seem to have best bandwidth but the SNR is very low at these points. For the measurements section a window length of 200 was chosen as this presents a peak in the bandwidth. }
+	\caption{The effect of the number of Wiener filter coefficients on the SNR and bandwidth. To clarify the more general influence of filter length both plots were smoothed using a Savitzky-Golay filter with length of 71 and poly order of 3. It appears there is a clear peak in SNR at 650 filter terms but this corresponds to a low bandwidth. A filter length of 500 was chosen as this presents a good middle ground between SNR and bandwidth peak in the bandwidth. }
 	\label{fig:wiener_filter_length}
 \end{figure}
+
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[width=1.0\columnwidth]{images/wiener_filter_response_mvc.png}
+	\end{center}
+	\caption{The frequency response of a Wiener filter at different levels of MVC. It can be seen that at a lower MVC the filter appears to have a very aggressive frequency response (seen by the large peaks at \SI{10}{\hertz} and higher frequencies) while at higher MVC this response is much less pronounced.}
+	\label{fig:wiener_filter_response_mvc}
+\end{figure}
+
 
 \subsubsection{Adaptive filter}
 The functioning of an LMS filter has been described in the theory section. An LMS filter has two properties that determine its behaviour: The filter length and the convergence coefficient. To determine the best combination of these parameters when applied to sEMG signals a range of different values was tested. The results can be found in Figure~\ref{fig:lms_filter_windowsize}. For the measurement section (\ref{sec:measurements}) an LMS filter with length 500 and convergence value of 0.1 will be used.
