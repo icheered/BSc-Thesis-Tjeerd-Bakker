@@ -64,7 +64,7 @@ The ratio between how much of the measured signal is actual desired signal and h
 
 \section{Filters}
 % Introduce basic concept of filters
-At a fundamental level filters are simply a tool to remove something unwanted (noise) that is mixed with something wanted (signal). In signal processing filtering is achieved by decomposing a measured signal into repeating patterns and subsequently deciding which patterns should be retained and which patterns should be removed. Figure~\ref{fig:filter_example} displays how a time-domain signal can be represented in the frequency domain to display information about which frequencies are present in the signal.
+Filters are a tool that can be used to remove something unwanted (noise) that is mixed with something wanted (signal). In signal processing filtering is achieved by decomposing a measured signal into repeating patterns and subsequently deciding which patterns should be retained and which patterns should be removed. Figure~\ref{fig:filter_example} displays how a time-domain signal can be represented in the frequency domain to display information about which frequencies are present in the signal.
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -212,6 +212,12 @@ The coefficients are calculated for the next iteration
 The steps in equations \ref{eq:adaptive1}-\ref{eq:adaptive3} are repeated for every sample.
 
 In the presented equations a constant $\mu$ was present, this is called the convergence coefficient. Determining the value of the convergence coefficient $\mu$ is a double-edged sword. On the one hand it determines how fast gradient descent is traversed, and thus how fast the filter coefficients converge to the optimal filter coefficients. Ideally this happens as fast as possible, and thus the convergence coefficient must be as large as possible. On the other hand it was previously mentioned that the filter coefficients will never reach the optimal filter coefficients but instead oscillate around this value. The convergence coefficient also determines how large this oscillatory behaviour is, and thus to achieve an accurate estimation of the optimal filter the convergence factor should be as small as possible. 
+
+A problem presented by the basic LMS algorithm is that scaling the input also results in scaling the error term calculated in Equation~\ref{eq:adaptive2}. This makes it difficult (if not impossible) to find a convergence factor that functions across a wide range of possible scaled inputs. A solution to this problem is found in the work of Haykin \cite{adaptive_filter_theory} in the form of the Normalized LMS filter. This normalizes the power of the input signal before multiplying the input with the error and convergence factor. This is done by dividing the input signal with the the dot product of the input signal with itself. It turns Equation~\ref{eq:adaptive3} into Equation~\ref{eq:adaptive4} \cite{adaptive_filter_theory}.
+
+\begin{equation}\label{eq:adaptive4}
+    w(n+1) = w(n) + 2 \mu e(n)  \frac{x(n)}{x(n) \cdot x(n)}
+\end{equation}
 
 Common applications of adaptive filters include speech recognition, echo cancellation, and headphones employing active noise cancellation \cite{active_noise_cancellation_wiener_filter,wiener_vs_adaptive_realtime_noisecancellation}.
 
