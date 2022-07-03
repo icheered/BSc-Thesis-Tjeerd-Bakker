@@ -43,49 +43,22 @@ The applied force followed the following pattern:
 \end{itemize}
 
 \section{Measurement data}
-\textcolor{red}{Figure out the best way to present this information without it taking up 2 pages}
 The following configuration parameters were chosen based on simulation results:
 \begin{itemize}
-    \item Whitening
-    \begin{itemize}
-        \item \textcolor{red}{Do this}
-    \end{itemize}
+    \item Whitening: A whitening filter was created from the signal spectrum between 5 and 10 seconds in figure \ref{fig:measurement_1k}. The number of coefficients was limited to 500.
     \item Filtering
     \begin{itemize}
-        \item Static filter 
-        \begin{itemize}
-            \item 3 notch filters at \SI{50}{\hertz}, \SI{100}{\hertz}, and \SI{150}{\hertz} with q-factor of 10
-            \item low-pass Butterworth filter with $f_{cut}$ of \SI{20}{\hertz} and length 5
-            \item high-pass Butterworth filter with $f_{cut}$ of \SI{300}{\hertz} and length 5
-        \end{itemize}
-        \item Wiener filter
-        \begin{itemize}
-            \item 200 filter terms
-        \end{itemize}
-        \item Adaptive Wiener filter
-        \begin{itemize}
-            \item Window-size of 500 (number of samples from which the filter coefficients are calculated)
-            \item 1 block per window (how many samples to skip before recalculating the filter coefficients)
-        \end{itemize}
+        \item Static filter: 3 notch filters at \SI{50}{\hertz}, \SI{100}{\hertz}, and \SI{150}{\hertz} with q-factor of 10, low-pass Butterworth filter with $f_{cut}$ of \SI{20}{\hertz} and length 5, high-pass Butterworth filter with $f_{cut}$ of \SI{300}{\hertz} and length 5
+        \item Wiener filter: 200 filter terms, filter was created from the bicep signal
+        \item Adaptive LMS filter: The filter length was 500 and the convergence value was 0.05
     \end{itemize}
     \item Envelope detection
-        \begin{itemize}
-            \item Moving average envelope detection
-        \begin{itemize}
-            \item \textcolor{red}{Do this}
-        \end{itemize}
-        \item IIR LP filter
-        \begin{itemize}
-            \item \textcolor{red}{Do this}
-        \end{itemize}
-        \item RMS
-        \begin{itemize}
-            \item \textcolor{red}{Do this}
-        \end{itemize}
+    \begin{itemize}
+        \item Moving average envelope detection: Length of filter was 120 terms
+        \item IIR LP filter: $f_{cut}$ of \SI{4}{\hertz} and a filter order of 3
+        \item RMS: Length of filter was 120 terms
     \end{itemize}
 \end{itemize}
-
-3 notch filters at \SI{50}{\hertz}, \SI{100}{\hertz}, and \SI{150}{\hertz}  with q-factor of 10, Band-pass filter consisting of a high-pass filter with $f_{cut}$ of \SI{20}{\hertz} and a low-pass filter with an $f_{cut}$ of
 
 
 \begin{figure}[h!t]
@@ -146,7 +119,7 @@ Index & Abbreviation & Full form \\
 	\noindent\makebox[\textwidth]{
 		\includegraphics[width=1.3\columnwidth]{images/measurement_prewhitening.png}}
 	\end{center}
-	\caption{This figure illustrates the effect that whitening of the sEMG signal has on the resulting envelope. The signals were not filtered and moving average was used for envelope detection. Both unfiltered and adaptive filtered versions show volatile behaviour compared to the non-whitened variant. The adaptive filter seems to amplify this behaviour as seen by the large spike around 13 seconds. In the frequency domain it can be seen that whitening results in a spectrum of larger amplitude compared to the non-whitened spectrum which seems to follow the measured force much more closely}
+	\caption{This figure illustrates the effect that whitening of the sEMG signal has on the resulting envelope. The signals were not filtered and moving average was used for envelope detection. Both unfiltered and adaptive filtered versions show volatile behaviour compared to the non-whitened variant. In the frequency domain it can be seen that whitening results in a spectrum of larger amplitude compared to the non-whitened spectrum which seems to follow the measured force much more closely}
 	\label{fig:result_prewhitening}
 \end{figure}
 
