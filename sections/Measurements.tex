@@ -48,14 +48,14 @@ The following configuration parameters were chosen based on simulation results:
     \item Whitening: A whitening filter was created from the signal spectrum between 5 and 10 seconds in Figure~\ref{fig:measurement_1k}. The number of coefficients was limited to 500.
     \item Filtering
     \begin{itemize}
-        \item Static filter: 3 notch filters at \SI{50}{\hertz}, \SI{100}{\hertz}, and \SI{150}{\hertz} with q-factor of 10, low-pass Butterworth filter with $f_{cut}$ of \SI{20}{\hertz} and length 5, high-pass Butterworth filter with $f_{cut}$ of \SI{300}{\hertz} and length 5
+        \item Static filter: 3 notch filters at \SI{50}{\hertz}, \SI{100}{\hertz}, and \SI{150}{\hertz} with q-factor of 10, low-pass Butterworth filter with $f_\text{cut}$ of \SI{20}{\hertz} and length 5, high-pass Butterworth filter with $f_\text{cut}$ of \SI{300}{\hertz} and length 5
         \item Wiener filter: 200 filter terms, filter was created from the bicep signal
         \item Adaptive LMS filter: The filter length was 500 and the convergence value was 0.05
     \end{itemize}
     \item Envelope detection
     \begin{itemize}
         \item Moving average envelope detection: Length of filter was 120 terms
-        \item IIR LP filter: $f_{cut}$ of \SI{4}{\hertz} and a filter order of 3
+        \item IIR LP filter: $f_\text{cut}$ of \SI{4}{\hertz} and a filter order of 3
         \item RMS: Length of filter was 120 terms
     \end{itemize}
 \end{itemize}
@@ -65,7 +65,7 @@ The following configuration parameters were chosen based on simulation results:
 	\begin{center}
 		\includegraphics[width=0.8\columnwidth]{images/measurement_calibratie3_1k.png}
 	\end{center}
-	\caption{Calibration measurement at \SI{1}{\kilo\hertz} sampling rate. The force has been low-passed with an $f_{cut}$ of 10 Hz to remove large \SI{50}{\hertz} noise component. The offset was determined to be \SI{-30}{\micro\volt}. The weight op the object was \SI{1681}{\gram} which corresponds to a measured signal of \SI{725}{\micro\volt}}.
+	\caption{Calibration measurement at \SI{1}{\kilo\hertz} sampling rate. The force has been low-passed with an $f_\text{cut}$ of 10 Hz to remove large \SI{50}{\hertz} noise component. The offset was determined to be \SI{-30}{\micro\volt}. The weight op the object was \SI{1681}{\gram} which corresponds to a measured signal of \SI{725}{\micro\volt}}.
 	\label{fig:calibration_1k}
 \end{figure}
 
@@ -80,14 +80,14 @@ The following configuration parameters were chosen based on simulation results:
 The calibration was performed to determine what the relation between the measured voltage and the force was. A weight of \SI{1681}{\gram} was attached to the measurement handle attached to the load cell which resulted in the measurement that can be seen in Figure~\ref{fig:calibration_1k}. Through visual inspection, the steady state offset of the setup without attached weight was determined to be \SI{30}{\micro\volt}. After attaching the weight, the steady state voltage was determined to be \SI{725}{\micro\volt}.
 
 \begin{equation}
-    \frac{\delta \text{weight [g]}}{\delta \text{signal [mV]}} = \frac{1681}{7.25-0.30} = 0.00241 [N/uV]
+    \frac{\Delta \text{weight [g]}}{\Delta \text{signal [mV]}} = \frac{1681}{7.25-0.30} = 0.00241 [N/uV]
 \end{equation}
 The measured force in Newton is approximately 0.00241 times the measured signal in micro Volt.
 
 All measurements were performed in bipolar electrode configuration and the measurement for a set of two electrodes was found by adding the results together. This removes the average signal that is present in all signals.
 
 \section{Measurement processing result}
-All combinations of whitening, filtering, and envelope detection were applied onto the signals as seen in Figure~\ref{fig:measurement_1k}. The combinations are indicated by the first letter of each processing method: 'w-s-r' means that Whitening was applied, the applied filter was a Static filter, and the envelope was determined using the RMS envelope detection. Further clarification can be found in Table~\ref{tab:abbreviation_explanation}.
+All combinations of whitening, filtering, and envelope detection were applied onto the signals as seen in Figure~\ref{fig:result_all_lagerrorscaling}. 
 During processing it was noticed that some methods scaled the estimated force by large amounts and this resulted in high error rates. To still compare the accuracy of force estimation regardless of scaling factor the decision was made to intrude an intermediate step between measuring/compensating the lag and calculating the error. After accounting for the lag, a scaling factor is determined that minimizes the RMSE. The scaling factor is determined through the following algorithm:
 \begin{itemize}
     \item Calculate the RMSE
@@ -107,12 +107,12 @@ The estimated force is subsequently scaled by this scaling factor preparatory to
 	\label{fig:result_all_lagerrorscaling}
 \end{figure}
 
-In Figure~\ref{fig:result_all_lagerrorscaling} it can be seen that whitening introduces significant lag. In the appendix are the results of constructing the whitening filter using zero-phase, linear-phase, and negative input signal phase \ref{fig:result_whitening_linearphase, fig:result_whitening_negative_sourcephase, fig:result_whitening_sourcephase, fig:result_whitening_zerophase}. Intuitively it would be expected that using negative source phase this introduced delay would be counteracted, but as can be seen in appendix Figure~\ref{fig:result_whitening_negative_sourcephase} this does not appear to be the case. Using zero-phase does seem to reduce the introduced lag.
+In Figure~\ref{fig:result_all_lagerrorscaling} it can be seen that whitening introduces significant lag. In the appendix are the results of constructing the whitening filter using zero-phase, linear-phase, and negative input signal phase \ref{fig:result_whitening_linearphase}, \ref{fig:result_whitening_negative_sourcephase}, \ref{fig:result_whitening_sourcephase}, \ref{fig:result_whitening_zerophase}. If this were caused by the fact that the whitening filter was constructed using the phase of the input signal then it would be expected that using negative source phase this introduced delay would be counteracted, but as can be seen in appendix Figure~\ref{fig:result_whitening_negative_sourcephase} this does not appear to be the case. 
 
 \begin{figure}[h!t]
 	\begin{center}
 	\noindent\makebox[\textwidth]{
-		\includegraphics[width=1.3\columnwidth]{images/measurement_prewhitening.png}}
+		\includegraphics[width=1.0\columnwidth]{images/measurement_prewhitening.png}}
 	\end{center}
 	\caption{This figure illustrates the effect that whitening of the sEMG signal has on the resulting envelope. The signals were not filtered and moving average was used for envelope detection. Both unfiltered and adaptive filtered versions show volatile behaviour compared to the non-whitened variant. In the frequency domain it can be seen that whitening results in a spectrum of larger amplitude compared to the non-whitened spectrum which seems to follow the measured force much more closely}
 	\label{fig:result_prewhitening}
@@ -123,7 +123,7 @@ In Figure~\ref{fig:result_all_lagerrorscaling} it can be seen that whitening int
 	\begin{center}
 		\includegraphics[width=1.0\columnwidth]{images/measurement_filtering.png}
 	\end{center}
-	\caption{This figure illustrates the effect that different filtering techniques have on the resulting envelope. The signals were not whitened and moving average was used for envelope detection. The frequency plots have been smoothed using a moving average filter of length 10 to clearer show the difference in behaviour. The volatile behaviour that the adaptive Wiener filter exhibits in the time domain matches the behaviour found in Figure~\ref{fig:result_prewhitening}}
+	\caption{This figure illustrates the effect that different filtering techniques have on the resulting envelope. The signals were not whitened and moving average was used for envelope detection. The frequency plots have been smoothed using a moving average filter of length 10 to clearer show the difference in behaviour.}
 	\label{fig:result_filtering}
 \end{figure}
 
@@ -132,8 +132,9 @@ In Figure~\ref{fig:result_all_lagerrorscaling} it can be seen that whitening int
 	\begin{center}
 		\includegraphics[width=1.0\columnwidth]{images/measurement_envelopes.png}
 	\end{center}
-	\caption{This figure illustrates the effect that different envelope estimation techniques have on sEMG signal. The signals were not whitened and not filtered. Even though all methods seem to provide almost identical behaviour in the time domain it can be seen from the frequency spectra that this only holds for moving average and root mean square envelope detection. IIR Butterworth low-pass filtering results in a more linear attenuation from the $f_{cut}$ on wards (set to 5Hz) which is in line with the simulations as seen in Figure~\ref{fig:iir_frequencyresponse_coefficients}}
+	\caption{This figure illustrates the effect that different envelope estimation techniques have on sEMG signal. The signals were not whitened and not filtered. Even though all methods seem to provide almost identical behaviour in the time domain it can be seen from the frequency spectra that this only holds for moving average and root mean square envelope detection. IIR Butterworth low-pass filtering results in a more linear attenuation from the $f_\text{cut}$ on wards (set to \SI{5}{\hertz}) which is in line with the simulations as seen in Figure~\ref{fig:iir_frequencyresponse_coefficients}}
 	\label{fig:result_envelopes}
 \end{figure}
 
-\section{conclusion}
+\section{Conclusion}
+Figure~\ref{fig:result_all_lagerrorscaling} shows the results that allow comparing different signal processing chains. Furthermore the individual processing steps have been compared in the time and frequency domain to show any notable characteristics. Further observations are made in the Discussion section \ref{sec:discussion} and compared to expectations made after the simulations.
