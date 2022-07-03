@@ -79,7 +79,9 @@ Filters are a tool that can be used to remove something unwanted (noise) that is
 \end{figure}
 
 A digital filter consists of a set of values called the filter coefficients. The input (measurements) is multiplied with the filter coefficients to create the output. That is, the latest measurement is multiplied with the first filter coefficient, the previous measurement is multiplied with the second filter coefficient, and so on. This can also be interpreted as multiplying each filter coefficients with a delayed input sample. Figure~\ref{fig:wiki_digital_filter_working} shows the working and standard notation of a digital filter.
-By carefully choosing the number and value of filter coefficients it is possible to attenuate specific frequencies while not influencing other frequencies such as the effect shown in \ref{fig:filter_example}. Analog signals and filters are conventionally presented as a continuous function of time (e.g. $x(t)$). Digital signals and filters are discrete rather than continuous, and are conventionally presented as a function of samples (e.g. $x(n)$). The variable $n$ describes the n'th sample of the signal. Converting a continuous signal to a discrete signal is done through the process of sampling the continuous signal at equidistant points in time: $s(n)=s(n*\Delta t)$ \cite{linear_systems_and_signals}.
+By carefully choosing the number and value of filter coefficients it is possible to attenuate specific frequencies while not influencing other frequencies such as the effect shown in \ref{fig:filter_example}. 
+
+Analog signals and filters are conventionally presented as a continuous function of time (e.g. $x(t)$). Digital signals and filters are discrete rather than continuous, and are conventionally presented as a function of samples (e.g. $x(n)$). The variable $n$ describes the $n$'th sample of the signal. Converting a continuous signal to a discrete signal is done through the process of sampling the continuous signal at equidistant points in time: $s(n)=s(n*\Delta t)$ \cite{linear_systems_and_signals}.
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -151,8 +153,8 @@ In sEMG, the signal+noise is measured at the point of muscle contraction while t
 Assuming that the calculated Wiener filter approximates the optimal Wiener filter, multiplying the filter (in frequency domain) with the signal+noise input will result in an approximation of the signal as seen below.
 
 \begin{align}
-    \hat{\Phi_\text{s}}(z) & \ = \ \hat{H_\text{opt}}(z) \ \cdot \ (\Phi_\text{s}(z) + \Phi_\text{v}(z)) \label{eq:wiener_filter_frequency_application_1} \\
-    & \ = \ \frac{\hat{\Phi_\text{s}}(z)}{\hat{\Phi_\text{s}}(z) + \hat{\Phi_\text{v}}(z)} \ \cdot \ (\Phi_\text{s}(z) + \Phi_\text{v}(z)) \label{eq:wiener_filter_frequency_application_2}\\
+    \hat{\Phi}_\text{s}(z) & \ = \ \hat{H}_\text{opt}(z) \ \cdot \ \left(\Phi_\text{s}(z) + \Phi_\text{v}(z)\right) \label{eq:wiener_filter_frequency_application_1} \\
+    & \ = \ \frac{\hat{\Phi}_\text{s}(z)}{\hat{\Phi}_\text{s}(z) + \hat{\Phi}_\text{v}(z)} \ \cdot \ \left(\Phi_\text{s}(z) + \Phi_\text{v}(z)\right) \label{eq:wiener_filter_frequency_application_2}\\
     & \ \approx \ \Phi_\text{s}(z) \label{eq:wiener_filter_frequency_application_3}
 \end{align}
 
@@ -175,8 +177,8 @@ As an example a Wiener filter was made from the signal as seen in Figure~\ref{fi
 	\label{fig:adaptive_filter_diagram}
 \end{figure}
 
-Adaptive filters is a class of filters where the filter coefficients are adjusted over time to attempt to find an optimal solution even without knowing the spectral properties of the signal beforehand \cite{adaptive_filter_and_applications}. Adaptive filters adjust the filter coefficients by decreasing the error that remains after applying the filter. A diagram describing this process can be found in Figure~\ref{fig:adaptive_filter_diagram}. 
-One type of adaptive filter is the Least Mean Square (LMS) algorithm. Where a Wiener filter finds an optimal solution by using cross-correlation and auto-correlation, the adaptive LMS algorithm converges to the optimal solution (i.e. the solution found by the Wiener filter given complete knowledge of the spectral domain) using gradient descent. Filter coefficients will never reach $w_\text{opt}$ but instead oscillate around it. The mathematical definition for calculating the filter coefficients is given, derived from the work of J. Orfanidis \cite[Ch. 7.3]{introduction_optimal_signal_processing} and lectures by S. Safapourhajari \cite{lecture_adaptive_filters_2}. Again it is assumed that there is an input signal ($d(n)$) consisting of a desired signal ($e(n)$) and additive noise ($x(n)$), as well as a separate measure of the noise that is correlated with the noise in the input signal but uncorrelated with the desired signal.
+Adaptive filters are a class of filters where the filter coefficients are adjusted over time to attempt to find an optimal solution even without knowing the spectral properties of the signal beforehand \cite{adaptive_filter_and_applications}. Adaptive filters adjust the filter coefficients by decreasing the error that remains after applying the filter. A diagram describing this process can be found in Figure~\ref{fig:adaptive_filter_diagram}. 
+One type of adaptive filter is the Least Mean Squares (LMS) algorithm. Where a Wiener filter finds an optimal solution by using cross-correlation and auto-correlation, the adaptive LMS algorithm converges to the optimal solution (i.e. the solution found by the Wiener filter given complete knowledge of the spectral domain) using gradient descent. Filter coefficients will never reach $w_\text{opt}$ but instead oscillate around it. The mathematical definition for calculating the filter coefficients is given, derived from the work of J. Orfanidis \cite[Ch. 7.3]{introduction_optimal_signal_processing} and lectures by S. Safapourhajari \cite{lecture_adaptive_filters_2}. Again it is assumed that there is an input signal ($d(n)$) consisting of a desired signal ($e(n)$) and additive noise ($x(n)$), as well as a separate measure of the noise that is correlated with the noise in the input signal but uncorrelated with the desired signal.
 
 The cost function for adjusting the adaptive filter as seen in figure \ref{fig:adaptive_filter_diagram} coefficients is taken to be the Mean Square Error $J$ (MSE):
 \begin{equation}
@@ -188,12 +190,12 @@ To calculate the expected value of the square of the error we would normally nee
 \end{equation}
 Since the error $e(n)$ equals $d(n) - wx(n)$ this can be filled into the equation
 \begin{equation}
-    E((d(n) - wx(n))^2)) \sim (d(n) - wx(n))^2
+    E(d(n) - wx(n))^2) \sim (d(n) - wx(n))^2
 \end{equation}
 
 To find $w$ that minimizes the MSE we can take the derivative of MSE with respect to $w$ for every sample $n$
 \begin{equation}
-    \frac{\delta J}{\delta w} = 2(d(n) - wx(n)) \frac{\delta(d(n) - wx(n))}{\delta w} = -2e(n)x(n)
+    \frac{\delta J}{\delta w} = 2\left(d(n) - wx(n)\right) \frac{\delta\left(d(n) - wx(n)\right)}{\delta w} = -2e(n)x(n)
 \end{equation}
 This results in the following weight-adjusting algorithm
 \begin{align}
@@ -216,15 +218,23 @@ The coefficients are calculated for the next iteration
     w(n+1) = w(n) + 2 \mu e(n) x(n)
 \end{equation}
 
-The steps in equations \ref{eq:adaptive1}-\ref{eq:adaptive3} are repeated for every sample.
+The steps in equations \ref{eq:adaptive1}-\ref{eq:adaptive3} are repeated for every next sample.
 
-In the presented equations a constant $\mu$ was present, this is called the convergence coefficient. Determining the value of the convergence coefficient $\mu$ is a double-edged sword. On the one hand it determines how fast gradient descent is traversed, and thus how fast the filter coefficients converge to the optimal filter coefficients. Ideally this happens as fast as possible, and thus the convergence coefficient must be as large as possible. On the other hand it was previously mentioned that the filter coefficients will never reach the optimal filter coefficients but instead oscillate around this value. The convergence coefficient also determines how large this oscillatory behaviour is, and thus to achieve an accurate estimation of the optimal filter the convergence factor should be as small as possible. 
+In the presented equations a constant $\mu$ is present; this is called the convergence coefficient. Determining the value of the convergence coefficient $\mu$ is a double-edged sword. On the one hand it determines how fast the gradient descent is traversed, and thus how fast the filter coefficients converge to the optimal filter coefficients. Ideally this happens as fast as possible, and thus the convergence coefficient must be as large as possible. On the other hand it was previously mentioned that the filter coefficients will never reach the optimal filter coefficients but instead oscillate around this value. The convergence coefficient also determines how large this oscillatory behaviour is, and thus to achieve an accurate estimation of the optimal filter the convergence factor should be as small as possible. 
 
-A problem presented by the basic LMS algorithm is that scaling the input also results in scaling the error term calculated in Equation~\ref{eq:adaptive2}. This makes it difficult (if not impossible) to find a convergence factor that functions across a wide range of possible scaled inputs. A solution to this problem is found in the work of Haykin \cite{adaptive_filter_theory} in the form of the Normalized LMS filter. This normalizes the power of the input signal before multiplying the input with the error and convergence factor. This is done by dividing the input signal with the the dot product of the input signal with itself. It turns Equation~\ref{eq:adaptive3} into Equation~\ref{eq:adaptive4} \cite{adaptive_filter_theory}.
+A problem presented by the basic LMS algorithm is that scaling the input also results in scaling the error term calculated in Equation~\ref{eq:adaptive2}. This makes it difficult (if not impossible) to find a convergence factor that functions across a wide range of possible scaled inputs. A solution to this problem is found in the work of Haykin \cite{adaptive_filter_theory} in the form of the Normalized LMS filter. This normalizes the power of the input signal before multiplying the input with the error and convergence factor. This is done by dividing the input signal with the  dot product of the input signal with itself. It turns Equation~\ref{eq:adaptive3} into Equation~\ref{eq:adaptive4} \cite{adaptive_filter_theory}. It should be noted that since the filter coefficients are updated over time, the final result of the coefficients are only the approximation of the optimal coefficients that correspond to the last part of the signal. This holds true especially for non-stationary signals. Purely for completeness the final result of an LMS filter has been given in Figure~\ref{lms_filter_response}.
 
 \begin{equation}\label{eq:adaptive4}
     w(n+1) = w(n) + 2 \mu e(n)  \frac{x(n)}{x(n) \cdot x(n)}
 \end{equation}
+
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[width=1.0\columnwidth]{images/lms_filter_response.png}
+	\end{center}
+	\caption{Filter coefficients and frequency response of an adaptive LMS filter}
+	\label{fig:lms_filter_response}
+\end{figure}
 
 Common applications of adaptive filters include speech recognition, echo cancellation, and headphones employing active noise cancellation \cite{active_noise_cancellation_wiener_filter,wiener_vs_adaptive_realtime_noisecancellation}.
 
