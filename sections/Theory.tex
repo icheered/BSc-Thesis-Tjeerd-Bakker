@@ -74,8 +74,8 @@ Filters are a tool that can be used to remove something unwanted (noise) that is
 	\label{fig:filter_example}
 \end{figure}
 
-A filter digital consists of a set of values called the filter coefficients. The input (measurements) is multiplied with the filter coefficients to create the output. That is, the latest measurement is multiplied with the first filter coefficient, the previous measurement is multiplied with the second filter coefficient, and so on. This can also be interpreted as multiplying each filter coefficients with a delayed input sample. Figure~\ref{fig:wiki_digital_filter_working} shows the working and standard notation of a digital filter.
-By carefully choosing the number and value of filter coefficients it is possible to attenuate specific frequencies while not influencing other frequencies such as the effect shown in \ref{fig:filter_example}.
+A digital filter consists of a set of values called the filter coefficients. The input (measurements) is multiplied with the filter coefficients to create the output. That is, the latest measurement is multiplied with the first filter coefficient, the previous measurement is multiplied with the second filter coefficient, and so on. This can also be interpreted as multiplying each filter coefficients with a delayed input sample. Figure~\ref{fig:wiki_digital_filter_working} shows the working and standard notation of a digital filter.
+By carefully choosing the number and value of filter coefficients it is possible to attenuate specific frequencies while not influencing other frequencies such as the effect shown in \ref{fig:filter_example}. Analog signals and filters are conventionally presented as a continuous function of time (e.g. $x(t)$). Digital signals and filters are discrete rather than continuous, and are conventionally presented as a function of samples (e.g. $x(n)$). The variable $n$ describes the n'th sample of the signal. Converting a continuous signal to a discrete signal is done through the process of sampling the continuous signal at equidistant points in time: $s(n)=s(n*\Delta t)$ \cite{linear_systems_and_signals}.
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -88,23 +88,23 @@ By carefully choosing the number and value of filter coefficients it is possible
 \subsection{Static filters, Wiener filter, Adaptive filters}\label{sec:filters_theory}
 The main difference between the different presented filter types is the way of calculating the filter coefficients. If a filter is static (e.g. high-pass, low-pass, band-pass, or band-stop) it simply means that the number of filter coefficients and the values of the filter coefficients are predetermined. These filters are very popular due to their simplicity in terms of finding the value of the filter coefficients. 
 
-A Wiener filter aims to produce an estimate of a target process by linear time-invariant filtering of a noisy signal using knowledge of the spectrum of the stationary noise and target process assuming additive noise \cite{wiki:Wiener_filter,lecture_adaptive_filters_1}. In other words, given a frequency spectrum of noise and a signal polluted by noise with the same frequency spectrum, a Wiener filter tries to produce the original signal. It is the optimal solution in terms of mean square error to statically filtering additive noise from a signal. Figure~\ref{fig:wiener_filter_diagram} shows a diagram that illustrates how the Wiener filter is applied using a noise source and a signal+noise source.
+A Wiener filter aims to produce an estimate of a target process by linear time-invariant filtering of a noisy signal using knowledge of the spectrum of the stationary noise and target process assuming additive noise \cite{wiki:Wiener_filter,lecture_adaptive_filters_1}. Figure~\ref{fig:wiener_filter_diagram} shows the use of a Wiener filter. It is assumed that the noise component $v(n)$ is correlated to the noise component in the input signal in input $d(n)$ and uncorrelated to the desired signal $s(n)$. The Wiener filter coefficients aim to minimize the correlated signals, leaving only the desired signal as the 'error'. It is the optimal solution in terms of mean square error to statically filtering additive noise from a signal. The filter is constructed from the cross-correlation between an input sample and a noise sample, and the auto-correlation of the noise sample.
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[width=0.7\columnwidth]{images/WienerFilterDiagram.png}
+		\includegraphics[width=0.7\columnwidth]{images/wiener_filter_diagram.png}
 	\end{center}
-	\caption{Diagram that illustrates the functioning of a Wiener filter. $s(n)$ is the desired signal, and $v(n)$ is the additive noise.}
+	\caption{Diagram that illustrates the functioning of a Wiener filter. $s(n)$ is the desired signal, $v(n)$ is the additive noise, and $d(n)$ is the combination of desired signal and noise \cite{wiener_filter_system_identification}}
 	\label{fig:wiener_filter_diagram}
 \end{figure}
 
-$s(n)$ is the target signal, $v(n)$ is the additive noise. The goal of the Wiener filter is to find an estimate $\hat{s}(n)$ of the target signal $s(n)$ using spectral knowledge of $v(n)$ and of the additive combination of $s(n)+v(n)$. The target signal estimate $\hat{s}(n)$ is also called the 'error' as it is the part that is left over after applying the Wiener filter.
+$s(n)$ is the target signal, $v(n)$ is the additive noise. The goal of the Wiener filter is to find an estimate $\hat{s}(n)$ of the target signal $s(n)$ using spectral knowledge of $v(n)$ and of the additive combination of $s(n)+v(n)$. The target signal estimate $\hat{s}(n)$ is also called the 'error' as it is the part that is left over after applying the Wiener filter. $w$ presents the wiener filter coefficients.
   \begin{equation}\label{eq:start_wiener}
     \hat{s}(n) = (s(n) + v(n)) - \hat{v}(n) = d(n) - \boldsymbol{w}^T v(n)
   \end{equation}
 Calculate the square of the error \cite{lecture_adaptive_filters_1}
 \begin{equation}
-    \hat{s}^2(n) = \large(d(n) - \boldsymbol{w}^T v(n)\large)^2
+    \hat{s}^2(n) = (d(n) - \boldsymbol{w}^T v(n))^2
 \end{equation}
 \begin{equation}
     \hat{s}^2(n) = d^2(n) - 2d(n)\boldsymbol{w}^T v(n) + \boldsymbol{w}^T v(n)\boldsymbol{w}^T v(n)
@@ -161,14 +161,14 @@ As an example a Wiener filter was made from the signal as seen in Figure~\ref{fi
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[width=0.7\columnwidth]{images/adaptive_filter_block_diagram.png}
+		\includegraphics[width=1.0\columnwidth]{images/adaptive_filter_block_diagram.png}
 	\end{center}
 	\caption{Block diagram of an adaptive filter \cite{introduction_optimal_signal_processing}}
 	\label{fig:adaptive_filter_diagram}
 \end{figure}
 
 Adaptive filters is a class of filters where the filter coefficients are adjusted over time to attempt to find an optimal solution even without knowing the spectral properties of the signal beforehand \cite{adaptive_filter_and_applications}. Adaptive filters adjust the filter coefficients by decreasing the error that remains after applying the filter. A diagram describing this process can be found in Figure~\ref{fig:adaptive_filter_diagram}. 
-One type of adaptive filter is the Least Mean Square (LMS) algorithm. Where a Wiener filter finds an optimal solution by using cross-correlation and auto-correlation, the adaptive LMS algorithm converges to the optimal solution using gradient descent. Filter coefficients will never reach $w_{opt}$ but instead oscillate around it. The mathematical definition for calculating the filter coefficients is given, derived from the work of J. Orfanidis \cite[Ch. 7.3]{introduction_optimal_signal_processing} and lectures by S. Safapourhajari \cite{lecture_adaptive_filters_2}.
+One type of adaptive filter is the Least Mean Square (LMS) algorithm. Where a Wiener filter finds an optimal solution by using cross-correlation and auto-correlation, the adaptive LMS algorithm converges to the optimal solution (i.e. the solution found by the Wiener filter given complete knowledge of the spectral domain) using gradient descent. Filter coefficients will never reach $w_{opt}$ but instead oscillate around it. The mathematical definition for calculating the filter coefficients is given, derived from the work of J. Orfanidis \cite[Ch. 7.3]{introduction_optimal_signal_processing} and lectures by S. Safapourhajari \cite{lecture_adaptive_filters_2}. Again it is assumed that there is an input signal ($d(n)$) consisting of a desired signal ($e(n)$) and additive noise ($x(n)$), as well as a separate measure of the noise that is correlated with the noise in the input signal but uncorrelated with the desired signal.
 
 Taking the definition of the MSE (which is the cost function we're trying to minimize) as defined in Equation~\ref{eq:wiener_mse_def}
 \begin{equation}
