@@ -102,44 +102,46 @@ A Wiener filter aims to produce an estimate of a target process by linear time-i
 	\label{fig:wiener_filter_diagram}
 \end{figure}
 
-$s(n)$ is the target signal, $v(n)$ is the additive noise. The goal of the Wiener filter is to find an estimate $\hat{s}(n)$ of the target signal $s(n)$ using spectral knowledge of $v(n)$ and of the additive combination of $s(n)+v(n)$. The target signal estimate $\hat{s}(n)$ is also called the 'error' as it is the part that is left over after applying the Wiener filter. $w$ presents the wiener filter coefficients.
-  \begin{equation}\label{eq:start_wiener}
-    \hat{s}(n) = (s(n) + v(n)) - \hat{v}(n) = d(n) - \boldsymbol{w}^T v(n)
-  \end{equation}
-Calculate the square of the error \cite{lecture_adaptive_filters_1}
-\begin{equation}
-    \hat{s}^2(n) = (d(n) - \boldsymbol{w}^T v(n))^2
-\end{equation}
-\begin{equation}
-    \hat{s}^2(n) = d^2(n) - 2d(n)\boldsymbol{w}^T v(n) + \boldsymbol{w}^T v(n)\boldsymbol{w}^T v(n)
-\end{equation}
-\begin{equation}
-    \hat{s}^2(n) = d^2(n) - 2 \boldsymbol{w}^T d(n) v(n) + \boldsymbol{w}^T v(n) v^T(n) \boldsymbol{w}
-\end{equation}
-Take the mean of both sides to end up with the Mean Square Error (MSE) \cite{lecture_adaptive_filters_1}
-\begin{equation}\label{eq:wiener_final}
-    E\left(\hat{s}^2(n)\right) = E\left(d^2(n)\right) - 2 \boldsymbol{w}^T E\left(d(n) v(n)\right) + \boldsymbol{w}^T E\left(v(n) v^T(n)\right) \boldsymbol{w}
-\end{equation}
+% $s(n)$ is the target signal, $v(n)$ is the additive noise. The goal of the Wiener filter is to find an estimate $\hat{s}(n)$ of the target signal $s(n)$ using spectral knowledge of $v(n)$ and of the additive combination of $s(n)+v(n)$. The target signal estimate $\hat{s}(n)$ is also called the 'error' as it is the part that is left over after applying the Wiener filter. $w$ presents the wiener filter coefficients.
+%   \begin{equation}\label{eq:start_wiener}
+%     \hat{s}(n) = (s(n) + v(n)) - \hat{v}(n) = d(n) - \boldsymbol{w}^T v(n)
+%   \end{equation}
+% Calculate the square of the error \cite{lecture_adaptive_filters_1}
+% \begin{equation}
+%     \hat{s}^2(n) = (d(n) - \boldsymbol{w}^T v(n))^2
+% \end{equation}
+% Expanding the brackets
+% \begin{equation}
+%     \hat{s}^2(n) = d^2(n) - 2d(n)\boldsymbol{w}^T v(n) + \boldsymbol{w}^T v(n)\boldsymbol{w}^T v(n)
+% \end{equation}
+% \begin{equation}
+%     \hat{s}^2(n) = d^2(n) - 2 \boldsymbol{w}^T d(n) v(n) + \boldsymbol{w}^T v(n) v^T(n) \boldsymbol{w}
+% \end{equation}
+% Take the mean of both sides to end up with the Mean Square Error (MSE) \cite{lecture_adaptive_filters_1}
+% \begin{equation}\label{eq:wiener_final}
+%     E\left(\hat{s}^2(n)\right) = E\left(d^2(n)\right) - 2 \boldsymbol{w}^T E\left(d(n) v(n)\right) + \boldsymbol{w}^T E\left(v(n) v^T(n)\right) \boldsymbol{w}
+% \end{equation}
 
-Redefine the terms of Equation~\ref{eq:wiener_final} to give insight into their definitions \cite{lecture_adaptive_filters_1}
-\begin{align}
-&J(\boldsymbol{w}) \                  &=& E(\hat{s}^2(n))  &=& \text{MSE (scalar)} \label{eq:wiener_mse_def}\\
-&\sigma^2 \           &=& E(d^2(n))        &=& \text{Power of }d(n) \text{ (scalar)} \\
-&\boldsymbol{p} \      &=& E(d(n) v(n))     &=& \text{M-by-1 Cross-correlation vector between } d(n) \text{ and } v(n)  \\
-&\boldsymbol{R} \      &=& E(v(n) v^T(n))  &=& \text{M-by-M Auto-correlation matrix of } v(n)
-\end{align}
+% Redefine the terms of Equation~\ref{eq:wiener_final} to give insight into their definitions \cite{lecture_adaptive_filters_1}
+% \begin{align}
+% &J(\boldsymbol{w}) \                  &=& E(\hat{s}^2(n))  &=& \text{MSE (scalar)} \label{eq:wiener_mse_def}\\
+% &\sigma^2 \           &=& E(d^2(n))        &=& \text{Power of }d(n) \text{ (scalar)} \\
+% &\boldsymbol{p} \      &=& E(d(n) v(n))     &=& \text{M-by-1 Cross-correlation vector between } d(n) \text{ and } v(n)  \\
+% &\boldsymbol{R} \      &=& E(v(n) v^T(n))  &=& \text{M-by-M Auto-correlation matrix of } v(n)
+% \end{align}
 
-Substitute these terms into Equation~\ref{eq:wiener_final} to form the total equation for Mean Square Error \cite{lecture_adaptive_filters_1}
-\begin{equation}
-    J(\boldsymbol{w}) = \sigma^2 - 2 \boldsymbol{w}^T \boldsymbol{p} + \boldsymbol{w}^T \boldsymbol{R} \boldsymbol{w}
-\end{equation}
-To find the filter coefficients that result in minimum MSE we take the derivative of the MSE with respect to each filter coefficient. The derivation of this process is quite lengthy but can be found in \cite{proakis_manolakis_1996}. The resulting final solution is called the Wiener-Hopf equation \cite{lecture_adaptive_filters_1} and is also shown in Equation~\ref{eq:wiener_hopf}
-\begin{equation}\label{eq:end_wiener}
-    \frac{\delta J}{\delta w_i} = 0, i = 0, 1, ... M-1 \ \rightarrow \ \boldsymbol{R} \boldsymbol{w_\text{opt}} = \boldsymbol{p} \ \rightarrow \ \boldsymbol{w_\text{opt}} = \boldsymbol{R}^{-1}\boldsymbol{p} \text{\cite{lecture_adaptive_filters_1}}
-\end{equation}
+% Substitute these terms into Equation~\ref{eq:wiener_final} to form the total equation for Mean Square Error \cite{lecture_adaptive_filters_1}
+% \begin{equation}
+%     J(\boldsymbol{w}) = \sigma^2 - 2 \boldsymbol{w}^T \boldsymbol{p} + \boldsymbol{w}^T \boldsymbol{R} \boldsymbol{w}
+% \end{equation}
+% To find the filter coefficients that result in minimum MSE we take the derivative of the MSE with respect to each filter coefficient. The derivation of this process is quite lengthy but can be found in \cite{proakis_manolakis_1996}. The resulting final solution is called the Wiener-Hopf equation \cite{lecture_adaptive_filters_1} and is also shown in Equation~\ref{eq:wiener_hopf}
+% \begin{equation}\label{eq:end_wiener}
+%     \frac{\delta J}{\delta w_i} = 0, i = 0, 1, ... M-1 \ \rightarrow \ \boldsymbol{R} \boldsymbol{w_\text{opt}} = \boldsymbol{p} \ \rightarrow \ \boldsymbol{w_\text{opt}} = \boldsymbol{R}^{-1}\boldsymbol{p} \text{\cite{lecture_adaptive_filters_1}}
+% \end{equation}
 
 
-The mathematical derivation for finding the optimal filter coefficients is given in equations \ref{eq:start_wiener} to \ref{eq:end_wiener}. The conclusion is that the optimal filter coefficients are calculated by multiplying (dot-product) the inverse of the auto-correlation of signal+noise and the cross-correlation between signal+noise and noise. In sEMG, the signal+noise is measured at the point of muscle contraction while the noise can be measured separately from a different body part that does not experience contraction. This separately measured noise has similar frequency characteristics as the noise included in the signal+noise as it experiences the same amplifier noise and environment noise. The resulting frequency domain definition of the optimal Wiener filter is defined in Equation~\ref{eq:wiener_filter_frequency_behaviour}\cite{stanford_wiener_filter}.
+% The mathematical derivation for finding the optimal filter coefficients is given in equations \ref{eq:start_wiener} to \ref{eq:end_wiener}. The conclusion is that the optimal filter coefficients are calculated by multiplying (dot-product) the inverse of the auto-correlation of signal+noise and the cross-correlation between signal+noise and noise. 
+In sEMG, the signal+noise is measured at the point of muscle contraction while the noise can be measured separately from a different body part that does not experience contraction. This separately measured noise has similar frequency characteristics as the noise included in the signal+noise as it experiences the same amplifier noise and environment noise. The resulting frequency domain definition of the optimal Wiener filter is defined in Equation~\ref{eq:wiener_filter_frequency_behaviour}\cite{stanford_wiener_filter}. $\Phi_\text{s}(z)$ reflects the frequency contents of signal+noise, and $\Phi_\text{v}(z)$ reflects the frequency contents of the noise.
 
 \begin{equation}
     H_\text{opt}(z) = \frac{\Phi_\text{s}(z)}{\Phi_\text{s}(z) + \Phi_\text{v}(z)}
@@ -155,7 +157,7 @@ Assuming that the calculated Wiener filter approximates the optimal Wiener filte
 \end{align}
 
 The Wiener filter requires both the signal and the noise to be stationary, i.e. the spectral density does not change over time, and results in a linear time-invariant filter \cite{stationary_processes_definition} \cite{difference_stationary_nonstationary}. If the signal and noise were not stationary then the approximated frequency spectrum of signal+noise is not the same as the actual frequency spectrum of signal+noise which means they no longer cancel out in Equation~\ref{eq:wiener_filter_frequency_application_2} and Equation~\ref{eq:wiener_filter_frequency_application_3} no longer holds.
-As an example a Wiener filter was made from the signal as seen in Figure~\ref{fig:sEMG_signal_example}. The time span from 0-2 seconds is taken as the 'noise', and the time span from 5-7 seconds is taken to be signal+noise. From these a Wiener filter is constructed and can be seen in Figure~\ref{fig:wiener_filter_response}.
+As an example a Wiener filter was made from the signal as seen in Figure~\ref{fig:sEMG_signal_example}. The time span from \SIrange{0}{2}{\second} is taken as the 'noise', and the time span from \SIrange{5}{7}{\second} is taken to be signal+noise. From these a Wiener filter is constructed and can be seen in Figure~\ref{fig:wiener_filter_response}.
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -176,29 +178,28 @@ As an example a Wiener filter was made from the signal as seen in Figure~\ref{fi
 Adaptive filters is a class of filters where the filter coefficients are adjusted over time to attempt to find an optimal solution even without knowing the spectral properties of the signal beforehand \cite{adaptive_filter_and_applications}. Adaptive filters adjust the filter coefficients by decreasing the error that remains after applying the filter. A diagram describing this process can be found in Figure~\ref{fig:adaptive_filter_diagram}. 
 One type of adaptive filter is the Least Mean Square (LMS) algorithm. Where a Wiener filter finds an optimal solution by using cross-correlation and auto-correlation, the adaptive LMS algorithm converges to the optimal solution (i.e. the solution found by the Wiener filter given complete knowledge of the spectral domain) using gradient descent. Filter coefficients will never reach $w_\text{opt}$ but instead oscillate around it. The mathematical definition for calculating the filter coefficients is given, derived from the work of J. Orfanidis \cite[Ch. 7.3]{introduction_optimal_signal_processing} and lectures by S. Safapourhajari \cite{lecture_adaptive_filters_2}. Again it is assumed that there is an input signal ($d(n)$) consisting of a desired signal ($e(n)$) and additive noise ($x(n)$), as well as a separate measure of the noise that is correlated with the noise in the input signal but uncorrelated with the desired signal.
 
-Taking the definition of the MSE (which is the cost function we're trying to minimize) as defined in Equation~\ref{eq:wiener_mse_def}
+The cost function for adjusting the adaptive filter as seen in figure \ref{fig:adaptive_filter_diagram} coefficients is taken to be the Mean Square Error $J$ (MSE):
 \begin{equation}
     J(w) = E(e^2(n)) = E[(d(n) - wx(n))^2)]
 \end{equation}
 To calculate the expected value of the square of the error we would normally need statistics over a large block of data. An approximation of the expected value can be made by using a smaller set of data. This can be done by taking the current samples as the estimates of the mean
 \begin{equation}
-    E(e^2(n)) ~ e^(n)
+    E(e^2(n)) \sim e^2(n)
 \end{equation}
+Since the error $e(n)$ equals $d(n) - wx(n)$ this can be filled into the equation
 \begin{equation}
-    E((d(n) - wx(n))^2)) ~ (d(n) - wx(n))^2
+    E((d(n) - wx(n))^2)) \sim (d(n) - wx(n))^2
 \end{equation}
 
 To find $w$ that minimizes the MSE we can take the derivative of MSE with respect to $w$ for every sample $n$
 \begin{equation}
-    \frac{\delta J}{\delta w} = 2(d(n) - wx(n)) \frac{\delta(d(n) - wx(n))}{\deta w} = -2e(n)x(n)
+    \frac{\delta J}{\delta w} = 2(d(n) - wx(n)) \frac{\delta(d(n) - wx(n))}{\delta w} = -2e(n)x(n)
 \end{equation}
 This results in the following weight-adjusting algorithm
-\begin{equation}
-   w(n+1) = w(n) + 2 \mu e(n)x(n)
-\end{equation}
-\begin{equation}
-    \textrm{w(n+1)}=\left.w(n)-\mu \frac{\delta J}{\delta w}\right\rvert_\text{\textrm{w(n)}}
-\end{equation}
+\begin{align}
+    \textrm{w(n+1)}&=\left.w(n)-\mu \frac{\delta J}{\delta w}\right\rvert_\text{\textrm{w(n)}} \\
+    &= w(n) + 2 \mu e(n)x(n)
+\end{align}
 
 
 This algorithm is implemented by performing the following steps. \\
