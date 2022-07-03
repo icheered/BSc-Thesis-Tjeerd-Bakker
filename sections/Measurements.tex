@@ -65,7 +65,7 @@ The following configuration parameters were chosen based on simulation results:
 	\begin{center}
 		\includegraphics[width=0.8\columnwidth]{images/measurement_calibratie3_1k.png}
 	\end{center}
-	\caption{Calibration measurement at \SI{1}{\kilo\hertz} sampling rate. The force has been low-passed with an $f_{cut}$ of 10 Hz to remove large \SI{50}{\hertz} noise component. The offset was determined to be \SI{-30}{\micro\volt}. The weight op the object was \SI{1681}{\gram} which corresponds to a change of \SI{695}{\micro\volt}}.
+	\caption{Calibration measurement at \SI{1}{\kilo\hertz} sampling rate. The force has been low-passed with an $f_{cut}$ of 10 Hz to remove large \SI{50}{\hertz} noise component. The offset was determined to be \SI{-30}{\micro\volt}. The weight op the object was \SI{1681}{\gram} which corresponds to a measured signal of \SI{725}{\micro\volt}}.
 	\label{fig:calibration_1k}
 \end{figure}
 
@@ -98,24 +98,12 @@ During processing it was noticed that some methods scaled the estimated force by
 
 The estimated force is subsequently scaled by this scaling factor preparatory to calculating the RMSE value. For the RMSE calculation, the first 3 seconds and the last 3 seconds of the signals were discarded (after processing) because some processing steps did not yield their steady-state response in that time \cite{transient_response}. The results for lag, error, and scaling can be found in the bar-chart in Figure~\ref{fig:result_all_lagerrorscaling}. 
 
-\begin{table} [h!]
-\begin{tabular}{ccc}
-Index & Abbreviation & Full form \\
-\hline
-0 & w/n & Whitening / No whitening \\
-1 & n/s/w/a & No filter / Static filter / Wiener filter / Adaptive filter \\
-2 & m/i/r & Moving average envelope / IIR LP envelope / RMS envelope \\
-\end{tabular}
-\caption{Table for clarifying the abbreviations used in result bar charts}
-\label{tab:abbreviation_explanation}
-\end{table}
-
 \begin{figure}[h!t]
 	\begin{center}
 	\noindent\makebox[\textwidth]{
-		\includegraphics[width=1.3\columnwidth]{images/result_all_lagerrorscaling.png}}
+		\includegraphics[width=1.3\columnwidth]{images/result_all_lagerrorscaling_fullabel.png}}
 	\end{center}
-	\caption{This plot contains all relevant results for all different combinations of whitening, filters and envelope detection. The abbreviations are the first letter of the used technique for each step. Further clarification of these abbreviations can be found in Table~\ref{tab:abbreviation_explanation}}
+	\caption{This plot contains all relevant results for all different combinations of whitening, filters and envelope detection}
 	\label{fig:result_all_lagerrorscaling}
 \end{figure}
 
