@@ -107,6 +107,8 @@ The estimated force is subsequently scaled by this scaling factor preparatory to
 	\label{fig:result_all_lagerrorscaling}
 \end{figure}
 
+In Figure~\ref{fig:result_all_lagerrorscaling} it can be seen that whitening introduces significant lag. In the appendix are the results of constructing the whitening filter using zero-phase, linear-phase, and negative input signal phase \ref{fig:result_whitening_linearphase, fig:result_whitening_negative_sourcephase, fig:result_whitening_sourcephase, fig:result_whitening_zerophase}. Intuitively it would be expected that using negative source phase this introduced delay would be counteracted, but as can be seen in appendix Figure~\ref{fig:result_whitening_negative_sourcephase} this does not appear to be the case. Using zero-phase does seem to reduce the introduced lag.
+
 \begin{figure}[h!t]
 	\begin{center}
 	\noindent\makebox[\textwidth]{

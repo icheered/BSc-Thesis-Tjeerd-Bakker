@@ -223,7 +223,7 @@ The graph describing the performance of the IIR Butterworth filter can be seen i
 
 From Figure~\ref{fig:lagerror_iir} it can be seen that an IIR LP Butterworth filter of length 3 and $f_{cut}$ of \SI{4}{\hertz} results in the lowest error. A filter with $f_{cut}$ of \SI{6}{\hertz} has the lowest lag but this is only marginally less than a $f_{cut}$ of \SI{4}{\hertz}. For this reason an IIR LP Butterworth filter of length 3 and $f_{cut}$ of \SI{4}{\hertz} is used in the the measurement section (\ref{sec:measurements}).
 
-From Figure~\ref{fig:lagerror_RMS_MA} it can be seen that moving average and RMS methods have similar lag, and the lag has a linear relation to the filter length. In the same figure it can also be seen that the error reaches a minimum at a filter length of 120. For this reason both the RMS and moving average method are applied with a filter length of 120.
+From Figure~\ref{fig:lagerror_RMS_MA} it can be seen that moving average and RMS methods have similar lag, and the lag has a linear relation to the filter length. In the same figure it can also be seen that the error reaches a minimum at a filter length of 120. For this reason both the RMS and moving average method are applied with a filter length of 120. The Figure also shows that the error increases with more filter terms which may seem counter-intuitive. For a
 
 \section{Force estimation}\label{section:force_estimation}
 The measured sEMG signals from antagonistic muscles needs to be combined to form an estimate of the exerted force. Since this calculation is done in a consistent way throughout all measurements this section serves purely to provide some insight into the method of calculation.
@@ -239,3 +239,9 @@ The previous step of envelope estimation is used to get a measure of muscle acti
 \end{figure}
 
 \section{conclusion}
+In this chapter different filtering and envelope detection methods were compared. For each method, different variations of parameters were tested to determine the most optimal solution for each option.
+From the presented simulations the following expectations are made:
+\begin{itemize}
+    \item The static filter performs the best in terms of SNR, but in terms of bandwidth performs worse than other filters. The unfiltered signal yields the largest bandwidth but the lowest SNR. From this it is expected that if a high SNR results in a more accurate force estimation from sEMG that the static filter will perform best in force estimation as long as the MVC is large as seen in Figure~\ref{fig:filter_snr_mvc}, but if MVC is small then the adaptive LMS filter is expected to perform best.If bandwidth is the most important property for estimating force from sEMG it is expected that unfiltered signals perform the best, closely followed by the adaptive LMS filter and Wiener filter.
+    \item The RMS envelope detection method results in the smallest error compared to moving average and IIR Lowpass filter for the determined filter parameters. In terms of lag the RMS envelope detection performs about the same as the moving average envelope detection, and both of these are expected to result in less lag than IIR LP filter.
+\end{itemize}
