@@ -122,3 +122,22 @@
 %\ifpdf
 %	\pdfminorversion=6 
 %\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Macros for commenting and correcting.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{xcolor}															%Needed to have some colored text
+\usepackage{soul}															% Strike out text using \textst{...}
+\newcommand{\crgk}[1]{\noindent\textcolor{blue}{{#1}}} 							%Corrections	
+\newcommand{\cmgk}[1]{\noindent\textcolor{blue}{\emph{GK:} #1}}  					%Comments
+\newcommand{\rmgk}[1]{\noindent\textcolor{red}{{\textst{#1}}}} 						%Remove
+\newcommand{\rpgk}[2]{\noindent\textcolor{red}{{\textst{#1 }}\textcolor{olive}{{#2}}}}  	%Replace
+\newcommand{\gk}[1]{\noindent\textcolor{red}{#1~Please: reread, reconsider, rephrase!}}
+\newcommand{\csgk}{\cmgk{Clumsy sentence, please rephrase.}}     					%Improve sentence
+\newcommand{\itgk}{\cmgk{Illegible text in graph. Please improve.}}  					%Improve text in figure
+\newcommand{\wngk}[1]{
+\vspace{4mm}
+\fbox{\begin{minipage}{0.90\columnwidth}\noindent\textcolor{red}{#1}\end{minipage}}
+\vspace{4mm}
+}
+

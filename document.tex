@@ -26,6 +26,17 @@
 
 \cleardoublepage
 
+\cmgk{General remarks:
+\begin{itemize}
+    \item Please adjust title page. Massimo is professor.
+    \item Use non-italic font for subscripts indicating a name since it improves readability. E.g. $\phi_\text{C}$ instead of $\phi_C$, unless the subscript represents a variable, e.g. $\phi_i=i\cdot\Delta\phi$ would e.g. be the potential of the $i^{th}$ element. Also use the \LaTeX~names for functions. So `$\tan$' instead of `$tan$' since `$\tan$' is actually a name (of a function), not a variable.
+    \item Considering the use of "a" and "an": "an" is used for all words and abbreviations that start with a \emph{vowel}. This does include the consonants that, when spoken out loud, begin with a vowel sound. E.g. "an SEM picture" since SEM is pronounced "es-ee-em". But one would use "a DAC", pronounced "de-a-c".
+    \item Use \texttt{siunitx} to obtain very consistent type setting of numbers and units. A single value would e.g. look like \SI{2.8}{\ohm\cm} (\texttt{\tb SI\{2.8\}\{\tb ohm\tb cm\}}. A range \SIrange{2.8}{9}{\ohm\cm}. Note that it takes care to consistently typeset number, unit and spacing. For one thing, units should not be typeset italic!
+    \item Try to keep figures and corresponding text close to each other; scrolling through all the pages is not convenient for your readers. If needed you can use \texttt{FloatBarrier} to prevent figures and tables to be moved past a certain point. 
+    \item Use \emph{amount, lot of} for uncountable quantities, \emph{many, number of} for countable quantities.
+\end{itemize}
+}
+
 \include{sections/Abstract}
 
 % Add the table of contents pages (TOC)
