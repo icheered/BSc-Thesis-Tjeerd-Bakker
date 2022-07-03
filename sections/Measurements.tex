@@ -1,4 +1,4 @@
-\chapter{Measurements}
+\chapter{Measurements}\label{sec:measurements}
 This chapter aims to validate the accuracy of force estimation from sEMG after different processing techniques by comparing it to measured data. The goal is to measure sEMG from biceps and triceps, and record sEMG reference noise, and measure the estimated force using a load cell during an exercise of isometric contraction. The sEMG data is then processed using the different techniques that are discussed in the simulation chapter, and the final estimated force will be compared to the measured force. 
 
 \section{Experimental setup}
@@ -43,6 +43,7 @@ The applied force followed the following pattern:
 \end{itemize}
 
 \section{Measurement data}
+\textcolor{red}{Figure out the best way to present this information without it taking up 2 pages}
 The following configuration parameters were chosen based on simulation results:
 \begin{itemize}
     \item Whitening
@@ -54,8 +55,8 @@ The following configuration parameters were chosen based on simulation results:
         \item Static filter 
         \begin{itemize}
             \item 3 notch filters at \SI{50}{\hertz}, \SI{100}{\hertz}, and \SI{150}{\hertz} with q-factor of 10
-            \item low-pass Butterworth filter with cut-off frequency of \SI{20}{\hertz} and length 5
-            \item high-pass Butterworth filter with cut-off frequency of \SI{300}{\hertz} and length 5
+            \item low-pass Butterworth filter with $f_{cut}$ of \SI{20}{\hertz} and length 5
+            \item high-pass Butterworth filter with $f_{cut}$ of \SI{300}{\hertz} and length 5
         \end{itemize}
         \item Wiener filter
         \begin{itemize}
@@ -84,14 +85,14 @@ The following configuration parameters were chosen based on simulation results:
     \end{itemize}
 \end{itemize}
 
-3 notch filters at \SI{50}{\hertz}, \SI{100}{\hertz}, and \SI{150}{\hertz}  with q-factor of 10, Band-pass filter consisting of a high-pass filter with cut-off frequency of \SI{20}{\hertz} and a low-pass filter with a cut-off frequency of
+3 notch filters at \SI{50}{\hertz}, \SI{100}{\hertz}, and \SI{150}{\hertz}  with q-factor of 10, Band-pass filter consisting of a high-pass filter with $f_{cut}$ of \SI{20}{\hertz} and a low-pass filter with an $f_{cut}$ of
 
 
 \begin{figure}[h!t]
 	\begin{center}
 		\includegraphics[width=0.8\columnwidth]{images/measurement_calibratie3_1k.png}
 	\end{center}
-	\caption{Calibration measurement at \SI{1}{\kilo\hertz} sampling rate. The force has been low-passed with a cut-off frequency of 10 Hz to remove large \SI{50}{\hertz} noise component. The offset was determined to be \SI{-30}{\micro\volt}. The weight op the object was \SI{1681}{\gram} which corresponds to a change of \SI{695}{\micro\volt}}.
+	\caption{Calibration measurement at \SI{1}{\kilo\hertz} sampling rate. The force has been low-passed with an $f_{cut}$ of 10 Hz to remove large \SI{50}{\hertz} noise component. The offset was determined to be \SI{-30}{\micro\volt}. The weight op the object was \SI{1681}{\gram} which corresponds to a change of \SI{695}{\micro\volt}}.
 	\label{fig:calibration_1k}
 \end{figure}
 
@@ -163,6 +164,6 @@ Index & Abbreviation & Full form \\
 	\begin{center}
 		\includegraphics[width=1.0\columnwidth]{images/measurement_envelopes.png}
 	\end{center}
-	\caption{This figure illustrates the effect that different envelope estimation techniques have on sEMG signal. The signals were not whitened and not filtered. Even though all methods seem to provide almost identical behaviour in the time domain it can be seen from the frequency spectra that this only holds for moving average and root mean square envelope detection. IIR Butterworth low-pass filtering results in a more linear attenuation from the cut-off frequency on wards (set to 5Hz) which is in line with the simulations as seen in Figure~\ref{fig:iir_frequencyresponse_coefficients}}
+	\caption{This figure illustrates the effect that different envelope estimation techniques have on sEMG signal. The signals were not whitened and not filtered. Even though all methods seem to provide almost identical behaviour in the time domain it can be seen from the frequency spectra that this only holds for moving average and root mean square envelope detection. IIR Butterworth low-pass filtering results in a more linear attenuation from the $f_{cut}$ on wards (set to 5Hz) which is in line with the simulations as seen in Figure~\ref{fig:iir_frequencyresponse_coefficients}}
 	\label{fig:result_envelopes}
 \end{figure}

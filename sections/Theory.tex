@@ -1,30 +1,31 @@
 \chapter{Theory}
-I will attempt to explain all theory required to understand this project using a top-down approach. By first explaining the big picture in which this research project is located we hope to avoid the reader getting lost in the details and misunderstanding the purpose of this report. 
+The required background theory will be presented in a top-down approach. For someone experienced in the field of sEMG and signal processing some portions can be perceived as ubiquitous but it is done to make this paper more accessible for different fields.
 
 \section{Force estimation from sEMG}
-When moving a limb the most intuitive way of describing it is a change in position, moving your hand from A to B. However, a more objective way of describing this movement is in terms of forces applied on a mass:
+When moving a limb the most intuitive way of describing it is a change in position, moving your hand from A to B. However, a more objective way of describing this movement is in terms of forces applied on a mass \cite{human_physiology}\cite{human_anatomy_physiology}\cite{3d_printing_soft_semg}:
 \begin{itemize}
     \item Brain makes decision to move a limb and sends a signal through motor neurons
-    \item The synaptic input received from the motor neuron makes muscles contract
+    \item The synaptic input received from the motor neuron result in contraction of the muscles
     \item This causes a force to be applied on a mass, or a torque around a pivot point
     \item This force results in an acceleration in a certain direction
     \item This acceleration is maintained for a certain period of time
-    \item The entire process is repeated for deceleration using visual feedback for fine tuning of forces
+    \item The entire process is repeated for deceleration using visual, kinesthetic, proprioceptive and tactile sensory signals \cite{human_robotics}
     \item Your limb has arrived at a new location.
-\end{itemize}
+\end{itemize} 
 
-Understanding this reasoning of moving a limb in terms of forces being applied by contracting muscles is vital because it forms the basis for recognizing a user's intent. EMG can be used to measure the degree of contraction of a muscle, and by measuring the degree of contraction of two antagonistic muscles it is possible to calculate the amount of force applied in a certain direction which signals a desire for this limb to move. Even if the limb is not present and replaced by a prosthesis this idea of forces moving a mass will still apply, and thus EMG can be used as a human-machine interface.
+Understanding this reasoning of moving a limb in terms of forces being applied by contracting muscles is vital because it forms the basis for recognizing a user's intent. EMG can be used to measure the intensity of muscle activation which indicates the amount of contraction \cite{human_robotics}. By measuring the amount of contraction of two antagonistic muscles it is possible to calculate the amount of force applied in a certain direction. Even if the limb is replaced by a prosthesis this idea of forces moving a mass will still apply, and thus EMG can be used as a human-machine interface.
 
 So to summarize the basic concept of force estimation:
 \begin{itemize}
     \item Movement of a limb is the result of a force acting on that limb
     \item This force is the result of certain muscles contracting stronger than other muscles
-    \item The contraction of these muscles can be measured using EMG
+    \item The contraction of these muscles follows from muscle activation 
+    \item Muscle activation can be measured using EMG
     \item EMG can be used to estimate limb movement
 \end{itemize}
 
-\section{sEMG signal properties}
 
+\section{sEMG signal properties}
 \begin{figure}[h!t]
 	\begin{center}
 		\includegraphics[width=0.7\columnwidth]{images/sEMG_signal_example.png}
@@ -51,15 +52,15 @@ So to summarize the basic concept of force estimation:
 \end{figure}
 
 Figure \ref{fig:muscle_anatomy} illustrates the anatomy of a muscle which may be useful in this section. 
-Large skeletal muscles such as the biceps consists of hundreds of thousands of small muscle fibers. These muscle fibers are divided into groups called motor units, and each motor unit is connected to a motor neuron which is a special type of very long brain cell that runs through the spinal cord. A contraction of a skeletal muscle is the result of many muscle fibers contracting individually and repeatedly \cite{human_anatomy_physiology}. The contraction of these muscle fibers is the result of an action potential caused by the motor neuron, and this action potential is a measurable (but very small) voltage. When measuring the surface EMG of a contracting skeletal muscle the result is the aggregate of the small voltages from all contracting muscle fibers. This manifests itself into a signal resembling white noise where the amplitude of the noise correlates to the number of contracting muscle fibers and thus to the amount of contraction the skeletal muscle experiences. An illustration of the form of the measured sEMG is shown in figure \ref{fig:sEMG_signal_example} where a maximum voluntary contraction (MVC) is measured from a biceps.
+Large skeletal muscles such as the biceps consists of hundreds of thousands of small muscle fibers. These muscle fibers are divided into groups called motor units, and each motor unit is connected to a motor neuron which is a special type of very long brain cell that runs through the spinal cord. A contraction of a skeletal muscle is the result of many muscle fibers contracting individually and repeatedly \cite{human_anatomy_physiology}. The contraction of these muscle fibers is the result of muscle activation which in turn is the result an action potential caused by the motor neuron. The activation of the muscle fibre is a small yet measurable voltage. When measuring the surface EMG of an activating skeletal muscle the result is the aggregate of the small voltages from all activating muscle fibers. This manifests itself into a signal resembling white noise where the amplitude of the noise correlates to the number of activated muscle fibers and thus to the amount of contraction the skeletal muscle will experiences \cite{optimal_myoprocessor}. An illustration of the form of the measured sEMG is shown in figure \ref{fig:sEMG_signal_example} where a maximum voluntary contraction (MVC) is measured from a biceps.
  
-So to summarize: to determine the degree of contraction of a skeletal muscle we simply need to determine the amplitude of the noise at the surface of the muscle.
+So to summarize: to determine the degree of activation of a skeletal muscle we simply need to determine the amplitude of the noise at the surface of the muscle.
 
-From this point onwards I will refer to the 'noise' generated by muscle contraction as 'the signal'. This is done because noise is usually unwanted, but the signal caused by muscle contraction is the opposite of unwanted: It precisely what we're trying to measure! 
+From this point onward I will refer to the 'noise' generated by muscle contraction as 'the signal'. This is done because noise is usually unwanted, but the signal caused by muscle contraction is the opposite of unwanted: It precisely what we're trying to measure! 
 
 Unfortunately, when measuring sEMG signals it is impossible to measure solely the signal generated by muscle contraction. The signal may be polluted by other signals coming from the surrounding environment (such a 50 Hz power lines nearby) or from the amplifier used to amplify the measured signal. So in reality we are measuring a combination of our desired signal from muscle contraction, and the undesired noise from the environment and amplifier. An illustration of the frequency content of the signal and noise is shown in figure \ref{fig:sEMG_fft_signalnoise_example}. Note how the the noise has large peaks at 50Hz and multiples of 50Hz; This is the noise generated by the power lines. 
 
-The ratio between how much of the measured signal is actual desired signal and how much is undesired noise is called the Signal to Noise Ratio (SNR) and is defined as the signal power divided by the noise power \textcolor{red}{(SOURCE) (EQUATION)}. As the amount of desired signal increases and the amount of noise decreases, the accuracy with which the force can be estimated from the contraction also increases. In other words, a larger SNR results in a more accurate estimation. We can increase the SNR by removing noise, and for this exact purpose 'filters' were invented.
+The ratio between how much of the measured signal is actual desired signal and how much is undesired noise is called the Signal to Noise Ratio (SNR) and is defined as the average signal power divided by the average noise power \ref{introduction_analog_digital_communications}. Intuitively one might think that force can be more accurately estimated from sEMG signals with a high SNR, this assumption will be tested in this report. SNR can be increased by removing noise from a noisy signal, and for this exact purpose 'filters' were invented.
 
 \section{Filters}
 % Introduce basic concept of filters
@@ -116,12 +117,12 @@ Take the mean of both sides to end up with the Mean Square Error (MSE) \cite{lec
     E(\hat{s}^2(n)) = E(d^2(n)) - 2 \boldsymbol{w}^T E(d(n) v(n)) + \boldsymbol{w}^T E(v(n) v^T(n)) \boldsymbol{w}
 \end{equation}
 Redefine terms of the equation \cite{lecture_adaptive_filters_1}
-\begin{align*}
-&J(\boldsymbol{w}) \                  &=& E(\hat{s}^2(n))  &=& \text{MSE (scalar)} \\
+\begin{align}
+&J(\boldsymbol{w}) \                  &=& E(\hat{s}^2(n))  &=& \text{MSE (scalar)} \label{eq:wiener_mse_def}\\
 &\sigma^2 \           &=& E(d^2(n))        &=& \text{Power of }d(n) \text{ (scalar)} \\
 &\boldsymbol{p} \      &=& E(d(n) v(n))     &=& \text{M-by-1 Crosscorrelation vector between } d(n) \text{ and } v(n)  \\
 &\boldsymbol{R} \      &=& E(v(n) v^T(n))  &=& \text{M-by-M Autocorrelation matrix of } v(n)
-\end{align*}
+\end{align}
 Insert redefined terms into the equation to form the total equation for Mean Square Error \cite{lecture_adaptive_filters_1}
 \begin{equation}
     J(\boldsymbol{w}) = \sigma^2 - 2 \boldsymbol{w}^T \boldsymbol{p} + \boldsymbol{w}^T \boldsymbol{R} \boldsymbol{w}
@@ -158,18 +159,61 @@ As an example a Wiener filter was made from the signal as seen in figure \ref{fi
 	\label{fig:wiener_filter_response}
 \end{figure}
 
-Adaptive filters is a class of filters where the filter coefficients are adjusted over time to attempt to find an optimal solution even without knowing the spectral properties of the signal beforehand \cite{adaptive_filter_and_applications}. A Wiener filter can be turned into an adaptive Wiener filter by re-calculating the filter coefficients with new data to match a changing spectral density. 
-
-Adaptive filters are applied in the same way as static filters by just multiplying the filter with measurements. However, the method of finding the filter coefficients is different. Instead of deciding beforehand what frequencies will be removed, the signal and noise are measured to determine their frequency spectrum. Then the filter coefficients are tuned to remove the noise components from the measurement while leaving the signal unaffected. This filter is used in environments where the noise frequency spectrum is not known beforehand, or when the frequency behaviour of the noise may change over time. Common applications of adaptive filters include speech recognition, echo cancellation, and headphones employing active noise cancellation! \cite{active_noise_cancellation_wiener_filter} \cite{wiener_vs_adaptive_realtime_noisecancellation}. An block-diagram of an adaptive filter is given in figure \ref{fig:adaptive_filter_diagram}.
-
 \begin{figure}[h!t]
 	\begin{center}
 		\includegraphics[width=0.7\columnwidth]{images/adaptive_filter_block_diagram.png}
 	\end{center}
-	\caption{Block diagram of an adaptive filter \cite{adaptive_filter_block_diagram}}
+	\caption{Block diagram of an adaptive filter \cite{introduction_optimal_signal_processing}}
 	\label{fig:adaptive_filter_diagram}
 \end{figure}
 
+Adaptive filters is a class of filters where the filter coefficients are adjusted over time to attempt to find an optimal solution even without knowing the spectral properties of the signal beforehand \cite{adaptive_filter_and_applications}. Adaptive filters adjust the filter coefficients by decreasing the error that remains after applying the filter. A diagram describing this process can be found in figure \ref{fig:adaptive_filter_diagram}. 
+One type of adaptive filter is the Least Mean Square (LMS) algorithm. Where a Wiener filter finds an optimal solution by using cross-correlation and auto-correlation, the adaptive LMS algorithm converges to the optimal solution using gradient descent. Filter coefficients will never reach $w_{opt}$ but instead oscillate around it. The mathematical definition for calculating the filter coefficients is given, derived from the work of J. Orfanidis \cite{introduction_optimal_signal_processing} and lectures by S. Safapourhajari \cite{lecture_adaptive_filters_2}.
+
+Taking the definition of the MSE (which is the cost function we're trying to minimize) as defined in equation \ref{eq:wiener_mse_def}
+\begin{equation}
+    J(w) = E(e^2(n)) = E[(d(n) - wx(n))^2)]
+\end{equation}
+To calculate the expected value of the square of the error we would normally need statistics over a large block of data. An approximation of the expected value can be made by using a smaller set of data. This can be done by taking the current samples as the estimates of the mean
+\begin{equation}
+    E(e^2(n) ~ e^(n)
+\end{equation}
+\begin{equation}
+    E((d(n) - wx(n))^2)) ~ (d(n) - wx(n))^2
+\end{equation}
+
+To find $w$ that minimizes the MSE we can take the derivative of MSE with respect to $w$ for every sample $n$
+\begin{equation}
+    \frac{\delta J}{\delta w} = 2(d(n) - wx(n)) \frac{\delta(d(n) - wx(n))}{\deta w} = -2e(n)x(n)
+\end{equation}
+This results in the following weight-adjusting algorithm
+\begin{equation}
+   w(n+1) = w(n) + 2 \mu e(n)x(n)
+\end{equation}
+\begin{equation}
+    \textrm{w(n+1)}=\left.w(n)-\mu \frac{\delta J}{\delta w}\right\rvert_{\textrm{w(n)}}
+\end{equation}
+
+
+This algorithm is implemented by performing the following steps. \\
+The estimated value for signal+noise is computed from the filter and noise
+\begin{equation}\label{eq:adaptive1}
+    \hat{x}_n = w(n)\cdot y(n)
+\end{equation}
+The error is calculated by taking the difference between the expected signal+noise value and the measured signal+noise value.
+\begin{equation}\label{eq:adaptive2}
+    e(n) = x(n) - \hat{x}_n
+\end{equation}
+The coefficients are calculated for the next iteration
+\begin{equation}\label{eq:adaptive3}
+    w(n+1) = w(n) + 2 \mu e(n) x(n)
+\end{equation}
+
+The steps in equations \ref{eq:adaptive1}-\ref{eq:adaptive3} are repeated for every sample.
+
+In the presented equations a constant $\mu$ was present, this is called the convergence coefficient. Determining the value of the convergence coefficient $\mu$ is a double-edged sword. On the one hand it determines how fast gradient descent is traversed, and thus how fast the filter coefficients converge to the optimal filter coefficients. Ideally this happens as fast as possible, and thus the convergence coefficient must be as large as possible. On the other hand it was previously mentioned that the filter coefficients will never reach the optimal filter coefficients but instead oscillate around this value. The convergence coefficient also determines how large this oscillatory behaviour is, and thus to achieve an accurate estimation of the optimal filter the convergence factor should be as small as possible. 
+
+Common applications of adaptive filters include speech recognition, echo cancellation, and headphones employing active noise cancellation! \cite{active_noise_cancellation_wiener_filter} \cite{wiener_vs_adaptive_realtime_noisecancellation}
 
 \subsection{FIR vs IIR}
 Another subdivision within filter design is concerned with the type of possible responses to a specific input (impulse) and whether or not this can go to infinity.
@@ -259,7 +303,7 @@ A low-pass filter such as a Butterworth or Chebyshev can be used to determine th
 	\begin{center}
 		\includegraphics[width=0.7\columnwidth]{images/iirfilter_phaseshift.png}
 	\end{center}
-	\caption{Frequency response of an infinite impulse response (Butterworth) low-pass filter. The filter has a cut-off frequency of \SI{1}{Hz} and has a length of 3. Notice how the phase delay is \textit{not} linear and thus phase distortion is introduced}
+	\caption{Frequency response of an infinite impulse response (Butterworth) low-pass filter. The filter has a $f_{cut}$ of \SI{1}{Hz} and has a length of 3. Notice how the phase delay is \textit{not} linear and thus phase distortion is introduced}
 	\label{fig:iirfilter_phaseshift}
 \end{figure}
 
@@ -274,7 +318,7 @@ The Root Mean Square (RMS) of a signal is the square root of average power of a 
 \section{Standard sEMG signal processing}\label{section:standard_semg_processing}
 A conventional static real-time sEMG signal processing chain is described in \cite{muscle_force_estimation}. The relevant steps are as follows:
 \begin{itemize}
-    \item Remove DC component from sig
+    \item Remove DC component from signal
     \item Band-pass filter 20-\SI{300}{\hertz}
     \item Notch filter at \SI{50}{\hertz}
     \item Half-wave rectification

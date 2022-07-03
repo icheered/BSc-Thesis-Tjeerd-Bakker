@@ -6,7 +6,7 @@ This section of the report describes the testing of separate signal processing s
     \item Envelope estimation
 \end{itemize}
 
-Unless specified otherwise all signals will be high-passed with a cutoff frequency of \SI{1}{\hertz} to remove DC bias before any operation is applied
+Unless specified otherwise all signals will be high-passed with an $f_{cut}$ of \SI{1}{\hertz} to remove DC bias before any operation is applied
 
 \section{Pre-whitening}\label{sec:whitening}
 A whitening filter is a digital filter with a frequency response that is (ideally) the inverse of the frequency contents of an sEMG signal. 
@@ -28,62 +28,12 @@ The whitening filter is then created by taking the FFT of the time-domain test s
 In \ref{fig:whitening_simulation} it can be seen that the whitening filter functions as expected. In the center subplot the 'ideal' result can be seen (multiplication in the frequency domain), and in subplot 5 the result from convolution in the time domain is shown. In subplot 5 a smoothed version of the filtered signal FFT is added to display that the signal power has a mean that approximates white noise. This filter was made using a Savitzky-Golay filter with a window length of 31 and a polynomial order of 3.
 
 \section{Filtering}
-Due to the difficulty of creating a simulated signal that has the frequency contents of an sEMG signal and environmental noise, a pre-recorded sample of sEMG of a bicep going through maximum voluntary contraction was used to test the filters. This sample is not used for force estimation because there is no way to validate the degree of contraction, and purely the frequency contents of the signal are of interest. The sample that is used can be seen in figure \ref{fig:sEMG_signal_example}. 
+First the metrics are introduced that will be used to compare filter performance. Subsequently, the construction process of each filter is presented. Lastly the different filtering methods are compared.
 
-The construction of each filter will be explained in the method, and the SNR performance and bandwidth of each filter will be discussed in the results. 
+\subsection{Comparison metrics}
+Each filter will be tested using two metrics: SNR (eq \ref{eq:rms}) and Bandwidth (definition of this will be given shortly). All filters are linear time invariant which means the superposition principle can be used to simplify SNR calculations \cite{linear_systems_theory}. The superposition principle simply states that filtering the sum of two signals is the same as filtering the signals individually and adding the results. An illustration of this can be seen in \ref{fig:filter_process}. 
 
-\subsubsection{Static filter}
-The theory from section \ref{section:standard_semg_processing} specifies the removal of DC frequencies, a notch filter at \SI{50}{Hz}, and a bandpass filter between \SI{20}{Hz} and \SI{300}{Hz}. Looking at the noise spectrum in figure \ref{fig:sEMG_fft_signalnoise_example} it can be seen that there also exist significant peaks at \SI{100}{Hz} and \SI{150}{Hz}. For this reason, additional notch filters are constructed to target these frequencies. The total frequency response of the concatenated filters can be seen in figure \ref{fig:staticfilter_frequencyresponse}.
-\begin{itemize}
-    \item IIR Notch filters at \SI{50}{Hz}, \SI{100}{Hz}, \SI{150}{Hz}. All have a Q-factor of 10, are constructed as numerator/denominator pairs and applied using scipy's lfilter.
-    \item The bandpass filter consists of a high-pass filter with a cut-off frequency of \SI{20}{Hz} and a lowpass filter with a cut-off frequency of \SI{300}{Hz}. Both filters are of length 5, are constructed as numerator/denominator pairs, and applied using scipy's lfilter.
-\end{itemize}
-
-\subsection{Method}
-\begin{figure}[h!t]
-	\begin{center}
-		\includegraphics[width=1.0\columnwidth]{images/staticfilter_frequencyresponse.png}
-	\end{center}
-	\caption{Frequency response of the static filter. This plot was created by determining the frequency responses of each individual filter, then multiplying the amplitudes and adding the phase shifts}
-	\label{fig:staticfilter_frequencyresponse}
-\end{figure}
-
-
-\subsubsection{Wiener filter}
-As discussed in section \ref{sec:filters_theory} the Wiener filter coefficients are constructed from the cross-correlation vector between signal+noise ($d(n)$) and the noise ($v(n)$) and the auto-correlation of the noise as is presented in the Wiener-Hopf equation in equation \ref{eq:wiener_hopf} \cite{lecture_adaptive_filters_1}. 
-
-The number of Wiener filter coefficients have a strong influence on the performance of the filter as can be seen in figure \ref{fig:wiener_filter_length}. The explanation behind SNR calculation and bandwidth will be discussion in the 'Results' section.
-
-\begin{equation}
-    w_{opt} = R^{-1}P
-    \label{eq:wiener_hopf}
-\end{equation}
-
-\begin{figure}[h!t]
-	\begin{center}
-		\includegraphics[width=1.0\columnwidth]{images/wiener_filter_length.png}
-	\end{center}
-	\caption{The effect of the number of Wiener filter coefficients on the SNR and bandwidth}
-	\label{fig:wiener_filter_length}
-\end{figure}
-
-\subsubsection{Adaptive Wiener filter}
-The method of calculation to obtain the filter coefficients for the adaptive Wiener filter is identical to the one presented in the Wiener filter. The difference with this method is that instead of taking a large signal sample and noise sample to calculating the filter coefficients and using those on the entire signal, the filter coefficients are repeatedly recalculated over the latest sample set. This allows the filter to adapt to changing statistical signal properties. This leaves the question: How often should the coefficients be recalculated and over how many samples should the filter coefficients be calculated?
-
-Using the previously discussed prerecorded sample that can be seen in figure \ref{fig:sEMG_signal_example} various combinations of window size (number of samples from which the coefficients are calculated) and 'blocks' per window (how many samples are skipped before recalculating the filter coefficients) were tested. The results can be found in figure \ref{fig:adaptive_wiener_windowsize}. For the comparison between different filters, a window length of 500 was used in combination with 1 block per window. In other words, every 500 samples the Wiener filter coefficients are calculated using the last 500 samples.
-
-\begin{figure}[h!t]
-	\begin{center}
-		\includegraphics[width=1.0\columnwidth]{images/adaptive_wiener_windowsize.png}
-	\end{center}
-	\caption{SNR and bandwidth of an adaptive wiener filter using different combinations of window size and blocks per window. It should be noted that each signal has been smoothed using a Savitzky-Golay filter with a window length of 31 and a polynomial order of 3. This is done to make the difference in performance between different blocks per window clearer, without filtering the signals have a larger deviation that makes the lines unreadable.
-	The SNR seems to have a linear relation with the window size, and the bandwidth seems to have an inverse linear relationship to window size. The odd blocks-per-window that stand out in the bandwidth plot (3, 6, 7, 9 blocks per window) are caused by the fact that the division of window size by blocks per window did not yield an integer.}
-	\label{fig:adaptive_wiener_windowsize}
-\end{figure}
-
-
-\subsection{Results}
-Each filter will be tested using two metrics: SNR (eq \ref{eq:rms}) and Bandwidth (definition of this will be given shortly). All filters are linear time invariant which means the superposition principle can be used to simplify SNR calculations \cite{linear_systems_theory}. The superposition principle simply states that filtering the sum of two signals is the same as filtering the signals individually and adding the results. An illustration of this can be seen in \ref{fig:filter_process}. A sample of noise data and a sample of EMG data is taken from \ref{fig:sEMG_signal_example} where noise is taken to be 0-2s and signal is taken to be 5-\SI{7}{\second}. The RMS of the filtered signal is divided by the RMS of the filtered noise to create a signal to noise ratio.
+Due to the difficulty of creating a simulated signal that has the frequency contents of an sEMG signal and environmental noise, a pre-recorded sample of sEMG of a bicep going through maximum voluntary contraction was used to test the filters. This sample is not used for force estimation because there is no way to validate the degree of contraction, and purely the frequency contents of the signal are of interest. The sample that is used can be seen in figure \ref{fig:sEMG_signal_example}. Noise is taken to be 0-2s and signal is taken to be 5-\SI{7}{\second}. The RMS of the filtered signal is divided by the RMS of the filtered noise to create a signal to noise ratio.
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -93,6 +43,91 @@ Each filter will be tested using two metrics: SNR (eq \ref{eq:rms}) and Bandwidt
 	\label{fig:filter_process}
 \end{figure}
 
+SNR by itself is not a valid metric for judging a filters performance in this scenario. The purpose of improving SNR is the assumption that force can be estimated more accurately from a signal that contains primarily the signal generated by muscle contraction. However, a filter may be able to attenuate the signal and noise in such a way that the SNR is very high, but the signal is attenuated to such a degree that it no longer resembles the original signal that was generated by the muscle contraction. An example of this can be seen in figure \ref{fig:good_snr_bad_integrity}. 
+
+A measure to define how much the frequency spectrum has changed is the bandwidth. Typically the bandwidth of a signal is defined as the range of frequencies between two frequency points outside of which the signal is attenuated more than a specific threshold value \cite{bandwidth_definition}. This definition is not applicable to this problem as the frequencies that are 'present' in an sEMG signal are not necessarily consecutive. Therefore the bandwidth of an sEMG signal will be defined as the number of frequency components that are larger than the mean of the frequency spectrum. With this metric, a frequency spectrum such as the one seen in figure \ref{fig:good_snr_bad_integrity} will have a low bandwidth because most frequencies are below the mean.
+
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[width=1.0\columnwidth]{images/good_snr_bad_integrity.png}
+	\end{center}
+	\caption{Example of filtering that results in good SNR but bad bandwidth.}
+	\label{fig:good_snr_bad_integrity}
+\end{figure}
+
+
+\subsection{Method}
+\subsubsection{Static filter}
+The theory from section \ref{section:standard_semg_processing} specifies the removal of DC frequencies, a notch filter at \SI{50}{Hz}, and a bandpass filter between \SI{20}{Hz} and \SI{300}{Hz}. Looking at the noise spectrum in figure \ref{fig:sEMG_fft_signalnoise_example} it can be seen that there also exist significant peaks at \SI{100}{Hz} and \SI{150}{Hz}. Therefore different static filters were tested with different amounts of notch filters. 
+
+\begin{itemize}
+    \item IIR Notch filters at \SI{50}{Hz}, \SI{100}{Hz}, \SI{150}{Hz}, \SI{200}{Hz}. All have a Q-factor of 10, are constructed as numerator/denominator pairs and applied using scipy's lfilter.
+    \item The bandpass filter consists of a high-pass filter with an $f_{cut}$ of \SI{20}{Hz} and a lowpass filter with an $f_{cut}$ of \SI{300}{Hz}. Both filters are of length 5, are constructed as numerator/denominator pairs, and applied using scipy's lfilter.
+\end{itemize}
+
+The frequency response of these filters can be seen in figure \ref{fig:staticfilter_notches_frequencyresponse}. The resulting metrics can be seen in the chart \ref{fig:staticfilter_notches_barchart}.
+
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[width=1.0\columnwidth]{images/staticfilter_notches_frequencyresponse.png}
+	\end{center}
+	\caption{Frequency response of static filters with different amounts of notch filters. The plots were created by determining the frequency responses of each individual filter (notches, low-pass, high-pass), then multiplying the amplitudes and adding the phase shifts. For the sake of illustration the amplitude graphs have been shifted vertically to clearly show the existence of notch filters in different lines, during simulations this shift was not present. }
+	\label{fig:staticfilter_notches_frequencyresponse}
+\end{figure}
+
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[width=1.0\columnwidth]{images/staticfilter_notches_barchart.png}
+	\end{center}
+	\caption{SNR and bandwidth of static filters with different numbers of Notch filters. Three notch filters were chosen for the measurement section (\ref{sec:measurements}) as the bandwidth seems to not depend very much on number of filters but in figure \ref{fig:sEMG_fft_signalnoise_example} the peak around \SI{200}{\hertz} is insignificant compared to other multiples of \SI{50}{\hertz}}
+	\label{fig:staticfilter_notches_barchart}
+\end{figure}
+
+
+\subsubsection{Wiener filter}
+As discussed in section \ref{sec:filters_theory} the Wiener filter coefficients are constructed from the cross-correlation vector between signal+noise ($d(n)$) and the noise ($v(n)$) and the auto-correlation of the noise as is presented in the Wiener-Hopf equation in equation \ref{eq:wiener_hopf} \cite{lecture_adaptive_filters_1}. 
+
+\begin{equation}
+    w_{opt} = R^{-1}P
+    \label{eq:wiener_hopf}
+\end{equation}
+
+The number of Wiener filter coefficients have a strong influence on the performance of the filter as can be seen in figure \ref{fig:wiener_filter_length}. For the measurements section (\ref{sec:measurements}), a Wiener filter of length 200 was chosen as this is a middle ground for SNR and bandwidth.
+
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[width=1.0\columnwidth]{images/wiener_filter_length.png}
+	\end{center}
+	\caption{The effect of the number of Wiener filter coefficients on the SNR and bandwidth. Filter orders around 0-10 seem to have best bandwidth but the SNR is very low at these points. For the measurements section a window length of 200 was chosen as this presents a peak in the bandwidth. }
+	\label{fig:wiener_filter_length}
+\end{figure}
+
+% \subsubsection{Adaptive Wiener filter}
+% The method of calculation to obtain the filter coefficients for the adaptive Wiener filter is identical to the one presented in the Wiener filter. The difference with this method is that instead of taking a large signal sample and noise sample to calculate the filter coefficients and using those on the entire signal, the filter coefficients are repeatedly recalculated over the latest signal samples. This allows the filter to adapt to changing statistical signal properties. This leaves the question: How often should the coefficients be recalculated and over how many samples should the filter coefficients be calculated?
+
+% Using the previously discussed prerecorded sample that can be seen in figure \ref{fig:sEMG_signal_example} various combinations of window size (number of samples from which the coefficients are calculated) and 'blocks' per window (how many samples are skipped before recalculating the filter coefficients) were tested. The results can be found in figure \ref{fig:adaptive_wiener_windowsize}. For the comparison between different filters, a window length of 500 was used in combination with 1 block per window. In other words, every 500 samples the Wiener filter coefficients are calculated using the last 500 samples.
+
+% \begin{figure}[h!t]
+% 	\begin{center}
+% 		\includegraphics[width=1.0\columnwidth]{images/adaptive_wiener_windowsize.png}
+% 	\end{center}
+% 	\caption{SNR and bandwidth of an adaptive wiener filter using different combinations of window size and blocks per window. It should be noted that each signal has been smoothed using a Savitzky-Golay filter with a window length of 31 and a polynomial order of 3. This is done to make the difference in performance between different blocks per window clearer, without filtering the signals have a larger deviation that makes the lines unreadable.
+% 	The SNR seems to have a linear relation with the window size, and the bandwidth seems to have an inverse linear relationship to window size. The odd blocks-per-window that stand out in the bandwidth plot (3, 6, 7, 9 blocks per window) are caused by the fact that the division of window size by blocks per window did not yield an integer.}
+% 	\label{fig:adaptive_wiener_windowsize}
+% \end{figure}
+\subsubsection{Adaptive filter}
+The functioning of an LMS filter has been described in the theory section. An LMS filter has two properties that determine its behaviour: The filter length and the convergence coefficient. To determine the best combination of these parameters when applied to sEMG signals a range of different values was tested. The results can be found in figure \ref{fig:lms_filter_windowsize}. For the measurement section (\ref{sec:measurements}) an LMS filter with length 500 and convergence value of 0.1 will be used.
+
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[width=1.0\columnwidth]{images/lms_filter_windowsize.png}
+	\end{center}
+	\caption{SNR and bandwidth of an adaptive LMS filter using different combinations of filter length and convergence value. It should be noted that each signal has been smoothed using a Savitzky-Golay filter with a window length of 31 and a polynomial order of 3. This is done to make the difference in performance between different convergence values clearer as without filtering the signals have a larger deviation that makes the lines unreadable. The SNR peaks with a filter length of around 600 samples and a convergence value of 0.3. However, in the bandwidth plot this convergence value corresponds to the worst option. A convergence value of 0.1 with a filter length of 500 was chosen as this yields a good middle ground between SNR and bandwidth}
+	\label{fig:lms_filter_windowsize}
+\end{figure}
+
+
+\subsection{Results}
 A property that might be of interest is each filters performance in different levels of Maximum Voluntary Contraction (MVC). This allows for insight into how well each filter functions in different levels of signal compared to the environment noise. This was realized by keeping the noise constant, but scaling the signal to different levels (from 1-\SI{100}{\percent}) to simulate different levels of MVC. The SNR of the filtered signal and filtered noise was divided by the reference SNR (SNR of input signal and input noise) to be able to draw a clear conclusion about the filters performance.
 
 \begin{figure}[h!t]
@@ -103,57 +138,55 @@ A property that might be of interest is each filters performance in different le
 	\label{fig:filter_snr_mvc}
 \end{figure}
 
-SNR by itself is not a valid metric for judging a filters performance in this scenario. The purpose of improving SNR is the assumption that force can be estimated more accurately from a signal that contains primarily the signal generated by muscle contraction. However, a filter may be able to attenuate the signal and noise in such a way that the SNR is very high, but the signal is attenuated to such a degree that it no longer resembles the original signal that was generated by the muscle contraction. An example of this can be seen in figure \ref{fig:good_snr_bad_integrity}. A measure to define how much the frequency spectrum has changed is the bandwidth. Typically the bandwidth of a signal is defined as the range of frequencies between two frequency points outside of which the signal is attenuated more than a specific threshold value \cite{bandwidth_definition}. This definition is not applicable to this problem as the frequencies that are 'present' in an sEMG signal are not necessarily consecutive. Therefore the bandwidth of an sEMG signal will be defined as the number of frequency components that are larger than the mean of the frequency spectrum. With this metric, a frequency spectrum such as the one seen in figure \ref{fig:good_snr_bad_integrity} will have a low bandwidth because most frequencies are below the mean.
-
-\begin{figure}[h!t]
-	\begin{center}
-		\includegraphics[width=1.0\columnwidth]{images/good_snr_bad_integrity.png}
-	\end{center}
-	\caption{Example of filtering that results in good SNR but bad bandwidth.}
-	\label{fig:good_snr_bad_integrity}
-\end{figure}
-
 Again, the bandwidth was calculated for different filters and at different levels of MVC. The results can be seen in figure \ref{fig:filter_bw_mvc}.
 
 \begin{figure}[h!t]
 	\begin{center}
 		\includegraphics[width=0.7\columnwidth]{images/filter_bw_mvc.png}
 	\end{center}
-	\caption{The bandwidth of each filter for different levels of MVC. It can be seen that there is no relation between a filters performance and the degree of contraction}
+	\caption{The bandwidth of each filter for different levels of MVC. It can be seen that there is no relation between a filters performance and the degree of contraction. }
 	\label{fig:filter_bw_mvc}
 \end{figure}
 
-For the static filter a few different variations were tested. Looking at figure \ref{fig:sEMG_fft_signalnoise_example} it can be seen that beside the \SI{50}{\hertz} peak in the noise spectrum there are additional peaks at multiples of \SI{50}{\hertz}. Different static filters were tested with different amounts of notch filters. The frequency response of these filters can be seen in figure \ref{fig:staticfilter_notches_frequencyresponse}. The resulting metrics can be seen in the chart  \ref{fig:staticfilter_notches_barchart}.
-
-\begin{figure}[h!t]
-	\begin{center}
-		\includegraphics[width=1.0\columnwidth]{images/staticfilter_notches_frequencyresponse.png}
-	\end{center}
-	\caption{Frequency response of static filters with different amounts of notch filters. For the sake of illustration the amplitude graphs have been shifted vertically to clearly show the existence of notch filters in different lines, during simulations this shift was not present. }
-	\label{fig:staticfilter_notches_frequencyresponse}
-\end{figure}
-
-\begin{figure}[h!t]
-	\begin{center}
-		\includegraphics[width=1.0\columnwidth]{images/staticfilter_notches_barchart.png}
-	\end{center}
-	\caption{SNR and bandwidth of static filters with different numbers of Notch filters. }
-	\label{fig:staticfilter_notches_barchart}
-\end{figure}
+For both SNR and bandwidth holds that the metric is independent of degree of muscle contraction as seen in Figures~\ref{fig:filter_snr_mvc} and \ref{fig:filter_bw_mvc}.
+Figure~\ref{fig:filter_snr_mvc} shows that the best signal to noise ratio is achieved using an adaptive Wiener filter, but this filter also has the worst bandwidth performance as seen in \ref{fig:filter_bw_mvc}. 
 
 \section{Envelope estimation}
-The construction of different envelope estimation techniques will be discussed in the method section. The metric for testing performance with be discussed in the results section, as well as the results themselves.
+\subsection{Comparison metrics}
+There are two separate metrics that need to be measured when comparing envelope estimation techniques. The first one is how 'fast' a techniques is, and the second is how 'good' the technique is. The first metric gives information about how much the 'detected' signal lags behind the 'true' signal. The second metric is the quality of the envelope estimate when accounting for the lag.
+
+The lag is detected by calculating the cross-correlation between the true signal and the envelope estimate. Cross-correlation is a metric that determines the similarity between two signals as a function of displacement of one signal relative to another \cite{wiki:cross_correlation}. Since the 'true' signal and the estimated signal are most similar when their displacement equals the lag, a detectable peak is formed in the cross correlation function. The left subplot in figure \ref{fig:envelope_estimation_method} displays a 'true' signal (measured force), and a simulated estimation of this signal (estimated force) that lags behind the true signal. The cross-correlation is also plotted that has a peak at \SI{100}{\milli\second}, which is the exact amount of lag between the two signals. The right subplot shows the two signals where the estimated signal has shifted to account for the lag. 
+
+The error can be determined by subtracting the true signal from the estimated signal, and the root-mean-square-error can be calculated. 
+
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[width=1.0\columnwidth]{images/envelope_estimation_method.png}
+	\end{center}
+	\caption{Illustration of method for judging envelope estimation}
+	\label{fig:envelope_estimation_method}
+\end{figure}
+
+An input signal was generated to be Gaussian white noise since it has signal properties close to that of an sEMG signal, and is multiplied with a modulation that can be seen in the left subplot of figure \ref{fig:envelope_detection}. The envelope detection techniques are applied onto the input signal and the results are plotted in the right subplot of figure \ref{fig:envelope_detection}.
+
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[width=1.0\columnwidth]{images/envelope_detection.png}
+	\end{center}
+	\caption{Left: Input signal and 'true' envelope'. Right: Envelope detection using different techniques to illustrate difference in behaviour}
+	\label{fig:envelope_detection}
+\end{figure}
 
 \subsection{Method}
 \subsubsection{IIR lowpass filter}
-A Butterworth filter was used to construct an IIR lowpass filter. The performance of such a lowpass filter is defined by its cut-off frequency and the number of filter coefficients (or the filter order). It was empirically determined that the maximum frequency for switching between total relaxation and maximum voluntary contraction was around \SI{5}{\hertz} and thus the cut-off frequency was varied from \SI{1}{\hertz}-\SI{9}{\hertz}. The filter order was varied from 2-8 because the minimum possible filter order is 2 (a single filter coefficient provides no filtering, just scaling the signal with a constant), and a filter order >8 resulted in unstable behaviour. A plot of the frequency response of the IIR Butterworth filter can be seen in figure \ref{fig:iir_frequencyresponse_coefficients}. The filters are achieved as a numerator/denominator sequence. Since the purpose of this filter is real-time envelope detection, it was applied using scipy's lfilter since as that is causal forward-in-time filtering only.
+A Butterworth filter was used to construct an IIR lowpass filter. The performance of such a lowpass filter is defined by its $f_{cut}$ and the number of filter coefficients (or the filter order). It was empirically determined that the maximum frequency for switching between total relaxation and maximum voluntary contraction was around \SI{5}{\hertz} and thus the $f_{cut}$ was varied from \SI{1}{\hertz}-\SI{9}{\hertz}. The filter order was varied from 2-8 because the minimum possible filter order is 2 (a single filter coefficient provides no filtering, just scaling the signal with a constant), and a filter order >8 resulted in unstable behaviour. A plot of the frequency response of the IIR Butterworth filter can be seen in figure \ref{fig:iir_frequencyresponse_coefficients}. The filters are achieved as a numerator/denominator sequence. Since the purpose of this filter is real-time envelope detection, it was applied using scipy's lfilter since as that is causal forward-in-time filtering only.
 
 
 \begin{figure}[h!t]
 	\begin{center}
 		\includegraphics[width=1.0\columnwidth]{images/iir_frequencyresponse_coefficients.png}
 	\end{center}
-	\caption{Frequency response of IIR Butterworth filter of different lengths. The cut-off frequency was set to 5Hz.}
+	\caption{Frequency response of IIR Butterworth filter of different lengths. The $f_{cut}$ was set to 5Hz.}
 	\label{fig:iir_frequencyresponse_coefficients}
 \end{figure}
 
@@ -172,35 +205,15 @@ The moving average filter only depends on the length of the filter, figure \ref{
 Similar to the moving average filter, the behaviour of the RMS filter is solely determined by the length of the filter. The same range of filter lengths was chosen as for the moving average filter so that the performance could be directly plotted against each other.
 
 \subsection{Results}
-There are two separate metrics that need to be measured when comparing envelope estimation techniques. The first one is how 'fast' a techniques is, and the second is how 'good' the technique is. The first metric gives information about how much the 'detected' signal lags behind the 'true' signal. The second metric is the quality of the envelope estimate when accounting for the lag.
+To properly evaluate the performance of the envelope detection techniques each method has been tested individually across the range of variables that were described in the previous method section and plotted against the resulting lag and error. 
 
-The lag is detected by calculating the cross-correlation between the true signal and the envelope estimate. Cross-correlation is a metric that determines the similarity between two signals as a function of displacement of one signal relative to another \cite{wiki:cross_correlation}. Since the 'true' signal and the estimated signal are most similar when their displacement equals the lag, a detectable peak is formed in the cross correlation function. The left subplot in figure \ref{fig:envelope_estimation_method} displays a 'true' signal (measured force), and a simulated estimation of this signal (estimated force) that lags behind the true signal. The cross-correlation is also plotted that has a peak at \SI{100}{\milli\second}, which is the exact amount of lag between the two signals. The right subplot shows the two signals where the estimated signal has shifted to account for the lag. At this point the error can be determined by subtracting the true signal from the estimated signal, and the root-mean-square-error can be calculated. 
-
-\begin{figure}[h!t]
-	\begin{center}
-		\includegraphics[width=1.0\columnwidth]{images/envelope_estimation_method.png}
-	\end{center}
-	\caption{Illustration of method for judging envelope estimation}
-	\label{fig:envelope_estimation_method}
-\end{figure}
-
-The input signal was generated to be Gaussian white noise since it has signal properties close to that of an sEMG signal, and is multiplied with a modulation that can be seen in the left subplot of figure \ref{fig:envelope_detection}. The envelope detection techniques are applied onto the input signal and the results are plotted in the right subplot of figure \ref{fig:envelope_detection}.
-
-\begin{figure}[h!t]
-	\begin{center}
-		\includegraphics[width=1.0\columnwidth]{images/envelope_detection.png}
-	\end{center}
-	\caption{Left: Input signal and 'true' envelope'. Right: Envelope detection using different techniques to illustrate difference in behaviour}
-	\label{fig:envelope_detection}
-\end{figure}
-
-To properly evaluate the performance of the envelope detection techniques each method has been tested individually across the range of variables that were described in the previous method section and plotted against the resulting lag and error. The graph describing the performance of the IIR Butterworth filter can be seen in figure \ref{fig:lagerror_iir}. The graph describing the performance of the moving average filter and the RMS filter can be seen in figure \ref{fig:lagerror_RMS_MA}.
+The graph describing the performance of the IIR Butterworth filter can be seen in figure \ref{fig:lagerror_iir}. The graph describing the performance of the moving average filter and the RMS filter can be seen in figure \ref{fig:lagerror_RMS_MA}.
 
 \begin{figure}[h!t]
 	\begin{center}
 		\includegraphics[width=1.0\columnwidth]{images/lagerror_iirfilter.png}
 	\end{center}
-	\caption{Lag and error of an IIR Butterworth filter for different cut-off frequencies and filter lengths. Note that filters with a lower cut-off frequency and high number of filter coefficients become unstable which can be seen in the error-graph for cut-off frequencies \SI{1}{\hertz}-\SI{3}{\hertz}. Additionally, the error in these graphs are all below 0.125. This is caused by the fact that the modulation is between 0 and 1, the error is <1 and the squared error is smaller still. So not the error value, but the \textit{relation between} = error values of different methods is the truly useful information here.}
+	\caption{Lag and error of an IIR Butterworth filter for different cut-off frequencies and filter lengths. Note that filters with a lower $f_{cut}$ and high number of filter coefficients become unstable which can be seen in the error-graph for cut-off frequencies \SI{1}{\hertz}-\SI{3}{\hertz}. Additionally, the error in these graphs are all below 0.125. This is caused by the fact that the modulation is between 0 and 1, the error is <1 and the squared error is smaller still. So not the error value, but the \textit{relation between} error values of different methods is the truly useful information here.}
 	\label{fig:lagerror_iir}
 \end{figure}
 
@@ -212,11 +225,14 @@ To properly evaluate the performance of the envelope detection techniques each m
 	\label{fig:lagerror_RMS_MA}
 \end{figure}
 
-\section{Force estimation}\label{section:force_estimation}
+From figure \ref{fig:lagerror_iir} it can be seen that an IIR LP Butterworth filter of length 3 and $f_{cut}$ of \SI{4}{\hertz} results in the lowest error. A filter with $f_{cut}$ of \SI{6}{\hertz} has the lowest lag but this is only marginally less than a $f_{cut}$ of \SI{4}{\hertz}. For this reason an IIR LP Butterworth filter of length 3 and $f_{cut}$ of \SI{4}{\hertz} is used in the the measurement section (\ref{sec:measurements}).
 
+From figure \ref{fig:lagerror_RMS_MA} it can be seen that moving average and RMS methods have similar lag, and the lag has a linear relation to the filter length. In the same figure it can also be seen that the error reaches a minimum at a filter length of 120. For this reason both the RMS and moving average method are applied with a filter length of 120.
+
+\section{Force estimation}\label{section:force_estimation}
 The measured sEMG signals from antagonistic muscles needs to be combined to form an estimate of the exerted force. Since this calculation is done in a consistent way throughout all measurements this section serves purely to provide some insight into the method of calculation.
 
-The previous step of envelope estimation is used to get a measure of muscle contraction. Exerted force around a joint is simply the difference between how much antagonistic contract. By measuring the sEMG from antagonistic muscles (such as bicep and triceps) and determining their envelope after processing, the estimated force is simply the difference between the two envelopes. However, this method does not directly result in an estimation of force but actually an estimation in the difference of muscle contraction. To correlate the difference in muscle contraction from antagonistic muscles to the exerted force, the muscle contraction needs to be scaled. As previously mentioned, a linear relation between sEMG and force will be assumed \cite{adaptive_filter_dry_electrode} \cite{interpreting_muscle_function_from_emg}. In figure \ref{fig:force_simulation} it is shown how the exerted force is estimated from simulated bicep and triceps sEMG. 
+The previous step of envelope estimation is used to get a measure of muscle activation. Since muscle activation leads to muscle contraction and exerted force around a joint is the difference between how much antagonistic contract \cite{human_robotics} it becomes possible to determine the force from sEMG. To correlate the difference in muscle contraction from antagonistic muscles (such as biceps and triceps) to the exerted force, the muscle contraction needs to be scaled. As previously mentioned, a linear relation between sEMG and force will be assumed \cite{adaptive_filter_dry_electrode} \cite{interpreting_muscle_function_from_emg}. In figure \ref{fig:force_simulation} it is shown how the exerted force is estimated from simulated bicep and triceps sEMG. 
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -225,4 +241,3 @@ The previous step of envelope estimation is used to get a measure of muscle cont
 	\caption{Process of estimating force from simulated sEMG (random Gaussian noise). The bicep envelope is calculated at the top, notice how during downwards force exertion the bicep still activates but to a lesser degree than during upwards force exertion. The same holds for the triceps in the bottom figure. The subplot on the right shows the envelope of the bicep, triceps, the difference between these two (identical to estimated force assuming linear scaling with factor 1), and the 'measured' force .}
 	\label{fig:force_simulation}
 \end{figure}
-
