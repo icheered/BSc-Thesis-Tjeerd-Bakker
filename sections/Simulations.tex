@@ -112,19 +112,19 @@ The number of Wiener filter coefficients have a strong influence on the performa
 
 
 \subsubsection{Adaptive filter}
-The functioning of an LMS filter has been described in the theory section. An LMS filter has two properties that determine its behaviour: The filter length and the convergence coefficient. To determine the best combination of these parameters when applied to sEMG signals a range of different values was tested. The results can be found in Figure~\ref{fig:lms_filter_windowsize}. For the measurement section (\ref{sec:measurements}) an LMS filter with length 500 and convergence value of 0.1 will be used.
+The functioning of an LMS filter has been described in the theory section \ref{sec:filters_theory}. An LMS filter has two properties that determine its behaviour: The filter length and the convergence coefficient. To determine the best combination of these parameters when applied to sEMG signals a range of different values was tested. The results can be found in Figure~\ref{fig:lms_filter_windowsize}. For the measurement section (\ref{sec:measurements}) an LMS filter with length 500 and convergence value of 0.1 will be used.
 
 \begin{figure}[h!t]
 	\begin{center}
 		\includegraphics[width=1.0\columnwidth]{images/lms_filter_windowsize.png}
 	\end{center}
-	\caption{SNR and bandwidth of an adaptive LMS filter using different combinations of filter length and convergence value. It should be noted that each signal has been smoothed using a Savitzky-Golay filter with a window length of 31 and a polynomial order of 3. This is done to make the difference in performance between different convergence values clearer as without filtering the signals have a larger deviation that makes the lines unreadable. The SNR peaks with a filter length of around 600 samples and a convergence value of 0.3. However, in the bandwidth plot this convergence value corresponds to the worst option. A convergence value of 0.1 with a filter length of 500 was chosen as this yields a good middle ground between SNR and bandwidth}
+	\caption{SNR and bandwidth of an adaptive LMS filter using different combinations of filter length and convergence value. It should be noted that each signal has been smoothed using a Savitzky-Golay filter with a window length of 31 and a polynomial order of 3. This is done to make the difference in performance between different convergence values clearer as without filtering the signals have a larger deviation that makes the lines unreadable. A higher convergence value seems to result in a better SNR. Furthermore it seems that increasing window length results to lower SNR (except for the convergence value of 0.3), but to slightly higher bandwidth. A convergence value of 0.1 with a filter length of 500 was chosen as this yields a good middle ground between SNR and bandwidth}
 	\label{fig:lms_filter_windowsize}
 \end{figure}
 
 
 \subsection{Results}
-A property that might be of interest is each filters performance in different levels of Maximum Voluntary Contraction (MVC). This allows for insight into how well each filter functions in different levels of signal compared to the environment noise. This was realized by keeping the noise constant, but scaling the signal to different levels (from 1-\SI{100}{\percent}) to simulate different levels of MVC. The SNR of the filtered signal and filtered noise was divided by the reference SNR (SNR of input signal and input noise) to be able to draw a clear conclusion about the filters performance.
+A property that might be of interest is each filters performance in different levels of Maximum Voluntary Contraction (MVC). This allows for insight into how well each filter functions in different levels of signal compared to the environment noise. This was realized by keeping the noise constant, but scaling the signal to different levels (from 1-\SI{100}{\percent}) to simulate different levels of MVC. The SNR of the filtered signal and filtered noise was divided by the reference SNR (SNR of input signal and input noise) to be able to draw a clear conclusion about the filters performance. This has as effect that the unfiltered signal results in a horizontal line with the value of 1 as can be seen in \ref{fig:filter_snr_mvc}.
 
 \begin{figure}[h!t]
 	\begin{center}
