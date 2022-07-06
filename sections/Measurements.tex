@@ -136,6 +136,17 @@ In Figure~\ref{fig:result_all_lagerrorscaling} it can be seen that whitening int
 	\label{fig:result_envelopes}
 \end{figure}
 
+\begin{figure}[h!t]
+	\begin{center}
+		\includegraphics[width=1.0\columnwidth]{images/lms_filter_spectogram.png}
+	\end{center}
+	\caption{The frequency response of the adaptive LMS filter over time. It can be seen that lower frequencies are attenuated, as well as a constantly present signal around \SI{60}{\hertz} and one at \SI{100}{\hertz}. Very faintly it can also be seen that around \SI{150}{\hertz} and \SI{200}{\hertz} the frequencies are attenuated, it is expected that these are the harmonic overtones of nearby power lines.}
+	\label{fig:lms_filter_spectogram}
+\end{figure}
+\FloatBarrier
+Figure~\ref{fig:lms_filter_spectogram} shows the adapting frequency response of the LMS filter. Comparing this spectrogram with the raw measurements as seen in Figure~\ref{fig:measurement_1k} the connection can be made between muscle contractions (starting at \SI{10}{s}) and the filter coefficients adjusting.
+
+
 
 \section{Conclusion}
 Figure~\ref{fig:result_all_lagerrorscaling} shows the results that allow comparing different signal processing chains. Furthermore the individual processing steps have been compared in the time and frequency domain to show any notable characteristics. Further observations are made in the Discussion section \ref{sec:discussion} and compared to expectations made after the simulations.

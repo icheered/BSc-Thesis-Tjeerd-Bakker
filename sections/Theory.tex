@@ -195,34 +195,36 @@ Since the error $e(n)$ equals $d(n) - wx(n)$ this can be filled into the equatio
 
 To find $w$ that minimizes the MSE we can take the derivative of MSE with respect to $w$ for every sample $n$
 \begin{equation}
-    \frac{\delta J}{\delta w} = 2\left(d(n) - wx(n)\right) \frac{\delta\left(d(n) - wx(n)\right)}{\delta w} = -2e(n)x(n)
+    \frac{\partial J}{\partial w} = 2\left(d(n) - wx(n)\right) \frac{\partial\left(d(n) - wx(n)\right)}{\partial w} = -2e(n)x(n)
 \end{equation}
 This results in the following weight-adjusting algorithm
 \begin{align}
-    \textrm{w(n+1)}&=\left.w(n)-\mu \frac{\delta J}{\delta w}\right\rvert_\text{\textrm{w(n)}} \\
+    w(n+1) &=\left.w(n)-\mu \frac{\partial J}{\partial w}\right\rvert_\text{w(n)} \\
     &= w(n) + 2 \mu e(n)x(n)
 \end{align}
 
 
 This algorithm is implemented by performing the following steps. \\
-The estimated value for signal+noise is computed from the filter and noise
-\begin{equation}\label{eq:adaptive1}
-    \hat{x}_n = w(n)\cdot y(n)
-\end{equation}
-The error is calculated by taking the difference between the expected signal+noise value and the measured signal+noise value.
-\begin{equation}\label{eq:adaptive2}
-    e(n) = x(n) - \hat{x}_n
-\end{equation}
-The coefficients are calculated for the next iteration
-\begin{equation}\label{eq:adaptive3}
-    w(n+1) = w(n) + 2 \mu e(n) x(n)
-\end{equation}
+\begin{enumerate}
+    \item The estimated value for signal+noise is computed from the filter and noise
+    \begin{equation}\label{eq:adaptive1}
+        \hat{x}_n = w(n)\cdot y(n)
+    \end{equation}
+        \item The error is calculated by taking the difference between the expected signal+noise value and the measured signal+noise value.
+    \begin{equation}\label{eq:adaptive2}
+        e(n) = x(n) - \hat{x}_n
+    \end{equation}
+    \item The coefficients are calculated for the next iteration
+    \begin{equation}\label{eq:adaptive3}
+        w(n+1) = w(n) + 2 \mu e(n) x(n)
+    \end{equation}
+\end{enumerate}
 
 The steps in equations \ref{eq:adaptive1}-\ref{eq:adaptive3} are repeated for every next sample.
 
 In the presented equations a constant $\mu$ is present; this is called the convergence coefficient. Determining the value of the convergence coefficient $\mu$ is a double-edged sword. On the one hand it determines how fast the gradient descent is traversed, and thus how fast the filter coefficients converge to the optimal filter coefficients. Ideally this happens as fast as possible, and thus the convergence coefficient must be as large as possible. On the other hand it was previously mentioned that the filter coefficients will never reach the optimal filter coefficients but instead oscillate around this value. The convergence coefficient also determines how large this oscillatory behaviour is, and thus to achieve an accurate estimation of the optimal filter the convergence factor should be as small as possible. 
 
-A problem presented by the basic LMS algorithm is that scaling the input also results in scaling the error term calculated in Equation~\ref{eq:adaptive2}. This makes it difficult (if not impossible) to find a convergence factor that functions across a wide range of possible scaled inputs. A solution to this problem is found in the work of Haykin \cite{adaptive_filter_theory} in the form of the Normalized LMS filter. This normalizes the power of the input signal before multiplying the input with the error and convergence factor. This is done by dividing the input signal with the  dot product of the input signal with itself. It turns Equation~\ref{eq:adaptive3} into Equation~\ref{eq:adaptive4} \cite{adaptive_filter_theory}. It should be noted that since the filter coefficients are updated over time, the final result of the coefficients are only the approximation of the optimal coefficients that correspond to the last part of the signal. This holds true especially for non-stationary signals. Purely for completeness the final result of an LMS filter has been given in Figure~\ref{lms_filter_response}.
+A problem presented by the basic LMS algorithm is that scaling the input also results in scaling the error term calculated in Equation~\ref{eq:adaptive2}. This makes it difficult (if not impossible) to find a convergence factor that functions across a wide range of possible scaled inputs. A solution to this problem is found in the work of Haykin \cite{adaptive_filter_theory} in the form of the Normalized LMS filter. This normalizes the power of the input signal before multiplying the input with the error and convergence factor. This is done by dividing the input signal with the  dot product of the input signal with itself. It turns Equation~\ref{eq:adaptive3} into Equation~\ref{eq:adaptive4} \cite{adaptive_filter_theory}. It should be noted that since the filter coefficients are updated over time, the final result of the coefficients are only the approximation of the optimal coefficients that correspond to the last part of the signal. This holds true especially for non-stationary signals. Purely for completeness the final result of an LMS filter has been given in Figure~\ref{fig:lms_filter_response}.
 
 \begin{equation}\label{eq:adaptive4}
     w(n+1) = w(n) + 2 \mu e(n)  \frac{x(n)}{x(n) \cdot x(n)}
@@ -243,9 +245,9 @@ Another subdivision within filter design is concerned with the type of possible 
 
 The previously discussed filters were all described as Finite Impulse Response (FIR) filters. This means that the output is the result of multiplying the filter coefficients with the input. This type of filter is always stable and the output can never go to infinity as long as the input does not go to infinity.
 
-An Infinite Impulse Response filter calculates the output using two sets of filter coefficients. The first set of filter coefficients is used to multiply with the input just like a FIR filter, but the second set of filter coefficients is used to multiply with previous \textit{outputs}. This means that there is now a feedback loop in the system, and a system with feedback can become unstable. Unstable in this case means that there is a possibility of positive feedback loop where increasing output values result in future output values also increasing, eventually going to infinity. Even though this feedback and possible instability may sound like a downside, it also results in shorter filter length and thus fewer computations required per filter operation. This could especially provide beneficial in low memory and low compute power environments like in prostheses \cite{fir_vs_iir}.
+An Infinite Impulse Response filter calculates the output using two sets of filter coefficients. The first set of filter coefficients is used to multiply the input with just like an FIR filter, but the second set of filter coefficients is used to multiply the previous \textit{outputs} with. This means that there is now a feedback loop in the system, and a system with feedback can become unstable. Unstable in this case means that there is a possibility of positive feedback loops where increasing output values result in future output values also increasing, eventually going to infinity. Even though this feedback and possible instability may sound like a downside, it also results in shorter filter length and thus fewer computations required per filter operation. This could especially turn out to be beneficial in low memory and low compute power environments like in prostheses \cite{fir_vs_iir}.
 
-Both static and adaptive filters can be implemented as both FIR or IIR filters. An adaptive IIR filter offers the potential to meet desired performance levels with much less computational complexity. However, the possibility for the system to become unstable combined with the fact that filter coefficients are adjusted automatically leads to a high-risk high-reward scenario due to a loss of control and hard to predict behaviour \cite{digital_signal_processing_handbook}.
+Both static and adaptive filters can be implemented as either FIR or IIR filters. An adaptive IIR filter offers the potential to meet desired performance levels with much less computational complexity. However, the possibility for the system to become unstable combined with the fact that filter coefficients are adjusted automatically leads to a high-risk high-reward scenario due to a loss of control and hard to predict behaviour \cite{digital_signal_processing_handbook}.
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -257,7 +259,7 @@ Both static and adaptive filters can be implemented as both FIR or IIR filters. 
 
 
 \section{Pre-whitening}
-During literature research it was noticed that it was not uncommon for literature to mention something along the lines of "including a temporal whitening filter [...] improves the performance of the amplitude estimate" \cite{single_site_emg_amplitude_estimation,adaptive_whitening,emg_whitening}. However, an intuitive explanation of \textit{why} whitening works was consistently lacking. So to understand the reasoning behind whitening we need to take a short detour to the world of computer science and information theory.
+During literature research it was noticed that it was not uncommon in literature to mention something along the lines of "including a temporal whitening filter [...] improves the performance of the amplitude estimate" \cite{single_site_emg_amplitude_estimation,adaptive_whitening,emg_whitening}. However, an intuitive explanation of \textit{why} whitening works was consistently lacking. So to understand the reasoning behind whitening we need to take a short detour to the world of computer science and information theory.
 
 Back in 1948 a mathematician, electrical engineer, and cryptographer named C.E. Shannon published a pioneering paper that formed the basis of information theory \cite{shannon}. In this paper it is shown that repetition does not carry information, and that the maximum information transfer occurs when a signal is truly random. Imagine a signal with only a single frequency component. After measuring a few samples of the signal the conclusion is drawn that this is a \SI{50}{\hertz} signal. Since it is possible to predict the value of every future measurement of the signal after drawing this conclusion it becomes unnecessary to continue measuring the signal because it will not give any new information. A repeating pattern is predictable, and predictable events carry no information.
 
@@ -275,9 +277,9 @@ To summarize: Whitening reduces the power of repeating frequencies and increase 
 
 \begin{figure}[h!t]
 	\begin{center}
-		\includegraphics[width=1.0\columnwidth]{images/prewhitening_example.jpg}
+		\includegraphics[width=0.7\columnwidth]{images/prewhitening_example.jpg}
 	\end{center}
-	\caption{An example of whitening a signal. The indicated peak contains the 'random' signal of interest. By whitening the powerful lower frequencies it is possible to give the information-carrying peak more presence on the signal \cite{time_series_analysis_methods}}
+	\caption{An example of whitening a signal. The indicated peak contains the 'random' signal of interest. By whitening the powerful lower frequencies it is possible to give the information-carrying peak more presence on the signal \cite{time_series_analysis_methods}. The focus with this figure should lie with the change in shape of the frequency spectrum, the actual represented data is irrelevant.}
 	\label{fig:whitening_example}
 \end{figure}
 
@@ -302,12 +304,12 @@ To summarize: Whitening reduces the power of repeating frequencies and increase 
 
 The relation between the amplitude of a measured sEMG signal, the degree of contraction of a skeletal muscle and the exerted force is very complicated. However, the relationship between force and EMG amplitude during isometric contractions is usually linear or close to linear  \cite{interpreting_muscle_function_from_emg} \cite{adaptive_filter_dry_electrode}. This is the reason that in this report it is assumed that there exists a linear relation between force and sEMG signals.
 
-Since the raw EMG signal consists of stochastic and unpredictable noise it is difficult to draw conclusions about the degree of muscle contraction when solely looking at individual samples \cite{semg_signals_analysis_and_applications}. By drawing an outline of the peaks of the signal a much more informative picture can be drawn. This is called an envelope and an illustration of this process can be found in Figure~\ref{fig:envelope_wikipedia}. In the case of more random sEMG signals it is preferred to perform full wave rectification on the signal before calculating the envelope so that all of the signal energy is taken into account \cite{semg_signals_analysis_and_applications}. Applying this concept to an sEMG signal can be found in Figure~\ref{fig:amplitude_estimation_example}.
+Since the raw EMG signal consists of stochastic and unpredictable noise it is difficult to draw conclusions about the degree of muscle contraction when solely looking at individual samples \cite{semg_signals_analysis_and_applications}. By drawing an outline of the peaks of the signal a much more informative picture can be drawn. This is called an envelope and an illustration of this process can be found in Figure~\ref{fig:envelope_wikipedia}. In the case of more random sEMG signals it is preferred to perform full wave rectification on the signal before calculating the envelope so that all of the signal energy is taken into account \cite{semg_signals_analysis_and_applications}. Applying this concept to an sEMG signal is illustrated in Figure~\ref{fig:amplitude_estimation_example}.
 
-Computationally envelope detection can be achieved in a number of different methods where "speed", or how much the detected envelope lags behind the true signal envelope, is traded against accuracy or noisiness \cite{dsp_good_bad_ugly}. A few different envelope detection techniques are discussed in \cite{rose2011electromyogram}.
+Computationally envelope detection can be achieved in a number of different methods where "speed", or how much the detected envelope lags behind the true signal envelope, is traded against accuracy or noisiness \cite{dsp_good_bad_ugly}.
 
 \subsection{Moving average}
-A moving average filter is a special type of FIR filter with coefficients that all have the value of $\frac{1}{n}$ where $n$ is the number of samples over which the average is taken. Thus the value of every smoothed sample is calculated to be the average of the previous $n$ samples. The upside of a moving average filter is that it introduces no phase distortion \cite{fir_filter_properties}, is very simple to implement, and require only addition to apply which is much faster than multiplication \cite{smith_moving_average_filters}. An illustration of the phase shift of a moving average filter is shown in Figure~\ref{fig:movingaverage_phaseshift}. An intuitive downside of a moving average filter is that its output lags behind the signal: a change in a static signal level is only properly reflected after $n$ samples. The sEMG signal must also be rectified before this method can be applied because EMG signal has approximately zero mean due to its oscillatory behaviour \cite{rose2011electromyogram}.
+The moving average filter used in this report is a special type of FIR filter with coefficients that all have the value of $\frac{1}{n}$ where $n$ is the number of samples over which the average is taken. Thus the value of every smoothed sample is calculated to be the average of the previous $n$ samples. The upside of a moving average filter is that it introduces no phase distortion \cite{fir_filter_properties}, is very simple to implement, and requires only additions to apply which is much faster than multiplication \cite{smith_moving_average_filters}. An illustration of the phase shift of a moving average filter is shown in Figure~\ref{fig:movingaverage_phaseshift}. An intuitive downside of a moving average filter is that its output lags behind the signal: a change in a static signal level is only properly reflected after $n$ samples. The sEMG signal must also be rectified before this method can be applied because EMG signal is of stochastic nature with zero mean \cite{rose2011electromyogram}.
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -351,4 +353,4 @@ A conventional static real-time sEMG signal processing chain is described in \ci
 This signal processing chain will also be tested in this report and compared to alternative techniques.
 
 \section{Conclusion}
-In this theory section the required background information is given to understand the simulations, measurements, and conclusions that will be drawn in this report. For each processing step, multiple processing methods have been discussed all of which can be seen in Figure~\ref{fig:global_thesis_flowchart}, and information about the relevant parameters has been given. For the Wiener filter and the adaptive LMS filter a mathematical derivation is presented.
+In this theory section the required background information is given to understand the simulations, measurements, and conclusions that are discussed in this report. For each processing step, multiple processing methods have been discussed all of which can be seen in Figure~\ref{fig:global_thesis_flowchart}, and information about the relevant parameters has been given. For the Wiener filter and the adaptive LMS filter a mathematical derivation is presented.
