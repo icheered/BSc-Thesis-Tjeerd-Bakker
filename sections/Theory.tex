@@ -94,7 +94,7 @@ Analog signals and filters are conventionally presented as a continuous function
 \subsection{Static filters, Wiener filter, Adaptive filters}\label{sec:filters_theory}
 The main difference between the different presented filter types is the way of calculating the filter coefficients. If a filter is static (e.g. high-pass, low-pass, band-pass, or band-stop) it simply means that the number of filter coefficients and the values of the filter coefficients are predetermined. These filters are very popular due to their simplicity in terms of finding the value of the filter coefficients. 
 
-A Wiener filter aims to produce an estimate of a target process by linear time-invariant filtering of a noisy signal using knowledge of the spectrum of the stationary noise and target process assuming additive noise \cite{wiki:Wiener_filter,lecture_adaptive_filters_1}. Figure~\ref{fig:wiener_filter_diagram} shows the use of a Wiener filter. It is assumed that the noise component $v(n)$ is correlated to the noise component in the input signal in input $d(n)$ and uncorrelated to the desired signal $s(n)$. The Wiener filter coefficients aim to minimize the correlated signals, leaving only the desired signal as the 'error'. It is the optimal solution in terms of mean square error to statically filtering additive noise from a signal. The filter is constructed from the cross-correlation between an input sample and a noise sample, and the auto-correlation of the noise sample.
+A Wiener filter aims to produce an estimate of a target process by linear time-invariant filtering of a noisy signal using knowledge of the spectrum of the stationary noise and target process assuming additive noise \cite{wiki:Wiener_filter,lecture_adaptive_filters_1}. Figure~\ref{fig:wiener_filter_diagram} shows the use of a Wiener filter. It is assumed that the noise component $v(n)$ is correlated to the noise component in the input signal in input $d(n)$ and uncorrelated to the desired signal $s(n)$. The Wiener filter coefficients aim to minimize the correlated signals, leaving only the desired signal as the 'error'. It is the optimal solution in terms of mean square error to statically filtering additive noise from a signal. The filter can either be constructed from the cross-correlation between an input sample and a noise sample, and the auto-correlation of the noise sample, or directly from the frequency contents of the signal+noise and noise signals as seen in Equation~\ref{eq:wiener_filter_frequency_behaviour}.
 
 \begin{figure}[h!t]
 	\begin{center}
@@ -143,19 +143,19 @@ A Wiener filter aims to produce an estimate of a target process by linear time-i
 
 
 % The mathematical derivation for finding the optimal filter coefficients is given in equations \ref{eq:start_wiener} to \ref{eq:end_wiener}. The conclusion is that the optimal filter coefficients are calculated by multiplying (dot-product) the inverse of the auto-correlation of signal+noise and the cross-correlation between signal+noise and noise. 
-In sEMG, the signal+noise is measured at the point of muscle contraction while the noise can be measured separately from a different body part that does not experience contraction. This separately measured noise has similar frequency characteristics as the noise included in the signal+noise as it experiences the same amplifier noise and environment noise. The resulting frequency domain definition of the optimal Wiener filter is defined in Equation~\ref{eq:wiener_filter_frequency_behaviour}\cite{stanford_wiener_filter}. $\Phi_\text{s}(z)$ reflects the frequency contents of signal+noise, and $\Phi_\text{v}(z)$ reflects the frequency contents of the noise.
+In sEMG, the signal+noise is measured at the point of muscle contraction while the noise can be measured separately from a different body part that does not experience contraction. This separately measured noise has similar frequency characteristics as the noise included in the signal+noise as it experiences the same amplifier noise and environment noise. The resulting frequency domain definition of the optimal Wiener filter is defined in Equation~\ref{eq:wiener_filter_frequency_behaviour}\cite{stanford_wiener_filter}. $D(z)$ reflects the frequency contents of signal+noise (input signal), $S(z)$ reflects the frequency contents of the signal, and $V(z)$ reflects the frequency contents of the noise.
 
 \begin{equation}
-    H_\text{opt}(z) = \frac{\Phi_\text{s}(z)}{\Phi_\text{s}(z) + \Phi_\text{v}(z)}
+    H_\text{opt}(z) = \frac{S(z)}{S(z) + V(z)} = \frac{D(z) - V(z)}{D(z)} 
     \label{eq:wiener_filter_frequency_behaviour}
 \end{equation}
 
 Assuming that the calculated Wiener filter approximates the optimal Wiener filter, multiplying the filter (in frequency domain) with the signal+noise input will result in an approximation of the signal as seen below.
 
 \begin{align}
-    \hat{\Phi}_\text{s}(z) & \ = \ \hat{H}_\text{opt}(z) \ \cdot \ \left(\Phi_\text{s}(z) + \Phi_\text{v}(z)\right) \label{eq:wiener_filter_frequency_application_1} \\
-    & \ = \ \frac{\hat{\Phi}_\text{s}(z)}{\hat{\Phi}_\text{s}(z) + \hat{\Phi}_\text{v}(z)} \ \cdot \ \left(\Phi_\text{s}(z) + \Phi_\text{v}(z)\right) \label{eq:wiener_filter_frequency_application_2}\\
-    & \ \approx \ \Phi_\text{s}(z) \label{eq:wiener_filter_frequency_application_3}
+    \hat{S}(z) & \ = \ \hat{H}_\text{opt}(z) \ \cdot \ \left(S(z) + V(z)\right) \label{eq:wiener_filter_frequency_application_1} \\
+    & \ = \ \frac{\hat{S}(z)}{\hat{S}(z) + \hat{V}(z)} \ \cdot \ \left(S(z) + V(z)\right) \label{eq:wiener_filter_frequency_application_2}\\
+    & \ \approx \ S(z) \label{eq:wiener_filter_frequency_application_3}
 \end{align}
 
 The Wiener filter requires both the signal and the noise to be stationary, i.e. the spectral density does not change over time, and results in a linear time-invariant filter \cite{stationary_processes_definition} \cite{difference_stationary_nonstationary}. If the signal and noise were not stationary then the approximated frequency spectrum of signal+noise is not the same as the actual frequency spectrum of signal+noise which means they no longer cancel out in Equation~\ref{eq:wiener_filter_frequency_application_2} and Equation~\ref{eq:wiener_filter_frequency_application_3} no longer holds.
@@ -190,7 +190,7 @@ To calculate the expected value of the square of the error we would normally nee
 \end{equation}
 Since the error $e(n)$ equals $d(n) - wx(n)$ this can be filled into the equation
 \begin{equation}
-    E(d(n) - wx(n))^2) \sim (d(n) - wx(n))^2
+    E \left( \left(d(n) - wx(n)\right)^2 \right) \sim \left(d(n) - wx(n)\right)^2
 \end{equation}
 
 To find $w$ that minimizes the MSE we can take the derivative of MSE with respect to $w$ for every sample $n$
